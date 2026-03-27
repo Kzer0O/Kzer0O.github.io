@@ -48,6 +48,10 @@ Breaking boxes. Writing it up. Sharing the knowledge."""
       url = "/posts/"
 
     [[params.profileMode.buttons]]
+      name = "Cheatsheets"
+      url = "/cheatsheets/"
+
+    [[params.profileMode.buttons]]
       name = "Tags"
       url = "/tags/"
 
@@ -110,6 +114,12 @@ Breaking boxes. Writing it up. Sharing the knowledge."""
   name = "Writeups"
   url = "/posts/"
   weight = 10
+
+[[menu.main]]
+  identifier = "cheatsheets"
+  name = "Cheatsheets"
+  url = "/cheatsheets/"
+  weight = 15
 
 [[menu.main]]
   identifier = "tags"
