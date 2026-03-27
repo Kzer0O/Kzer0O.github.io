@@ -9,22 +9,24 @@
     </pattern>
   </defs>
   <rect width="1200" height="300" fill="url(#bg)"/>
-  <rect width="1200" height="300" fill="url(#grid)" opacity="0.5"/>
-  <line x1="0" y1="4" x2="1200" y2="4" stroke="#00ff41" stroke-width="4"/>
-  <line x1="0" y1="296" x2="1200" y2="296" stroke="#00ff41" stroke-width="4"/>
-  <!-- Terminal icon -->
-  <g transform="translate(70, 90)">
-    <rect x="0" y="0" width="120" height="90" rx="8" fill="none" stroke="#00ff41" stroke-width="2" opacity="0.4"/>
-    <text x="15" y="35" font-family="'Courier New', monospace" font-size="18" fill="#00ff41" opacity="0.5">$_</text>
-    <line x1="15" y1="50" x2="85" y2="50" stroke="#00ff41" stroke-width="1" opacity="0.3"/>
-    <line x1="15" y1="65" x2="65" y2="65" stroke="#00ff41" stroke-width="1" opacity="0.3"/>
+  <rect width="1200" height="300" fill="url(#grid)" opacity="0.4"/>
+  <line x1="0" y1="3" x2="1200" y2="3" stroke="#00ff41" stroke-width="3"/>
+  <line x1="0" y1="297" x2="1200" y2="297" stroke="#00ff41" stroke-width="3"/>
+  <g transform="translate(70, 70)" opacity="0.2">
+    <rect x="0" y="0" width="130" height="95" rx="8" fill="none" stroke="#00ff41" stroke-width="3"/>
+    <rect x="0" y="0" width="130" height="22" rx="8" fill="#21262d"/>
+    <circle cx="14" cy="11" r="4" fill="#ff5f57"/>
+    <circle cx="28" cy="11" r="4" fill="#febc2e"/>
+    <circle cx="42" cy="11" r="4" fill="#28c840"/>
+    <text x="15" y="52" font-family="monospace" font-size="16" fill="#00ff41">$ _</text>
+    <text x="15" y="75" font-family="monospace" font-size="13" fill="#8b949e">root@ctf</text>
   </g>
-  <text x="600" y="120" font-family="'Courier New', monospace" font-size="16" fill="#8b949e" text-anchor="middle" letter-spacing="4">KEYLL0GER</text>
-  <text x="600" y="175" font-family="'Courier New', monospace" font-size="48" fill="#c9d1d9" text-anchor="middle" font-weight="bold">CHEATSHEET</text>
-  <rect x="470" y="200" width="260" height="40" rx="6" fill="none" stroke="#00ff41" stroke-width="2"/>
-  <text x="600" y="227" font-family="'Courier New', monospace" font-size="20" fill="#00ff41" text-anchor="middle" font-weight="bold">QUICK REFERENCE</text>
-  <path d="M 20 30 L 20 15 L 35 15" fill="none" stroke="#00ff41" stroke-width="2" opacity="0.6"/>
-  <path d="M 1180 30 L 1180 15 L 1165 15" fill="none" stroke="#00ff41" stroke-width="2" opacity="0.6"/>
-  <path d="M 20 270 L 20 285 L 35 285" fill="none" stroke="#00ff41" stroke-width="2" opacity="0.6"/>
-  <path d="M 1180 270 L 1180 285 L 1165 285" fill="none" stroke="#00ff41" stroke-width="2" opacity="0.6"/>
+  <text x="600" y="110" font-family="'Courier New', monospace" font-size="14" fill="#8b949e" text-anchor="middle" letter-spacing="6">OFFENSIVE SECURITY</text>
+  <text x="600" y="165" font-family="'Courier New', monospace" font-size="52" fill="#e6edf3" text-anchor="middle" font-weight="bold">CHEATSHEET</text>
+  <rect x="460" y="195" width="280" height="42" rx="4" fill="none" stroke="#00ff41" stroke-width="2"/>
+  <text x="600" y="223" font-family="'Courier New', monospace" font-size="20" fill="#00ff41" text-anchor="middle" font-weight="bold" letter-spacing="3">RED TEAM</text>
+  <path d="M 20 28 L 20 14 L 34 14" fill="none" stroke="#00ff41" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 1180 28 L 1180 14 L 1166 14" fill="none" stroke="#00ff41" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 20 272 L 20 286 L 34 286" fill="none" stroke="#00ff41" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 1180 272 L 1180 286 L 1166 286" fill="none" stroke="#00ff41" stroke-width="1.5" opacity="0.5"/>
 </svg>

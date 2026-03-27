@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#161b22"/>
+    </linearGradient>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#21262d" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="300" fill="url(#bg)"/>
+  <rect width="1200" height="300" fill="url(#grid)" opacity="0.4"/>
+  <line x1="0" y1="3" x2="1200" y2="3" stroke="#22c55e" stroke-width="3"/>
+  <line x1="0" y1="297" x2="1200" y2="297" stroke="#22c55e" stroke-width="3"/>
+  <!-- HTB hex left -->
+  <g transform="translate(40, 100)" opacity="0.12">
+    <polygon points="50,0 93,25 93,75 50,100 7,75 7,25" fill="none" stroke="#9fef00" stroke-width="2.5"/>
+    <text x="50" y="58" font-family="monospace" font-size="24" fill="#9fef00" text-anchor="middle" font-weight="bold">HTB</text>
+  </g>
+  <g transform="translate(1055, 55)" opacity="0.18">
+    <ellipse cx="42" cy="82" rx="36" ry="42" fill="#e6edf3"/>
+    <ellipse cx="42" cy="42" rx="30" ry="32" fill="#2d333b"/>
+    <ellipse cx="42" cy="46" rx="24" ry="22" fill="#e6edf3"/>
+    <circle cx="32" cy="38" r="4.5" fill="#fff"/><circle cx="32" cy="38" r="2" fill="#000"/>
+    <circle cx="52" cy="38" r="4.5" fill="#fff"/><circle cx="52" cy="38" r="2" fill="#000"/>
+    <ellipse cx="42" cy="50" rx="5" ry="3" fill="#f59e0b"/>
+    <path d="M37 50 L42 56 L47 50" fill="#f59e0b"/>
+  </g>
+  <!-- Machine name -->
+  <text x="600" y="100" font-family="'Courier New', monospace" font-size="14" fill="#8b949e" text-anchor="middle" letter-spacing="6">HACK THE BOX</text>
+  <text x="600" y="170" font-family="'Courier New', monospace" font-size="60" fill="#e6edf3" text-anchor="middle" font-weight="bold" letter-spacing="4">LINKVORTEX</text>
+  <!-- Difficulty badge -->
+  <rect x="440" y="200" width="320" height="42" rx="4" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <text x="600" y="228" font-family="'Courier New', monospace" font-size="18" fill="#22c55e" text-anchor="middle" font-weight="bold" letter-spacing="3">EASY // LINUX</text>
+  <!-- Corners -->
+  <path d="M 20 28 L 20 14 L 34 14" fill="none" stroke="#22c55e" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 1180 28 L 1180 14 L 1166 14" fill="none" stroke="#22c55e" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 20 272 L 20 286 L 34 286" fill="none" stroke="#22c55e" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 1180 272 L 1180 286 L 1166 286" fill="none" stroke="#22c55e" stroke-width="1.5" opacity="0.5"/>
+</svg>
