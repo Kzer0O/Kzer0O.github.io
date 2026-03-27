@@ -17,6 +17,11 @@ series:
 weight: 5
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/medium-linux.svg
+  alt: "medium linux writeup"
+  relative: false
 ---
 
 ![Imagery Banner](https://www.hackthebox.com/storage/avatars/imagery.png)

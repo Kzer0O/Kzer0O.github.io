@@ -19,6 +19,11 @@ series:
 weight: 3
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/medium-linux.svg
+  alt: "medium linux writeup"
+  relative: false
 ---
 
 > **OS:** Linux | **Difficulté:** Medium | **IP:** 10.129.15.16

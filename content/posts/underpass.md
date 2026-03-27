@@ -17,6 +17,11 @@ series:
 weight: 20
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/easy-linux.svg
+  alt: "easy linux writeup"
+  relative: false
 ---
 
 ```bash

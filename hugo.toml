@@ -32,16 +32,21 @@ buildExpired = false
   comments = false
   DateFormat = "2 January 2006"
 
+  [params.label]
+    text = "keyll0ger_"
+    icon = "/images/logo.svg"
+    iconHeight = 40
+
   [params.profileMode]
     enabled = true
     title = "keyll0ger_"
     subtitle = """Offensive Security Enthusiast | CTF Player | CRTA Certified
 
 Breaking boxes. Writing it up. Sharing the knowledge."""
-    imageUrl = ""
-    imageTitle = ""
-    imageWidth = 120
-    imageHeight = 120
+    imageUrl = "/images/logo.svg"
+    imageTitle = "keyll0ger"
+    imageWidth = 300
+    imageHeight = 60
 
     [[params.profileMode.buttons]]
       name = "Writeups"

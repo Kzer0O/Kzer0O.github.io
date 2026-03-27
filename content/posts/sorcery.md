@@ -24,6 +24,11 @@ series:
 weight: 1
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/insane-linux.svg
+  alt: "insane linux writeup"
+  relative: false
 ---
 
 ## Résumé

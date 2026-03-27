@@ -18,6 +18,11 @@ series:
 weight: 13
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/easy-windows.svg
+  alt: "easy windows writeup"
+  relative: false
 ---
 
 ![image](https://github.com/user-attachments/assets/1cf736dd-fac1-40c0-aba2-5c103d0076ca)

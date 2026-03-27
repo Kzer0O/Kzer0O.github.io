@@ -14,6 +14,11 @@ categories:
   - "WebAttacks"
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/cheatsheet.svg
+  alt: "cheatsheet"
+  relative: false
 ---
 
 ## Concept

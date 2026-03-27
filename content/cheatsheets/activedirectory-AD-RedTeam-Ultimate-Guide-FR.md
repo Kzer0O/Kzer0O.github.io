@@ -15,6 +15,11 @@ categories:
   - "ActiveDirectory"
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/cheatsheet.svg
+  alt: "cheatsheet"
+  relative: false
 ---
 
 > **Le guide définitif pour pentest et red team operations dans environnements Active Directory**  

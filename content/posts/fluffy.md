@@ -18,6 +18,11 @@ series:
 weight: 4
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/medium-windows.svg
+  alt: "medium windows writeup"
+  relative: false
 ---
 
 ## 📋 Résumé Exécutif

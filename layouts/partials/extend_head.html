@@ -1,0 +1,28 @@
+{{ if .IsHome }}
+<canvas id="matrix-bg" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.06;pointer-events:none;"></canvas>
+<script>
+(function(){
+  var c=document.getElementById('matrix-bg'),ctx=c.getContext('2d');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  var chars='01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン<>{}[]=/\\|;:~`$'.split('');
+  var fs=14,cols=Math.floor(c.width/fs),drops=[];
+  for(var i=0;i<cols;i++)drops[i]=Math.floor(Math.random()*-100);
+  function draw(){
+    ctx.fillStyle='rgba(13,17,23,0.15)';
+    ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle='#00ff41';
+    ctx.font=fs+'px monospace';
+    for(var i=0;i<drops.length;i++){
+      if(drops[i]>0){
+        var t=chars[Math.floor(Math.random()*chars.length)];
+        ctx.fillText(t,i*fs,drops[i]*fs);
+      }
+      if(drops[i]*fs>c.height&&Math.random()>0.975)drops[i]=0;
+      drops[i]++;
+    }
+  }
+  setInterval(draw,50);
+})();
+</script>
+{{ end }}

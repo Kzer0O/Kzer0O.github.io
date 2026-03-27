@@ -18,6 +18,11 @@ series:
 weight: 19
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/easy-windows.svg
+  alt: "easy windows writeup"
+  relative: false
 ---
 
 ## 📋 Résumé Exécutif

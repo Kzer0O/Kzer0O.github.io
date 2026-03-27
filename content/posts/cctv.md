@@ -18,6 +18,11 @@ series:
 weight: 11
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/easy-linux.svg
+  alt: "easy linux writeup"
+  relative: false
 ---
 
 > **OS:** Ubuntu 24.04 | **Difficulté:** Easy | **IP:** 10.129.15.181

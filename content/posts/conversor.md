@@ -17,6 +17,11 @@ series:
 weight: 14
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/easy-linux.svg
+  alt: "easy linux writeup"
+  relative: false
 ---
 
 ![Difficulty: Medium](https://img.shields.io/badge/Difficulty-Medium-yellow)

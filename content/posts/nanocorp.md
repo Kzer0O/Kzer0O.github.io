@@ -17,6 +17,11 @@ series:
 weight: 6
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/medium-linux.svg
+  alt: "medium linux writeup"
+  relative: false
 ---
 
 ## 📋 Résumé Exécutif

@@ -1,9 +1,19 @@
-/* keyll0ger blog - custom styles */
+/* =============================================================
+   keyll0ger blog - cyber theme
+   ============================================================= */
 
-/* Accent color - cyber green */
+/* -- Variables -- */
 :root {
     --accent: #00ff41;
     --accent-dim: #00cc33;
+    --accent-glow: 0 0 10px rgba(0, 255, 65, 0.3), 0 0 20px rgba(0, 255, 65, 0.1);
+    --bg-deep: #0d1117;
+    --bg-card: #161b22;
+    --border: #21262d;
+    --border-light: #30363d;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --mono: 'Courier New', 'Fira Code', monospace;
 }
 
 .dark {
@@ -14,180 +24,537 @@
     --hljs-bg: #0d1117;
 }
 
-/* Profile title styling */
-.profile .profile_inner h1 {
-    font-family: 'Courier New', monospace;
+/* -- Global -- */
+body {
+    background: var(--bg-deep);
+}
+
+/* -- Scanline overlay on homepage -- */
+body.list-page::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 65, 0.008) 2px,
+        rgba(0, 255, 65, 0.008) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* =============================================================
+   HEADER / NAV - centered
+   ============================================================= */
+.nav {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+header .nav {
+    justify-content: center;
+}
+
+/* Logo in header */
+header .logo a {
+    font-family: var(--mono);
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: var(--accent) !important;
+    text-shadow: var(--accent-glow);
+    font-size: 1.3rem;
+}
+
+/* Centered nav links */
+#menu {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+}
+
+#menu li {
+    list-style: none;
+}
+
+#menu a {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    padding: 8px 16px;
+    color: var(--text-secondary);
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+#menu a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+    box-shadow: var(--accent-glow);
+}
+
+#menu a:hover,
+#menu a.active {
     color: var(--accent);
-    font-size: 2.5rem;
+}
+
+#menu a:hover::after,
+#menu a.active::after {
+    width: 60%;
+}
+
+/* =============================================================
+   PROFILE MODE (Homepage)
+   ============================================================= */
+.profile {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile .profile_inner h1 {
+    font-family: var(--mono);
+    color: var(--accent);
+    font-size: 3rem;
+    text-shadow: var(--accent-glow);
+    letter-spacing: 3px;
+    animation: flicker 4s infinite alternate;
+}
+
+@keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.8; }
+    97% { opacity: 1; }
+    98% { opacity: 0.6; }
+    99% { opacity: 1; }
 }
 
 .profile .profile_inner .tagline {
-    font-family: 'Courier New', monospace;
-    opacity: 0.85;
+    font-family: var(--mono);
+    opacity: 0.75;
+    font-size: 0.95rem;
+    line-height: 1.6;
 }
 
-/* Navigation buttons */
+/* Profile buttons */
 .profile .profile_inner .buttons a {
     border: 1px solid var(--accent-dim);
-    border-radius: 4px;
-    padding: 8px 20px;
-    transition: all 0.2s ease;
-    font-family: 'Courier New', monospace;
+    border-radius: 0;
+    padding: 10px 28px;
+    font-family: var(--mono);
     text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 1px;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    color: var(--accent);
+    background: transparent;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.profile .profile_inner .buttons a::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: var(--accent);
+    transition: left 0.3s ease;
+    z-index: -1;
 }
 
 .profile .profile_inner .buttons a:hover {
-    background: var(--accent);
     color: #000;
+    border-color: var(--accent);
+    box-shadow: var(--accent-glow);
 }
 
-/* Post list */
+.profile .profile_inner .buttons a:hover::before {
+    left: 0;
+}
+
+/* =============================================================
+   POST LIST
+   ============================================================= */
 .post-entry {
-    border: 1px solid #21262d;
-    border-radius: 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
     margin-bottom: 16px;
-    transition: border-color 0.2s ease;
+    background: var(--bg-card);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.post-entry::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--accent);
+    transition: height 0.3s ease;
 }
 
 .post-entry:hover {
     border-color: var(--accent-dim);
+    transform: translateX(4px);
+    box-shadow: -4px 0 0 var(--accent-dim);
+}
+
+.post-entry:hover::before {
+    height: 100%;
 }
 
 .post-entry .entry-header h2 {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+    font-family: var(--mono);
 }
 
-/* Tags */
+.post-entry .entry-content {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+/* Cover images in post list */
+.post-entry .entry-cover {
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
+}
+
+.post-entry .entry-cover img {
+    transition: opacity 0.3s ease;
+}
+
+.post-entry:hover .entry-cover img {
+    opacity: 0.85;
+}
+
+/* =============================================================
+   TAGS
+   ============================================================= */
 .post-tags a {
-    border: 1px solid #30363d;
-    border-radius: 3px;
-    padding: 2px 8px;
-    font-size: 0.75rem;
-    font-family: 'Courier New', monospace;
+    border: 1px solid var(--border-light);
+    border-radius: 0;
+    padding: 3px 10px;
+    font-size: 0.7rem;
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 1px;
     transition: all 0.2s ease;
+    color: var(--text-secondary);
 }
 
 .post-tags a:hover {
     border-color: var(--accent);
     color: var(--accent);
+    box-shadow: 0 0 8px rgba(0, 255, 65, 0.2);
 }
 
-/* Code blocks */
+/* Tag cloud page */
+.terms-tags a {
+    transition: all 0.2s ease;
+}
+
+.terms-tags a:hover {
+    color: var(--accent) !important;
+    text-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+}
+
+/* =============================================================
+   CODE BLOCKS
+   ============================================================= */
 .highlight {
-    border-radius: 8px;
-    border: 1px solid #21262d;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    position: relative;
+}
+
+.highlight::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0.5;
 }
 
 .highlight pre {
-    border-radius: 8px;
+    border-radius: 4px;
 }
 
 code {
     font-size: 0.9em;
 }
 
-/* Inline code */
 :not(pre) > code {
-    background: #161b22;
+    background: var(--bg-card);
     padding: 2px 6px;
-    border-radius: 4px;
+    border-radius: 2px;
     color: var(--accent);
     font-size: 0.85em;
+    border: 1px solid var(--border);
 }
 
-/* Table styling */
+/* =============================================================
+   TABLES
+   ============================================================= */
 table {
     border-collapse: collapse;
     width: 100%;
+    font-size: 0.9rem;
 }
 
 th {
-    background: #161b22;
-    border: 1px solid #30363d;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
     padding: 8px 12px;
     text-align: left;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
+    font-family: var(--mono);
+    font-size: 0.85rem;
     color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 td {
-    border: 1px solid #21262d;
+    border: 1px solid var(--border);
     padding: 8px 12px;
 }
 
-/* Blockquotes */
+/* =============================================================
+   BLOCKQUOTES
+   ============================================================= */
 blockquote {
     border-left: 3px solid var(--accent-dim);
-    background: #0d1117;
+    background: var(--bg-deep);
     padding: 12px 20px;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 4px 4px 0;
     font-style: italic;
     opacity: 0.9;
 }
 
-/* TOC */
+/* =============================================================
+   TOC
+   ============================================================= */
 .toc {
-    border: 1px solid #21262d;
-    border-radius: 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
     padding: 16px;
-    background: #0d1117;
+    background: var(--bg-deep);
 }
 
-/* Scrollbar */
+.toc a {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    transition: color 0.2s ease;
+}
+
+.toc a:hover {
+    color: var(--accent);
+}
+
+/* =============================================================
+   SCROLLBAR
+   ============================================================= */
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #0d1117;
+    background: var(--bg-deep);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #30363d;
-    border-radius: 4px;
+    background: var(--border-light);
+    border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-dim);
 }
 
-/* Header nav */
-nav.nav a {
-    font-family: 'Courier New', monospace;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-}
-
-/* Footer */
-.footer {
-    font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
-    opacity: 0.6;
-}
-
-/* Social icons */
+/* =============================================================
+   SOCIAL ICONS
+   ============================================================= */
 .social-icons a {
-    transition: transform 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .social-icons a:hover {
-    transform: scale(1.15);
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 6px rgba(0, 255, 65, 0.4));
 }
 
-/* Post content headings */
+.social-icons a svg {
+    fill: var(--text-secondary);
+    transition: fill 0.2s ease;
+}
+
+.social-icons a:hover svg {
+    fill: var(--accent);
+}
+
+/* =============================================================
+   POST CONTENT
+   ============================================================= */
+.post-content h1,
+.post-content h2,
+.post-content h3 {
+    font-family: var(--mono);
+}
+
 .post-content h2 {
-    border-bottom: 1px solid #21262d;
+    border-bottom: 1px solid var(--border);
     padding-bottom: 8px;
+    margin-top: 2.5rem;
+    color: var(--accent);
+}
+
+.post-content h3 {
+    color: var(--text-primary);
     margin-top: 2rem;
 }
 
-/* Difficulty badge styling in summaries */
-.post-entry .entry-content {
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-    opacity: 0.8;
+/* Links in content */
+.post-content a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--accent-dim);
+    transition: all 0.2s ease;
+}
+
+.post-content a:hover {
+    border-bottom-style: solid;
+    text-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+}
+
+/* =============================================================
+   BREADCRUMBS
+   ============================================================= */
+.breadcrumbs {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+}
+
+.breadcrumbs a {
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+}
+
+.breadcrumbs a:hover {
+    color: var(--accent);
+}
+
+/* =============================================================
+   FOOTER
+   ============================================================= */
+.footer {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    opacity: 0.5;
+    letter-spacing: 1px;
+}
+
+/* =============================================================
+   PAGINATION
+   ============================================================= */
+.pagination a {
+    font-family: var(--mono);
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+}
+
+.pagination a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* =============================================================
+   SEARCH
+   ============================================================= */
+#searchbox input {
+    font-family: var(--mono);
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    transition: border-color 0.3s ease;
+}
+
+#searchbox input:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.15);
+}
+
+/* =============================================================
+   POST HEADER - single page
+   ============================================================= */
+.post-header h1 {
+    font-family: var(--mono);
+    letter-spacing: 1px;
+}
+
+.post-meta {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+/* =============================================================
+   COVER IMAGE - single post
+   ============================================================= */
+.post-header .post-cover {
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+/* =============================================================
+   SELECTION
+   ============================================================= */
+::selection {
+    background: var(--accent);
+    color: #000;
+}
+
+/* =============================================================
+   ANIMATIONS - fade in on page load
+   ============================================================= */
+.main {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =============================================================
+   RESPONSIVE
+   ============================================================= */
+@media (max-width: 768px) {
+    .profile .profile_inner h1 {
+        font-size: 2rem;
+    }
+
+    #menu {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #menu a {
+        font-size: 0.7rem;
+        padding: 6px 10px;
+    }
 }

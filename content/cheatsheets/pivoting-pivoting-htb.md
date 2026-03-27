@@ -14,6 +14,11 @@ categories:
   - "Pivoting"
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/cheatsheet.svg
+  alt: "cheatsheet"
+  relative: false
 ---
 
 # Pivoting, Tunneling, and Port Forwarding  

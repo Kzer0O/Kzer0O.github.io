@@ -17,6 +17,11 @@ series:
 weight: 10
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/easy-linux.svg
+  alt: "easy linux writeup"
+  relative: false
 ---
 
 > **OS:** Debian 12 | **Difficulté:** Easy | **IP:** 10.129.244.106

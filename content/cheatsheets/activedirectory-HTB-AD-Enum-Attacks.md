@@ -15,6 +15,11 @@ categories:
   - "ActiveDirectory"
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/cheatsheet.svg
+  alt: "cheatsheet"
+  relative: false
 ---
 
 ![image](https://github.com/user-attachments/assets/ecc2ba67-6475-4534-bce4-e5336ae403bf)

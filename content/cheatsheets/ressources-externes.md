@@ -13,6 +13,11 @@ categories:
   - "General"
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/cheatsheet.svg
+  alt: "cheatsheet"
+  relative: false
 ---
 
 Link :

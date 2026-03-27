@@ -23,6 +23,11 @@ series:
 weight: 2
 ShowToc: true
 TocOpen: false
+
+cover:
+  image: /images/covers/hard-windows.svg
+  alt: "hard windows writeup"
+  relative: false
 ---
 
 > **OS:** Windows Server 2019 | **Difficulté:** Hard | **IP:** 10.129.15.19 | **Domain:** pirate.htb
