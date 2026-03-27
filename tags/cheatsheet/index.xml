@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Cheatsheet on keyll0ger</title>
+    <link>https://keyll0ger.github.io/tags/cheatsheet/</link>
+    <description>Recent content in Cheatsheet on keyll0ger</description>
+    <generator>Hugo -- 0.131.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://keyll0ger.github.io/tags/cheatsheet/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Active Directory - Advanced Attack Notes</title>
+      <link>https://keyll0ger.github.io/cheatsheets/activedirectory-ad-advanced-notes/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/activedirectory-ad-advanced-notes/</guid>
+      <description>**Auteur**: Nikhil Mittal (@nikhil_mitt) **Objectif**: Compromettre un environnement Active Directory complexe multi-forêts sans exploits</description>
+    </item>
+    <item>
+      <title>Active Directory Certificate Services (ADCS) Attacks</title>
+      <link>https://keyll0ger.github.io/cheatsheets/activedirectory-adcs-notes/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/activedirectory-adcs-notes/</guid>
+      <description>**Auteur**: Nikhil Mittal (@nikhil_mitt) - Altered Security **Objectif**: Comprendre AD CS et exécuter attacks contre setup Enterprise typique</description>
+    </item>
+    <item>
+      <title>Active Directory Red Team - Guide Complet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/activedirectory-ad-redteam-ultimate-guide-fr/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/activedirectory-ad-redteam-ultimate-guide-fr/</guid>
+      <description>Cheatsheet: Active Directory Red Team - Guide Complet</description>
+    </item>
+    <item>
+      <title>Active Directory Vulnerability Detection</title>
+      <link>https://keyll0ger.github.io/cheatsheets/activedirectory-detection_vulns_ad/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/activedirectory-detection_vulns_ad/</guid>
+      <description>Un attaquant face à un environnement AD suit une progression méthodique : 1. **Reconnaissance passive** (aucun cred) 2. **Reconnaissance active** (aucun cred mais interaction réseau)</description>
+    </item>
+    <item>
+      <title>Apache Kafka RCE via ProduceRequest</title>
+      <link>https://keyll0ger.github.io/cheatsheets/exploitation-kafka_rce/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/exploitation-kafka_rce/</guid>
+      <description>Cheatsheet: Apache Kafka RCE via ProduceRequest</description>
+    </item>
+    <item>
+      <title>Chisel Tunneling from Docker Containers</title>
+      <link>https://keyll0ger.github.io/cheatsheets/pivoting-chisel_docker/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/pivoting-chisel_docker/</guid>
+      <description>Cheatsheet: Chisel Tunneling from Docker Containers</description>
+    </item>
+    <item>
+      <title>Common Web Attacks Cheatsheet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/webattacks-common/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/webattacks-common/</guid>
+      <description>&amp;#39; OR 1=1-- &amp;#39; OR 1=1-- &amp;#39; OR &amp;#39;1&amp;#39;=&amp;#39;1 admin&amp;#39;-- &amp;#39; UNION SELECT 1,2,3-- &amp;#39; UNION SELECT null,table_name,null FROM information_schema.tables--</description>
+    </item>
+    <item>
+      <title>CRTA Certification - Cheatsheet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/activedirectory-crta-cheatsheet/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/activedirectory-crta-cheatsheet/</guid>
+      <description>![CRTA](img/icon.png) - [Bastion-Host (Jump-Server)](#bastion-host-jump-server) - [Automation Server](#automation-server)</description>
+    </item>
+    <item>
+      <title>CVE-2025-4517 - Python Tarfile Path Traversal</title>
+      <link>https://keyll0ger.github.io/cheatsheets/privesc-cve_2025_4517_tarfile/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/privesc-cve_2025_4517_tarfile/</guid>
+      <description>os.path.realpath() retourne un résultat tronqué quand la résolution de symlinks dépasse PATH_MAX (4096 bytes). Le filtre data de tarfile utilise realpath() pour vérifier les chemins → bypass.</description>
+    </item>
+    <item>
+      <title>CVE-2026-29000 - pac4j JWT Authentication Bypass</title>
+      <link>https://keyll0ger.github.io/cheatsheets/exploitation-cve_2026_29000_pac4j_jwt/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/exploitation-cve_2026_29000_pac4j_jwt/</guid>
+      <description>Cheatsheet: CVE-2026-29000 - pac4j JWT Authentication Bypass</description>
+    </item>
+    <item>
+      <title>DNS Hijack &amp; SSL Phishing Attack</title>
+      <link>https://keyll0ger.github.io/cheatsheets/webattacks-dns_hijack_phishing/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/webattacks-dns_hijack_phishing/</guid>
+      <description>Si on contrôle le DNS interne ET la clé privée du Root CA de l&amp;#39;organisation, on peut intercepter/usurper n&amp;#39;importe quel sous-domaine en HTTPS de manière &amp;#39;légitime&amp;#39; aux yeux des clients internes.</description>
+    </item>
+    <item>
+      <title>External Resources &amp; Tools Collection</title>
+      <link>https://keyll0ger.github.io/cheatsheets/ressources-externes/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/ressources-externes/</guid>
+      <description>Link : - https://github.com/0xn1k5/Red-Teaming.git - https://github.com/botesjuan/Burp-Suite-Certified-Practitioner-Exam-Study.git</description>
+    </item>
+    <item>
+      <title>File Transfer Techniques - All Platforms</title>
+      <link>https://keyll0ger.github.io/cheatsheets/networking-transfert_fichiers/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/networking-transfert_fichiers/</guid>
+      <description>Cheatsheet: File Transfer Techniques - All Platforms</description>
+    </item>
+    <item>
+      <title>FreeIPA Privilege Escalation</title>
+      <link>https://keyll0ger.github.io/cheatsheets/privesc-freeipa_privesc/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/privesc-freeipa_privesc/</guid>
+      <description>FreeIPA utilise des roles, privileges et permissions hiérarchiques. Un utilisateur peut avoir des &amp;#39;Indirect Memberships&amp;#39; via ses groupes, lui donnant des capacités insoupconnees. L&amp;#39;exploitation repose</description>
+    </item>
+    <item>
+      <title>HTB Academy - AD Enumeration &amp; Attacks</title>
+      <link>https://keyll0ger.github.io/cheatsheets/activedirectory-htb-ad-enum-attacks/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/activedirectory-htb-ad-enum-attacks/</guid>
+      <description>![image](https://github.com/user-attachments/assets/ecc2ba67-6475-4534-bce4-e5336ae403bf) https://www.ired.team/ 1. [Initial Enumeration](#initial-enumeration)</description>
+    </item>
+    <item>
+      <title>HTB Academy - Attacking Common Services</title>
+      <link>https://keyll0ger.github.io/cheatsheets/exploitation-attacking-common-services-htb/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/exploitation-attacking-common-services-htb/</guid>
+      <description>Cheatsheet: HTB Academy - Attacking Common Services</description>
+    </item>
+    <item>
+      <title>HTB Academy - Footprinting Cheatsheet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/enumeration-footprinting-htb/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/enumeration-footprinting-htb/</guid>
+      <description>Cheatsheet: HTB Academy - Footprinting Cheatsheet</description>
+    </item>
+    <item>
+      <title>HTB Academy - Pivoting &amp; Tunneling</title>
+      <link>https://keyll0ger.github.io/cheatsheets/pivoting-pivoting-htb/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/pivoting-pivoting-htb/</guid>
+      <description>1. [Introduction](#introduction) - Introduction to Pivoting, Tunneling, and Port Forwarding - The Networking Behind Pivoting</description>
+    </item>
+    <item>
+      <title>Kerberos Constrained Delegation &amp; SPN Hijacking</title>
+      <link>https://keyll0ger.github.io/cheatsheets/activedirectory-kcd_spn_hijacking/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/activedirectory-kcd_spn_hijacking/</guid>
+      <description>1. Un compte avec **Constrained Delegation** vers un SPN (ex: HTTP/WEB01.domain) 2. **WriteSPN** sur l&amp;#39;objet cible (ex: DC01$) - souvent via un groupe (IT, etc.)</description>
+    </item>
+    <item>
+      <title>Ligolo-ng Pivoting Cheatsheet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/pivoting-ligolo_ng/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/pivoting-ligolo_ng/</guid>
+      <description>sudo ip tuntap add user $(whoami) mode tun ligolo sudo ip link set ligolo up sudo ip route add 192.168.X.0/24 dev ligolo ./ligolo-ng_proxy -selfcert -laddr 0.0.0.0:11601</description>
+    </item>
+    <item>
+      <title>Linux Privilege Escalation Cheatsheet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/privesc-linux/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/privesc-linux/</guid>
+      <description>Cheatsheet: Linux Privilege Escalation Cheatsheet</description>
+    </item>
+    <item>
+      <title>MotionEye RCE Exploitation</title>
+      <link>https://keyll0ger.github.io/cheatsheets/exploitation-motioneye_rce/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/exploitation-motioneye_rce/</guid>
+      <description>Cheatsheet: MotionEye RCE Exploitation</description>
+    </item>
+    <item>
+      <title>Neo4j Cypher Injection</title>
+      <link>https://keyll0ger.github.io/cheatsheets/webattacks-cypher_injection/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/webattacks-cypher_injection/</guid>
+      <description>Similaire à SQL injection mais pour Neo4j (base de données graphe). Le langage de requête est Cypher. Si la requête originale est:</description>
+    </item>
+    <item>
+      <title>Next.js Server Actions Exploitation</title>
+      <link>https://keyll0ger.github.io/cheatsheets/webattacks-nextjs_server_actions/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/webattacks-nextjs_server_actions/</guid>
+      <description>Cheatsheet: Next.js Server Actions Exploitation</description>
+    </item>
+    <item>
+      <title>Nmap - Complete Scanning Cheatsheet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/enumeration-nmap/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/enumeration-nmap/</guid>
+      <description>Cheatsheet: Nmap - Complete Scanning Cheatsheet</description>
+    </item>
+    <item>
+      <title>NTLM Relay to LDAP - RBCD Attack</title>
+      <link>https://keyll0ger.github.io/cheatsheets/activedirectory-ntlm_relay_ldap/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/activedirectory-ntlm_relay_ldap/</guid>
+      <description>Cheatsheet: NTLM Relay to LDAP - RBCD Attack</description>
+    </item>
+    <item>
+      <title>Password Cracking - Hashcat &amp; John Cheatsheet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/passwordattacks-cracking/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/passwordattacks-cracking/</guid>
+      <description>Cheatsheet: Password Cracking - Hashcat &amp;amp; John Cheatsheet</description>
+    </item>
+    <item>
+      <title>Pre-Windows 2000 &amp; gMSA Password Exploitation</title>
+      <link>https://keyll0ger.github.io/cheatsheets/activedirectory-pre_win2000_gmsa/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/activedirectory-pre_win2000_gmsa/</guid>
+      <description>Cheatsheet: Pre-Windows 2000 &amp;amp; gMSA Password Exploitation</description>
+    </item>
+    <item>
+      <title>Process Monitoring for Credential Harvesting</title>
+      <link>https://keyll0ger.github.io/cheatsheets/privesc-proc_monitoring/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/privesc-proc_monitoring/</guid>
+      <description>Cheatsheet: Process Monitoring for Credential Harvesting</description>
+    </item>
+    <item>
+      <title>Reverse Shells - Complete Cheatsheet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/exploitation-reverse_shells/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/exploitation-reverse_shells/</guid>
+      <description>Cheatsheet: Reverse Shells - Complete Cheatsheet</description>
+    </item>
+    <item>
+      <title>Service Enumeration Cheatsheet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/enumeration-services/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/enumeration-services/</guid>
+      <description>Cheatsheet: Service Enumeration Cheatsheet</description>
+    </item>
+    <item>
+      <title>Sudoers Wildcard Bypass with Strace</title>
+      <link>https://keyll0ger.github.io/cheatsheets/privesc-sudoers_wildcard_bypass/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/privesc-sudoers_wildcard_bypass/</guid>
+      <description>Cheatsheet: Sudoers Wildcard Bypass with Strace</description>
+    </item>
+    <item>
+      <title>Web Enumeration Cheatsheet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/enumeration-web/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/enumeration-web/</guid>
+      <description>Cheatsheet: Web Enumeration Cheatsheet</description>
+    </item>
+    <item>
+      <title>WebAuthn/FIDO2 Passkey Forgery</title>
+      <link>https://keyll0ger.github.io/cheatsheets/webattacks-webauthn_passkey_forgery/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/webattacks-webauthn_passkey_forgery/</guid>
+      <description>Si une app utilise WebAuthn (FIDO2) et qu&amp;#39;on a un XSS dans le contexte d&amp;#39;un admin, on peut **enregistrer notre propre passkey** pour l&amp;#39;admin sans interaction utilisateur.</description>
+    </item>
+    <item>
+      <title>Windows Privilege Escalation Cheatsheet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/privesc-windows-htb/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/privesc-windows-htb/</guid>
+      <description>Introduction to Windows Privilege Escalation Une fois que nous avons obtenu un accès initial à un système, l&amp;#39;escalade de privilèges nous permettra de disposer de davantage d&amp;#39;options pour assurer notre</description>
+    </item>
+    <item>
+      <title>Wing FTP Server RCE</title>
+      <link>https://keyll0ger.github.io/cheatsheets/exploitation-wing_ftp_rce/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/exploitation-wing_ftp_rce/</guid>
+      <description>Cheatsheet: Wing FTP Server RCE</description>
+    </item>
+    <item>
+      <title>Xvfb Framebuffer Reading for Credential Theft</title>
+      <link>https://keyll0ger.github.io/cheatsheets/privesc-xvfb_framebuffer/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/privesc-xvfb_framebuffer/</guid>
+      <description>Cheatsheet: Xvfb Framebuffer Reading for Credential Theft</description>
+    </item>
+  </channel>
+</rss>

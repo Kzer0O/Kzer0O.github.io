@@ -16,6 +16,20 @@
       <description></description>
     </item>
     <item>
+      <title>Brute Force</title>
+      <link>https://keyll0ger.github.io/tags/brute-force/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/brute-force/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Cheatsheet</title>
+      <link>https://keyll0ger.github.io/tags/cheatsheet/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/cheatsheet/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Cypher Injection</title>
       <link>https://keyll0ger.github.io/tags/cypher-injection/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
@@ -37,10 +51,38 @@
       <description></description>
     </item>
     <item>
+      <title>Enumeration</title>
+      <link>https://keyll0ger.github.io/tags/enumeration/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/enumeration/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Exploitation</title>
+      <link>https://keyll0ger.github.io/tags/exploitation/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/exploitation/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>File Transfer</title>
+      <link>https://keyll0ger.github.io/tags/file-transfer/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/file-transfer/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>FreeIPA</title>
       <link>https://keyll0ger.github.io/tags/freeipa/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/tags/freeipa/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>General</title>
+      <link>https://keyll0ger.github.io/tags/general/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/general/</guid>
       <description></description>
     </item>
     <item>
@@ -114,10 +156,31 @@
       <description></description>
     </item>
     <item>
+      <title>Networking</title>
+      <link>https://keyll0ger.github.io/tags/networking/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/networking/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>NTLM Relay</title>
       <link>https://keyll0ger.github.io/tags/ntlm-relay/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/tags/ntlm-relay/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>OWASP</title>
+      <link>https://keyll0ger.github.io/tags/owasp/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/owasp/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Password Cracking</title>
+      <link>https://keyll0ger.github.io/tags/password-cracking/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/password-cracking/</guid>
       <description></description>
     </item>
     <item>
@@ -128,10 +191,45 @@
       <description></description>
     </item>
     <item>
+      <title>Pivoting</title>
+      <link>https://keyll0ger.github.io/tags/pivoting/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/pivoting/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Privilege Escalation</title>
+      <link>https://keyll0ger.github.io/tags/privilege-escalation/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/privilege-escalation/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>RBCD</title>
       <link>https://keyll0ger.github.io/tags/rbcd/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/tags/rbcd/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>RCE</title>
+      <link>https://keyll0ger.github.io/tags/rce/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/rce/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Recon</title>
+      <link>https://keyll0ger.github.io/tags/recon/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/recon/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Red Team</title>
+      <link>https://keyll0ger.github.io/tags/red-team/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/red-team/</guid>
       <description></description>
     </item>
     <item>
@@ -153,6 +251,20 @@
       <link>https://keyll0ger.github.io/tags/sssd/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/tags/sssd/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Tunneling</title>
+      <link>https://keyll0ger.github.io/tags/tunneling/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/tunneling/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Web</title>
+      <link>https://keyll0ger.github.io/tags/web/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/tags/web/</guid>
       <description></description>
     </item>
     <item>
