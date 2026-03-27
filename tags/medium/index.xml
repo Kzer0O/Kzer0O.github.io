@@ -23,17 +23,17 @@
       <description>Windows Active Directory box with lateral movement and privilege escalation.</description>
     </item>
     <item>
+      <title>[Tips] NanoCorp - HTB Medium</title>
+      <link>https://keyll0ger.github.io/posts/nanocorp-tips/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/nanocorp-tips/</guid>
+      <description>Tips and hints to solve this machine — no spoilers!</description>
+    </item>
+    <item>
       <title>Imagery - HTB Medium</title>
       <link>https://keyll0ger.github.io/posts/imagery/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/posts/imagery/</guid>
-      <description>Linux medium difficulty machine.</description>
-    </item>
-    <item>
-      <title>NanoCorp - HTB Medium</title>
-      <link>https://keyll0ger.github.io/posts/nanocorp/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/nanocorp/</guid>
       <description>Linux medium difficulty machine.</description>
     </item>
   </channel>

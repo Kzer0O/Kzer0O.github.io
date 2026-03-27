@@ -9,11 +9,11 @@
     <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://keyll0ger.github.io/tags/sqli/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>CCTV - HTB Easy</title>
-      <link>https://keyll0ger.github.io/posts/cctv/</link>
+      <title>[Tips] CCTV - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/cctv-tips/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/cctv/</guid>
-      <description>Linux easy machine with SQL injection.</description>
+      <guid>https://keyll0ger.github.io/posts/cctv-tips/</guid>
+      <description>Tips and hints to solve this machine — no spoilers!</description>
     </item>
   </channel>
 </rss>

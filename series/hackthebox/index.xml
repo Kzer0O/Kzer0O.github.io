@@ -9,18 +9,11 @@
     <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://keyll0ger.github.io/series/hackthebox/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Sorcery - HTB Insane</title>
-      <link>https://keyll0ger.github.io/posts/sorcery/</link>
+      <title>[Tips] Pirate - HTB Hard</title>
+      <link>https://keyll0ger.github.io/posts/pirate-tips/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/sorcery/</guid>
-      <description>Architecture Docker complexe (9 containers) &#43; FreeIPA domain. Cypher Injection → WebAuthn Forgery → Kafka RCE → DNS Hijack → Phishing → Xvfb Framebuffer → Sudoers Wildcard → SSSD/IPA Privesc → Root.</description>
-    </item>
-    <item>
-      <title>Pirate - HTB Hard</title>
-      <link>https://keyll0ger.github.io/posts/pirate/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/pirate/</guid>
-      <description>Windows Active Directory box featuring Pre-Windows 2000 abuse, gMSA password reading, NTLM relay with RBCD, SPN Hijacking, and Constrained Delegation to Domain Admin.</description>
+      <guid>https://keyll0ger.github.io/posts/pirate-tips/</guid>
+      <description>Tips and hints to solve this machine — no spoilers!</description>
     </item>
     <item>
       <title>Principal - HTB Medium</title>
@@ -37,6 +30,13 @@
       <description>Windows Active Directory box with lateral movement and privilege escalation.</description>
     </item>
     <item>
+      <title>[Tips] NanoCorp - HTB Medium</title>
+      <link>https://keyll0ger.github.io/posts/nanocorp-tips/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/nanocorp-tips/</guid>
+      <description>Tips and hints to solve this machine — no spoilers!</description>
+    </item>
+    <item>
       <title>Imagery - HTB Medium</title>
       <link>https://keyll0ger.github.io/posts/imagery/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
@@ -44,25 +44,18 @@
       <description>Linux medium difficulty machine.</description>
     </item>
     <item>
-      <title>NanoCorp - HTB Medium</title>
-      <link>https://keyll0ger.github.io/posts/nanocorp/</link>
+      <title>[Tips] WingData - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/wingdata-tips/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/nanocorp/</guid>
-      <description>Linux medium difficulty machine.</description>
+      <guid>https://keyll0ger.github.io/posts/wingdata-tips/</guid>
+      <description>Tips and hints to solve this machine — no spoilers!</description>
     </item>
     <item>
-      <title>WingData - HTB Easy</title>
-      <link>https://keyll0ger.github.io/posts/wingdata/</link>
+      <title>[Tips] CCTV - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/cctv-tips/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/wingdata/</guid>
-      <description>Linux easy machine.</description>
-    </item>
-    <item>
-      <title>CCTV - HTB Easy</title>
-      <link>https://keyll0ger.github.io/posts/cctv/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/cctv/</guid>
-      <description>Linux easy machine with SQL injection.</description>
+      <guid>https://keyll0ger.github.io/posts/cctv-tips/</guid>
+      <description>Tips and hints to solve this machine — no spoilers!</description>
     </item>
     <item>
       <title>Chemistry - HTB Easy</title>
@@ -86,18 +79,18 @@
       <description>Linux easy machine.</description>
     </item>
     <item>
+      <title>[Tips] Kobold - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/kobold-tips/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/kobold-tips/</guid>
+      <description>Tips and hints to solve this machine — no spoilers!</description>
+    </item>
+    <item>
       <title>EscapeTwo - HTB Easy</title>
       <link>https://keyll0ger.github.io/posts/escapetwo/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/posts/escapetwo/</guid>
       <description>Windows easy machine with Active Directory and MSSQL exploitation.</description>
-    </item>
-    <item>
-      <title>Kobold - HTB Easy</title>
-      <link>https://keyll0ger.github.io/posts/kobold/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/kobold/</guid>
-      <description>Linux easy machine.</description>
     </item>
     <item>
       <title>LinkVortex - HTB Easy</title>
@@ -126,6 +119,13 @@
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/posts/underpass/</guid>
       <description>Linux easy machine.</description>
+    </item>
+    <item>
+      <title>[Tips] Sorcery - HTB Insane</title>
+      <link>https://keyll0ger.github.io/posts/sorcery-tips/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/sorcery-tips/</guid>
+      <description>Tips and hints to solve this machine — no spoilers!</description>
     </item>
   </channel>
 </rss>

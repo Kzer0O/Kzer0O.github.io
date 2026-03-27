@@ -9,11 +9,11 @@
     <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://keyll0ger.github.io/tags/windows/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Pirate - HTB Hard</title>
-      <link>https://keyll0ger.github.io/posts/pirate/</link>
+      <title>[Tips] Pirate - HTB Hard</title>
+      <link>https://keyll0ger.github.io/posts/pirate-tips/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/pirate/</guid>
-      <description>Windows Active Directory box featuring Pre-Windows 2000 abuse, gMSA password reading, NTLM relay with RBCD, SPN Hijacking, and Constrained Delegation to Domain Admin.</description>
+      <guid>https://keyll0ger.github.io/posts/pirate-tips/</guid>
+      <description>Tips and hints to solve this machine — no spoilers!</description>
     </item>
     <item>
       <title>Fluffy - HTB Medium</title>

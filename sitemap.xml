@@ -2,10 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://keyll0ger.github.io/posts/sorcery/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://keyll0ger.github.io/posts/pirate/</loc>
+    <loc>https://keyll0ger.github.io/posts/pirate-tips/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/posts/principal/</loc>
@@ -14,16 +11,16 @@
     <loc>https://keyll0ger.github.io/posts/fluffy/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://keyll0ger.github.io/posts/nanocorp-tips/</loc>
+    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://keyll0ger.github.io/posts/imagery/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/posts/nanocorp/</loc>
+    <loc>https://keyll0ger.github.io/posts/wingdata-tips/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/posts/wingdata/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://keyll0ger.github.io/posts/cctv/</loc>
+    <loc>https://keyll0ger.github.io/posts/cctv-tips/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/posts/chemistry/</loc>
@@ -35,10 +32,10 @@
     <loc>https://keyll0ger.github.io/posts/conversor/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/posts/escapetwo/</loc>
+    <loc>https://keyll0ger.github.io/posts/kobold-tips/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/posts/kobold/</loc>
+    <loc>https://keyll0ger.github.io/posts/escapetwo/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/posts/linkvortex/</loc>
@@ -51,6 +48,9 @@
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/posts/underpass/</loc>
+    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/posts/sorcery-tips/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/tags/active-directory/</loc>
