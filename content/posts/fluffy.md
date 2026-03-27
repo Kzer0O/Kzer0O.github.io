@@ -25,6 +25,10 @@ cover:
   relative: false
 ---
 
+<div align="center">
+  <img src="/images/logos/fluffy.png" alt="fluffy HTB logo" width="150">
+</div>
+
 ## 📋 Résumé Exécutif
 
 **Machine :** Fluffy (10.10.11.69)  

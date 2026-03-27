@@ -28,6 +28,10 @@ cover:
 
 > **OS:** Linux | **Difficulté:** Medium | **IP:** 10.129.15.16
 
+<div align="center">
+  <img src="/images/logos/principal.png" alt="principal HTB logo" width="150">
+</div>
+
 ---
 
 ## Phase 1 - Reconnaissance & Enumération

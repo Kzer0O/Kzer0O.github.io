@@ -24,6 +24,10 @@ cover:
   relative: false
 ---
 
+<div align="center">
+  <img src="/images/logos/imagery.png" alt="imagery HTB logo" width="150">
+</div>
+
 ![Imagery Banner](https://www.hackthebox.com/storage/avatars/imagery.png)
 
 **Difficulté:** Medium  

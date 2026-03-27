@@ -25,6 +25,10 @@ cover:
   relative: false
 ---
 
+<div align="center">
+  <img src="/images/logos/timelapse.png" alt="timelapse HTB logo" width="150">
+</div>
+
 ## 📋 Résumé Exécutif
 
 **Machine :** Timelapse (10.10.11.152)  

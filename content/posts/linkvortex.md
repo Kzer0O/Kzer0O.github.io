@@ -24,6 +24,10 @@ cover:
   relative: false
 ---
 
+<div align="center">
+  <img src="/images/logos/linkvortex.png" alt="linkvortex HTB logo" width="150">
+</div>
+
 ```
 nmap -sSCV -Pn LinkVortex.htb 
 Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-08 21:44 CST

@@ -24,6 +24,10 @@ cover:
   relative: false
 ---
 
+<div align="center">
+  <img src="/images/logos/chemistry.png" alt="chemistry HTB logo" width="150">
+</div>
+
 ```bash
 ┌──(kali㉿kali)-[~/Downloads]
 └─$ nmap -sV -sC -p- -vv 10.10.11.38    

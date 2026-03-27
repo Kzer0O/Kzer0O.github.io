@@ -26,6 +26,10 @@ cover:
   relative: false
 ---
 
+<div align="center">
+  <img src="/images/logos/escapetwo.png" alt="escapetwo HTB logo" width="150">
+</div>
+
 ## Enumération 
 
 ### Nmap

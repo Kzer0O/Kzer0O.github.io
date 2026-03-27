@@ -24,6 +24,10 @@ cover:
   relative: false
 ---
 
+<div align="center">
+  <img src="/images/logos/conversor.png" alt="conversor HTB logo" width="150">
+</div>
+
 ![Difficulty: Medium](https://img.shields.io/badge/Difficulty-Medium-yellow)
 ![OS: Linux](https://img.shields.io/badge/OS-Linux-blue)
 ![Release Date](https://img.shields.io/badge/Release-December%202025-green)

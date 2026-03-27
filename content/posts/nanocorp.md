@@ -24,6 +24,10 @@ cover:
   relative: false
 ---
 
+<div align="center">
+  <img src="/images/logos/nanocorp.png" alt="nanocorp HTB logo" width="150">
+</div>
+
 ## 📋 Résumé Exécutif
 
 **Machine :** Nanocorp (10.10.11.93)  

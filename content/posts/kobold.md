@@ -24,6 +24,10 @@ cover:
   relative: false
 ---
 
+<div align="center">
+  <img src="/images/logos/kobold.png" alt="kobold HTB logo" width="150">
+</div>
+
 | Field | Details |
 |-------|---------|
 | **Difficulty** | Medium |

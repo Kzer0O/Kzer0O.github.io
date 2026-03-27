@@ -24,6 +24,10 @@ cover:
   relative: false
 ---
 
+<div align="center">
+  <img src="/images/logos/underpass.png" alt="underpass HTB logo" width="150">
+</div>
+
 ```bash
 ──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/UnderPass]
 └─$ nmap -sV -sC -p- -vv 10.10.11.48 -oN underpass.txt 

@@ -25,6 +25,10 @@ cover:
   relative: false
 ---
 
+<div align="center">
+  <img src="/images/logos/return.png" alt="return HTB logo" width="150">
+</div>
+
 ## 📋 Résumé Exécutif
 
 **Machine :** Return (10.10.11.108)  

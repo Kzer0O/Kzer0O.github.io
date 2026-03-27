@@ -25,6 +25,10 @@ cover:
   relative: false
 ---
 
+<div align="center">
+  <img src="/images/logos/cicada.png" alt="cicada HTB logo" width="150">
+</div>
+
 ![image](https://github.com/user-attachments/assets/1cf736dd-fac1-40c0-aba2-5c103d0076ca)
 
 ## Nmap Full Scan 
