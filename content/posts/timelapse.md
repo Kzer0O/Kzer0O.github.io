@@ -20,7 +20,7 @@ ShowToc: true
 TocOpen: false
 
 cover:
-  image: /images/covers/easy-windows.svg
+  image: "/images/covers/machine-timelapse.svg"
   alt: "easy windows writeup"
   relative: false
 ---

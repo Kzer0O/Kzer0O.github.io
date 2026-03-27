@@ -19,7 +19,7 @@ ShowToc: true
 TocOpen: false
 
 cover:
-  image: /images/covers/easy-linux.svg
+  image: "/images/covers/machine-conversor.svg"
   alt: "easy linux writeup"
   relative: false
 ---

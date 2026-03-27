@@ -17,7 +17,7 @@ ShowToc: true
 TocOpen: false
 
 cover:
-  image: /images/covers/cheatsheet.svg
+  image: "/images/covers/cheatsheet.svg"
   alt: "cheatsheet"
   relative: false
 ---

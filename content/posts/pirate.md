@@ -25,7 +25,7 @@ ShowToc: true
 TocOpen: false
 
 cover:
-  image: /images/covers/hard-windows.svg
+  image: "/images/covers/machine-pirate.svg"
   alt: "hard windows writeup"
   relative: false
 ---

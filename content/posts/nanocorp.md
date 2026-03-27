@@ -19,7 +19,7 @@ ShowToc: true
 TocOpen: false
 
 cover:
-  image: /images/covers/medium-linux.svg
+  image: "/images/covers/machine-nanocorp.svg"
   alt: "medium linux writeup"
   relative: false
 ---

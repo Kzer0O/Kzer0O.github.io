@@ -20,7 +20,7 @@ ShowToc: true
 TocOpen: false
 
 cover:
-  image: /images/covers/easy-linux.svg
+  image: "/images/covers/machine-cctv.svg"
   alt: "easy linux writeup"
   relative: false
 ---

@@ -20,7 +20,7 @@ ShowToc: true
 TocOpen: false
 
 cover:
-  image: /images/covers/medium-windows.svg
+  image: "/images/covers/machine-fluffy.svg"
   alt: "medium windows writeup"
   relative: false
 ---

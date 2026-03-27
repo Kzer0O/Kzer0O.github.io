@@ -26,7 +26,7 @@ ShowToc: true
 TocOpen: false
 
 cover:
-  image: /images/covers/insane-linux.svg
+  image: "/images/covers/machine-sorcery.svg"
   alt: "insane linux writeup"
   relative: false
 ---
