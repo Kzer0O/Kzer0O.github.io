@@ -1,3 +1,0 @@
-User-agent: *
-Disallow:
-Sitemap: https://keyll0ger.github.io/sitemap.xml
