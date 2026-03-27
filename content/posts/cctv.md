@@ -1,7 +1,7 @@
 ---
 title: "CCTV - HTB Easy"
 date: 2026-03-27
-draft: false
+draft: true
 author: "keyll0ger"
 description: "Linux easy machine with SQL injection."
 summary: "Easy |  Linux | SQL Injection"

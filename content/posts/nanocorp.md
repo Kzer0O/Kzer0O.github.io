@@ -1,7 +1,7 @@
 ---
 title: "NanoCorp - HTB Medium"
 date: 2026-03-27
-draft: false
+draft: true
 author: "keyll0ger"
 description: "Linux medium difficulty machine."
 summary: "Medium |  Linux"

@@ -1,7 +1,7 @@
 ---
 title: "WingData - HTB Easy"
 date: 2026-03-27
-draft: false
+draft: true
 author: "keyll0ger"
 description: "Linux easy machine."
 summary: "Easy |  Linux"

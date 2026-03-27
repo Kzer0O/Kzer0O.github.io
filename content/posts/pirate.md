@@ -1,7 +1,7 @@
 ---
 title: "Pirate - HTB Hard"
 date: 2026-03-27
-draft: false
+draft: true
 author: "keyll0ger"
 description: "Windows Active Directory box featuring Pre-Windows 2000 abuse, gMSA password reading, NTLM relay with RBCD, SPN Hijacking, and Constrained Delegation to Domain Admin."
 summary: "Hard |  Windows | Active Directory chain: RBCD, gMSA, SPN Hijacking, Constrained Delegation"
