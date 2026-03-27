@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Medium on keyll0ger</title>
+    <link>https://keyll0ger.github.io/tags/medium/</link>
+    <description>Recent content in Medium on keyll0ger</description>
+    <generator>Hugo -- 0.131.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://keyll0ger.github.io/tags/medium/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Fluffy - HackTheBox Writeup</title>
+      <link>https://keyll0ger.github.io/posts/fluffy/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/fluffy/</guid>
+      <description>📋 Résumé Exécutif Machine : Fluffy (10.10.11.69)
+OS : Windows Server 2019 Build 17763
+Domaine : fluffy.htb / DC01.fluffy.htb
+Difficulté : Medium
+Points Clés : CVE-2025-24071, Shadow Credentials, ADCS ESC16
+🔗 Chaîne d&amp;rsquo;Attaque Complète j.fleischman (creds fournis) ↓ [CVE-2025-24071 - .library-ms] p.agila (hash NTLMv2 → cracké) ↓ [Ajout au groupe &amp;#34;Service Accounts&amp;#34;] GenericWrite sur winrm_svc &amp;amp; ca_svc ↓ [Shadow Credentials sur winrm_svc] winrm_svc (NT hash → WinRM) ↓ [ESC16 - UPN Spoofing via ca_svc] Administrator (certificat malveillant) 1️⃣ RECONNAISSANCE 🔍 Scan Nmap # Scan rapide des ports nmap -p- --min-rate 10000 10.</description>
+    </item>
+    <item>
+      <title>Imagery - HackTheBox Writeup</title>
+      <link>https://keyll0ger.github.io/posts/imagery/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/imagery/</guid>
+      <description>Difficulté: Medium
+OS: Linux (Ubuntu)
+Release Date: 2025
+IP: 10.10.11.88
+Table des Matières Énumération Initial Foothold - Blind XSS LFI via Admin Panel RCE via ImageMagick User Flag - Privilege Escalation vers Mark Root - Exploitation de Charcol Flags Lessons Learned Énumération Nmap Scan Scan initial pour découvrir les ports ouverts :
+nmap -p- --min-rate 10000 -vv 10.10.11.88 Résultats :
+PORT STATE SERVICE 22/tcp open ssh 8000/tcp open http-alt Scan détaillé des services :</description>
+    </item>
+    <item>
+      <title>NanoCorp - HackTheBox Writeup</title>
+      <link>https://keyll0ger.github.io/posts/nanocorp/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/nanocorp/</guid>
+      <description>📋 Résumé Exécutif Machine : Nanocorp (10.10.11.93)
+OS : Windows Server 2022 (Domain Controller)
+Domaine : nanocorp.htb / dc01.nanocorp.htb
+Difficulté : Hard
+Points Clés : CVE-2025-24071 (.library-ms NTLM Leak), IT_Support Group Abuse, ForceChangePassword Permission, WinRM Restrictions Bypass
+🔗 Chaîne d&amp;rsquo;Attaque Complète Port 80 - Apache/PHP Web Server ↓ [CVE-2025-24071 - Malicious .library-ms in ZIP] Responder capture (port 445) ↓ [NTLMv2 hash capture] web_svc hash → Hashcat crack ↓ [web_svc:dksehdgh712!@#] LDAP/AD Enumeration ↓ [Découverte groupe IT_Support + monitoring_svc] bloodyAD - Add web_svc to IT_Support ↓ [GenericAll permission sur monitoring_svc] bloodyAD - Change password monitoring_svc ↓ [monitoring_svc:PassW0rd!</description>
+    </item>
+    <item>
+      <title>Principal - HackTheBox Writeup</title>
+      <link>https://keyll0ger.github.io/posts/principal/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/principal/</guid>
+      <description>OS: Linux | Difficulté: Medium | IP: 10.129.15.16
+Phase 1 - Reconnaissance &amp;amp; Enumération Pourquoi on commence par là ? Toute attaque commence par comprendre la surface d&amp;rsquo;attaque. On veut savoir quels ports sont ouverts et quels services tournent avant de chercher des vulnérabilités.
+Scan de ports nmap -p- --min-rate 5000 -sS 10.129.15.16 nmap -sCV -p 22,8080 10.129.15.16 Résultats :
+Port 22 - OpenSSH Port 8080 - Serveur HTTP Réflexion : Seulement 2 ports.</description>
+    </item>
+  </channel>
+</rss>

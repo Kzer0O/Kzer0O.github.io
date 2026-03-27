@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>SPN Hijacking on keyll0ger</title>
+    <link>https://keyll0ger.github.io/tags/spn-hijacking/</link>
+    <description>Recent content in SPN Hijacking on keyll0ger</description>
+    <generator>Hugo -- 0.131.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://keyll0ger.github.io/tags/spn-hijacking/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Pirate - HackTheBox Writeup</title>
+      <link>https://keyll0ger.github.io/posts/pirate/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/pirate/</guid>
+      <description>OS: Windows Server 2019 | Difficulté: Hard | IP: 10.129.15.19 | Domain: pirate.htb
+Phase 1 - Reconnaissance Pourquoi commencer par un scan de ports ? Sur une machine Windows Hard, on s&amp;rsquo;attend à un environnement Active Directory. Le scan révèle les services qui déterminent notre surface d&amp;rsquo;attaque.
+Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.19 nmap -Pn -sCV -p 53,80,88,135,389,445,636,3268,5985,9389 10.129.15.19 Résultats clés :
+Port Service Info 53 DNS Simple DNS Plus 80 HTTP IIS 10.</description>
+    </item>
+  </channel>
+</rss>

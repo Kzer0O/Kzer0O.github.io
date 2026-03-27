@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head>
+	<meta name="generator" content="Hugo 0.131.0"><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>keyll0ger</title>
+
+<meta name="description" content="CTF Writeups &amp; Red Team Notes">
+<meta name="author" content="keyll0ger">
+<link rel="canonical" href="https://keyll0ger.github.io/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://keyll0ger.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://keyll0ger.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://keyll0ger.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://keyll0ger.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://keyll0ger.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="https://keyll0ger.github.io/index.xml">
+<link rel="alternate" type="application/json" href="https://keyll0ger.github.io/index.json">
+<link rel="alternate" hreflang="en" href="https://keyll0ger.github.io/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+  
+
+<meta property="og:title" content="keyll0ger" />
+<meta property="og:description" content="CTF Writeups &amp; Red Team Notes" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://keyll0ger.github.io/" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="keyll0ger"/>
+<meta name="twitter:description" content="CTF Writeups &amp; Red Team Notes"/>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "keyll0ger",
+  "url": "https://keyll0ger.github.io/",
+  "description": "CTF Writeups \u0026amp; Red Team Notes",
+  "thumbnailUrl": "https://keyll0ger.github.io/favicon.ico",
+  "sameAs": [
+      "https://github.com/keyll0ger"
+  ]
+}
+</script>
+</head>
+
+<body class="list dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://keyll0ger.github.io/" accesskey="h" title="keyll0ger (Alt + H)">keyll0ger</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://keyll0ger.github.io/posts/" title="Writeups">
+                    <span>Writeups</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Pirate - HackTheBox Writeup
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>OS: Windows Server 2019 | Difficulté: Hard | IP: 10.129.15.19 | Domain: pirate.htb
+Phase 1 - Reconnaissance Pourquoi commencer par un scan de ports ? Sur une machine Windows Hard, on s’attend à un environnement Active Directory. Le scan révèle les services qui déterminent notre surface d’attaque.
+Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.19 nmap -Pn -sCV -p 53,80,88,135,389,445,636,3268,5985,9389 10.129.15.19 Résultats clés :
+Port Service Info 53 DNS Simple DNS Plus 80 HTTP IIS 10....</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;12 min&nbsp;·&nbsp;keyll0ger</footer>
+  <a class="entry-link" aria-label="post link to Pirate - HackTheBox Writeup" href="https://keyll0ger.github.io/posts/pirate/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Principal - HackTheBox Writeup
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>OS: Linux | Difficulté: Medium | IP: 10.129.15.16
+Phase 1 - Reconnaissance &amp; Enumération Pourquoi on commence par là ? Toute attaque commence par comprendre la surface d’attaque. On veut savoir quels ports sont ouverts et quels services tournent avant de chercher des vulnérabilités.
+Scan de ports nmap -p- --min-rate 5000 -sS 10.129.15.16 nmap -sCV -p 22,8080 10.129.15.16 Résultats :
+Port 22 - OpenSSH Port 8080 - Serveur HTTP Réflexion : Seulement 2 ports....</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;9 min&nbsp;·&nbsp;keyll0ger</footer>
+  <a class="entry-link" aria-label="post link to Principal - HackTheBox Writeup" href="https://keyll0ger.github.io/posts/principal/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Return - HackTheBox Writeup
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>📋 Résumé Exécutif Machine : Return (10.10.11.108)
+OS : Windows Server (Domain Controller)
+Domaine : return.local / PRINTER.return.local
+Difficulté : Easy
+Points Clés : Printer Admin Panel LDAP Hijack, Server Operators Privilege Escalation
+🔗 Chaîne d’Attaque Complète Port 80 - Printer Admin Panel ↓ [Modification serveur LDAP → IP attaquant] nc listener port 389 ↓ [Capture credentials LDAP] svc-printer:1edFg43012!! (cleartext) ↓ [Evil-WinRM authentication] svc-printer (Remote Management Users) ↓ [Membre de Server Operators] Service Binary Hijacking (VSS/spooler) ↓ [sc....</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;16 min&nbsp;·&nbsp;keyll0ger</footer>
+  <a class="entry-link" aria-label="post link to Return - HackTheBox Writeup" href="https://keyll0ger.github.io/posts/return/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Sorcery - HackTheBox Writeup
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Résumé Machine Insane avec une architecture Docker complexe (9 containers) &#43; FreeIPA domain. Chaîne d’attaque: Cypher Injection → XSS/WebAuthn Forgery → Kafka RCE → DNS Hijack &#43; CA key → Phishing → SSH → FreeIPA privesc (IPA group roles → sudo rule injection).
+User flag: 15ea22ee4d2cbcc5f4b9b5632db6ee91 Root flag: b1e15dd687f19c6dbed6f0ed92c79147
+Reconnaissance Nmap 22/tcp open ssh OpenSSH 9.6p1 443/tcp open ssl/http nginx 1.27.1 Hostnames sorcery.htb → Next.js app git.sorcery.htb → Gitea 1.22.1 Source code Repo public sur Gitea: nicole_sullivan/infrastructure...</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;8 min&nbsp;·&nbsp;keyll0ger</footer>
+  <a class="entry-link" aria-label="post link to Sorcery - HackTheBox Writeup" href="https://keyll0ger.github.io/posts/sorcery/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Timelapse - HackTheBox Writeup
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>📋 Résumé Exécutif Machine : Timelapse (10.10.11.152)
+OS : Windows Server 2019
+Domaine : timelapse.htb / DC01.timelapse.htb
+Difficulté : Easy
+Points Clés : SMB Anonymous, PFX Certificate, WinRM Auth, PowerShell History, LAPS Abuse
+🔗 Chaîne d’Attaque Complète SMB Anonymous Access ↓ [Partage &#34;Shares&#34;] winrm_backup.zip (password-protected) ↓ [zip2john &#43; john → supremelegacy] legacyy_dev_auth.pfx (encrypted) ↓ [pfx2john &#43; john → thuglegacy] Certificate SSL &#43; Private Key ↓ [WinRM Certificate Auth] legacyy (utilisateur domain) ↓ [PowerShell ConsoleHost_history....</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;25 min&nbsp;·&nbsp;keyll0ger</footer>
+  <a class="entry-link" aria-label="post link to Timelapse - HackTheBox Writeup" href="https://keyll0ger.github.io/posts/timelapse/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">UnderPass - HackTheBox Writeup
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/UnderPass] └─$ nmap -sV -sC -p- -vv 10.10.11.48 -oN underpass.txt Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-01-26 18:03 CET NSE: Loaded 156 scripts for scanning. NSE: Script Pre-scanning. NSE: Starting runlevel 1 (of 3) scan. Initiating NSE at 18:03 Completed NSE at 18:03, 0.00s elapsed NSE: Starting runlevel 2 (of 3) scan. Initiating NSE at 18:03 Completed NSE at 18:03, 0.00s elapsed NSE: Starting runlevel 3 (of 3) scan. Initiating NSE at 18:03 Completed NSE at 18:03, 0....</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;6 min&nbsp;·&nbsp;keyll0ger</footer>
+  <a class="entry-link" aria-label="post link to UnderPass - HackTheBox Writeup" href="https://keyll0ger.github.io/posts/underpass/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">WingData - HackTheBox Writeup
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>OS: Debian 12 | Difficulté: Easy | IP: 10.129.244.106
+Phase 1 - Reconnaissance nmap -Pn -p- --min-rate 5000 10.129.244.106 nmap -Pn -sCV -p 22,80 10.129.244.106 Port Service Info 22 SSH OpenSSH 9.2p1 Debian 80 HTTP Apache 2.4.66, redirect → wingdata.htb Ajouter au hosts : 10.129.244.106 wingdata.htb ftp.wingdata.htb
+Le site principal est un site vitrine “WingData”. Le code source révèle un lien “Client Portal” vers http://ftp.wingdata.htb/.
+Phase 2 - Wing FTP Server 7....</p>
+  </div>
+  <footer class="entry-footer"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;4 min&nbsp;·&nbsp;keyll0ger</footer>
+  <a class="entry-link" aria-label="post link to WingData - HackTheBox Writeup" href="https://keyll0ger.github.io/posts/wingdata/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="prev" href="https://keyll0ger.github.io/">
+      «&nbsp;Prev&nbsp;
+    </a>
+  </nav>
+</footer>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://keyll0ger.github.io/">keyll0ger</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

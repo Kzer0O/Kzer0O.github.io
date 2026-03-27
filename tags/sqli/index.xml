@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>SQLi on keyll0ger</title>
+    <link>https://keyll0ger.github.io/tags/sqli/</link>
+    <description>Recent content in SQLi on keyll0ger</description>
+    <generator>Hugo -- 0.131.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://keyll0ger.github.io/tags/sqli/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CCTV - HackTheBox Writeup</title>
+      <link>https://keyll0ger.github.io/posts/cctv/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/cctv/</guid>
+      <description>OS: Ubuntu 24.04 | Difficulté: Easy | IP: 10.129.15.181
+Phase 1 - Reconnaissance Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.181 nmap -Pn -sCV -p 22,80 10.129.15.181 Résultats :
+Port Service Info 22 SSH OpenSSH 9.6p1 Ubuntu 80 HTTP Apache 2.4.58, redirect → http://cctv.htb/ Réflexion : Seulement 2 ports. Le redirect vers cctv.htb indique un virtual host. On ajoute au /etc/hosts.
+echo &amp;#39;10.129.15.181 cctv.htb&amp;#39; | sudo tee -a /etc/hosts Phase 2 - Enumération Web Page d&amp;rsquo;accueil curl -s http://cctv.</description>
+    </item>
+  </channel>
+</rss>

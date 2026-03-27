@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>FreeIPA on keyll0ger</title>
+    <link>https://keyll0ger.github.io/tags/freeipa/</link>
+    <description>Recent content in FreeIPA on keyll0ger</description>
+    <generator>Hugo -- 0.131.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://keyll0ger.github.io/tags/freeipa/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Principal - HackTheBox Writeup</title>
+      <link>https://keyll0ger.github.io/posts/principal/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/principal/</guid>
+      <description>OS: Linux | Difficulté: Medium | IP: 10.129.15.16
+Phase 1 - Reconnaissance &amp;amp; Enumération Pourquoi on commence par là ? Toute attaque commence par comprendre la surface d&amp;rsquo;attaque. On veut savoir quels ports sont ouverts et quels services tournent avant de chercher des vulnérabilités.
+Scan de ports nmap -p- --min-rate 5000 -sS 10.129.15.16 nmap -sCV -p 22,8080 10.129.15.16 Résultats :
+Port 22 - OpenSSH Port 8080 - Serveur HTTP Réflexion : Seulement 2 ports.</description>
+    </item>
+    <item>
+      <title>Sorcery - HackTheBox Writeup</title>
+      <link>https://keyll0ger.github.io/posts/sorcery/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/sorcery/</guid>
+      <description>Résumé Machine Insane avec une architecture Docker complexe (9 containers) + FreeIPA domain. Chaîne d&amp;rsquo;attaque: Cypher Injection → XSS/WebAuthn Forgery → Kafka RCE → DNS Hijack + CA key → Phishing → SSH → FreeIPA privesc (IPA group roles → sudo rule injection).
+User flag: 15ea22ee4d2cbcc5f4b9b5632db6ee91 Root flag: b1e15dd687f19c6dbed6f0ed92c79147
+Reconnaissance Nmap 22/tcp open ssh OpenSSH 9.6p1 443/tcp open ssl/http nginx 1.27.1 Hostnames sorcery.htb → Next.js app git.sorcery.htb → Gitea 1.22.1 Source code Repo public sur Gitea: nicole_sullivan/infrastructure</description>
+    </item>
+  </channel>
+</rss>

