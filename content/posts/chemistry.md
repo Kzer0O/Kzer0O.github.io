@@ -23,11 +23,6 @@ cover:
   alt: "easy linux writeup"
   relative: false
 ---
-
-<div align="center">
-  <img src="/images/logos/chemistry.png" alt="chemistry HTB logo" width="150">
-</div>
-
 ```bash
 ┌──(kali㉿kali)-[~/Downloads]
 └─$ nmap -sV -sC -p- -vv 10.10.11.38    
@@ -156,8 +151,6 @@ _space_group_magn.name_BNS  "P  n'  m  a'  "
 ```
 [*] Started reverse TCP handler on 10.10.14.204:4444 
 [*] Command shell session 1 opened (10.10.14.204:4444 -> 10.10.11.38:57846) at 2025-01-28 03:17:06 -0500
-
-
 Shell Banner:
 sh: 0:
 -----

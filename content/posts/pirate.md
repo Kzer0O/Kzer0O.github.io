@@ -31,11 +31,6 @@ cover:
 ---
 
 > **OS:** Windows Server 2019 | **Difficulté:** Hard | **IP:** 10.129.15.19 | **Domain:** pirate.htb
-
-<div align="center">
-  <img src="/images/logos/pirate.png" alt="pirate HTB logo" width="150">
-</div>
-
 ---
 
 ## Phase 1 - Reconnaissance

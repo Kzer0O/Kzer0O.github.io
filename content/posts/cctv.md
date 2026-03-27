@@ -26,11 +26,6 @@ cover:
 ---
 
 > **OS:** Ubuntu 24.04 | **Difficulté:** Easy | **IP:** 10.129.15.181
-
-<div align="center">
-  <img src="/images/logos/cctv.png" alt="cctv HTB logo" width="150">
-</div>
-
 ---
 
 ## Phase 1 - Reconnaissance

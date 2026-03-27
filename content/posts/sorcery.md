@@ -30,11 +30,6 @@ cover:
   alt: "insane linux writeup"
   relative: false
 ---
-
-<div align="center">
-  <img src="/images/logos/sorcery.png" alt="sorcery HTB logo" width="150">
-</div>
-
 ## Résumé
 Machine Insane avec une architecture Docker complexe (9 containers) + FreeIPA domain. Chaîne d'attaque: Cypher Injection → XSS/WebAuthn Forgery → Kafka RCE → DNS Hijack + CA key → Phishing → SSH → FreeIPA privesc (IPA group roles → sudo rule injection).
 

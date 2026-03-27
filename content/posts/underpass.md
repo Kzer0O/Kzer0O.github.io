@@ -23,11 +23,6 @@ cover:
   alt: "easy linux writeup"
   relative: false
 ---
-
-<div align="center">
-  <img src="/images/logos/underpass.png" alt="underpass HTB logo" width="150">
-</div>
-
 ```bash
 ──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/UnderPass]
 └─$ nmap -sV -sC -p- -vv 10.10.11.48 -oN underpass.txt 
@@ -231,21 +226,15 @@ Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 5.15.0-126-generic x86_64)
   Swap usage:   0%
 
   => There is 1 zombie process.
-
-
 Expanded Security Maintenance for Applications is not enabled.
 
 0 updates can be applied immediately.
 
 Enable ESM Apps to receive additional future security updates.
 See https://ubuntu.com/esm or run: sudo pro status
-
-
 The list of available updates is more than a week old.
 To check for new updates run: sudo apt update
 Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
-
-
 Last login: Sun Jan 26 18:43:49 2025 from 127.0.0.1
 svcMosh@underpass:~$ 
 ```
@@ -261,8 +250,6 @@ svcMosh@underpass:~$
 ```
 
 Aves quelque recherche et la commande: mosh -h
-
-
 on arrive a nos fin
 ```
 root@underpass:~# pwd

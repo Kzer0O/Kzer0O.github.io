@@ -23,11 +23,6 @@ cover:
   alt: "medium linux writeup"
   relative: false
 ---
-
-<div align="center">
-  <img src="/images/logos/imagery.png" alt="imagery HTB logo" width="150">
-</div>
-
 ![Imagery Banner](https://www.hackthebox.com/storage/avatars/imagery.png)
 
 **Difficulté:** Medium  
@@ -392,8 +387,6 @@ echo "[base64_output]" | base64 -d > backup.zip.aes
 ```
 
 ### Cracking du Fichier AES-Crypt
-
-
 Le fichier `backup.zip.aes` est chiffré avec AES-Crypt. Nous utilisons un script de brute-force multi-thread avec `pyAesCrypt` et la wordlist `rockyou.txt`.
 
 **Installation des dépendances :**
@@ -642,8 +635,6 @@ bash-5.1# cd /root
 bash-5.1# cat root.txt
 ae228b86e04c5f1f7070f879de0a6254
 ```
-
-
 ---
 
 ## Lessons Learned

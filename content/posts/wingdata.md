@@ -25,11 +25,6 @@ cover:
 ---
 
 > **OS:** Debian 12 | **Difficulté:** Easy | **IP:** 10.129.244.106
-
-<div align="center">
-  <img src="/images/logos/wingdata.png" alt="wingdata HTB logo" width="150">
-</div>
-
 ---
 
 ## Phase 1 - Reconnaissance
