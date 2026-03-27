@@ -1,17 +1,23 @@
 ---
-title: "Cicada - HackTheBox Writeup"
+title: "Cicada - HTB Easy"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Windows easy Active Directory machine."
+summary: "Easy |  Windows | Active Directory"
 tags:
   - "HTB"
   - "Windows"
   - "Easy"
   - "Active Directory"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 13
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 ![image](https://github.com/user-attachments/assets/1cf736dd-fac1-40c0-aba2-5c103d0076ca)

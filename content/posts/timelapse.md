@@ -1,17 +1,23 @@
 ---
-title: "Timelapse - HackTheBox Writeup"
+title: "Timelapse - HTB Easy"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Windows easy Active Directory machine."
+summary: "Easy |  Windows | Active Directory"
 tags:
   - "HTB"
   - "Windows"
   - "Easy"
   - "Active Directory"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 19
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 ## 📋 Résumé Exécutif

@@ -1,18 +1,24 @@
 ---
-title: "Principal - HackTheBox Writeup"
+title: "Principal - HTB Medium"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Linux machine with FreeIPA domain exploitation."
+summary: "Medium |  Linux | FreeIPA Active Directory exploitation"
 tags:
   - "HTB"
   - "Linux"
   - "Medium"
   - "Active Directory"
   - "FreeIPA"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 3
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 > **OS:** Linux | **Difficulté:** Medium | **IP:** 10.129.15.16

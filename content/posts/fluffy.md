@@ -1,17 +1,23 @@
 ---
-title: "Fluffy - HackTheBox Writeup"
+title: "Fluffy - HTB Medium"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Windows Active Directory box with lateral movement and privilege escalation."
+summary: "Medium |  Windows | Active Directory exploitation"
 tags:
   - "HTB"
   - "Windows"
   - "Medium"
   - "Active Directory"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 4
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 ## 📋 Résumé Exécutif

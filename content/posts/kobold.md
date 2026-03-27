@@ -1,16 +1,22 @@
 ---
-title: "kobold - HackTheBox Writeup"
+title: "Kobold - HTB Easy"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Linux easy machine."
+summary: "Easy |  Linux"
 tags:
   - "HTB"
   - "Linux"
   - "Easy"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 16
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 | Field | Details |

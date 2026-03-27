@@ -1,16 +1,22 @@
 ---
-title: "NanoCorp - HackTheBox Writeup"
+title: "NanoCorp - HTB Medium"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Linux medium difficulty machine."
+summary: "Medium |  Linux"
 tags:
   - "HTB"
   - "Linux"
   - "Medium"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 6
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 ## 📋 Résumé Exécutif

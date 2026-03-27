@@ -1,17 +1,23 @@
 ---
-title: "Return - HackTheBox Writeup"
+title: "Return - HTB Easy"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Windows easy Active Directory machine."
+summary: "Easy |  Windows | Active Directory"
 tags:
   - "HTB"
   - "Windows"
   - "Easy"
   - "Active Directory"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 18
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 ## 📋 Résumé Exécutif

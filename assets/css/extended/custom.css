@@ -1,0 +1,193 @@
+/* keyll0ger blog - custom styles */
+
+/* Accent color - cyber green */
+:root {
+    --accent: #00ff41;
+    --accent-dim: #00cc33;
+}
+
+.dark {
+    --primary: #00ff41;
+    --secondary: #8b949e;
+    --tertiary: #161b22;
+    --content: #c9d1d9;
+    --hljs-bg: #0d1117;
+}
+
+/* Profile title styling */
+.profile .profile_inner h1 {
+    font-family: 'Courier New', monospace;
+    color: var(--accent);
+    font-size: 2.5rem;
+}
+
+.profile .profile_inner .tagline {
+    font-family: 'Courier New', monospace;
+    opacity: 0.85;
+}
+
+/* Navigation buttons */
+.profile .profile_inner .buttons a {
+    border: 1px solid var(--accent-dim);
+    border-radius: 4px;
+    padding: 8px 20px;
+    transition: all 0.2s ease;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.profile .profile_inner .buttons a:hover {
+    background: var(--accent);
+    color: #000;
+}
+
+/* Post list */
+.post-entry {
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s ease;
+}
+
+.post-entry:hover {
+    border-color: var(--accent-dim);
+}
+
+.post-entry .entry-header h2 {
+    font-size: 1.2rem;
+}
+
+/* Tags */
+.post-tags a {
+    border: 1px solid #30363d;
+    border-radius: 3px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-family: 'Courier New', monospace;
+    transition: all 0.2s ease;
+}
+
+.post-tags a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Code blocks */
+.highlight {
+    border-radius: 8px;
+    border: 1px solid #21262d;
+}
+
+.highlight pre {
+    border-radius: 8px;
+}
+
+code {
+    font-size: 0.9em;
+}
+
+/* Inline code */
+:not(pre) > code {
+    background: #161b22;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 0.85em;
+}
+
+/* Table styling */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th {
+    background: #161b22;
+    border: 1px solid #30363d;
+    padding: 8px 12px;
+    text-align: left;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--accent);
+}
+
+td {
+    border: 1px solid #21262d;
+    padding: 8px 12px;
+}
+
+/* Blockquotes */
+blockquote {
+    border-left: 3px solid var(--accent-dim);
+    background: #0d1117;
+    padding: 12px 20px;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+/* TOC */
+.toc {
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    padding: 16px;
+    background: #0d1117;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0d1117;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-dim);
+}
+
+/* Header nav */
+nav.nav a {
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+/* Footer */
+.footer {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+
+/* Social icons */
+.social-icons a {
+    transition: transform 0.2s ease;
+}
+
+.social-icons a:hover {
+    transform: scale(1.15);
+}
+
+/* Post content headings */
+.post-content h2 {
+    border-bottom: 1px solid #21262d;
+    padding-bottom: 8px;
+    margin-top: 2rem;
+}
+
+/* Difficulty badge styling in summaries */
+.post-entry .entry-content {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    opacity: 0.8;
+}

@@ -1,18 +1,24 @@
 ---
-title: "EscapeTwo - HackTheBox Writeup"
+title: "EscapeTwo - HTB Easy"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Windows easy machine with Active Directory and MSSQL exploitation."
+summary: "Easy |  Windows | AD + MSSQL"
 tags:
   - "HTB"
   - "Windows"
   - "Easy"
   - "Active Directory"
   - "MSSQL"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 15
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 ## Enumération 

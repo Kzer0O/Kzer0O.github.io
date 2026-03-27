@@ -1,8 +1,10 @@
 ---
-title: "Sorcery - HackTheBox Writeup"
+title: "Sorcery - HTB Insane"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Architecture Docker complexe (9 containers) + FreeIPA domain. Cypher Injection → WebAuthn Forgery → Kafka RCE → DNS Hijack → Phishing → Xvfb Framebuffer → Sudoers Wildcard → SSSD/IPA Privesc → Root."
+summary: "Insane |  Linux | 13 steps from web to root through 9 Docker containers and FreeIPA"
 tags:
   - "HTB"
   - "Linux"
@@ -14,10 +16,14 @@ tags:
   - "Docker"
   - "Phishing"
   - "SSSD"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 1
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 ## Résumé

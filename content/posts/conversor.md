@@ -1,16 +1,22 @@
 ---
-title: "Conversor - HackTheBox Writeup"
+title: "Conversor - HTB Easy"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Linux easy machine."
+summary: "Easy |  Linux"
 tags:
   - "HTB"
   - "Linux"
   - "Easy"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 14
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 ![Difficulty: Medium](https://img.shields.io/badge/Difficulty-Medium-yellow)

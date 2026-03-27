@@ -1,16 +1,22 @@
 ---
-title: "Imagery - HackTheBox Writeup"
+title: "Imagery - HTB Medium"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Linux medium difficulty machine."
+summary: "Medium |  Linux"
 tags:
   - "HTB"
   - "Linux"
   - "Medium"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 5
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 ![Imagery Banner](https://www.hackthebox.com/storage/avatars/imagery.png)

@@ -1,16 +1,22 @@
 ---
-title: "WingData - HackTheBox Writeup"
+title: "WingData - HTB Easy"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Linux easy machine."
+summary: "Easy |  Linux"
 tags:
   - "HTB"
   - "Linux"
   - "Easy"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 10
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 > **OS:** Debian 12 | **Difficulté:** Easy | **IP:** 10.129.244.106

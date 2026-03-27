@@ -1,17 +1,23 @@
 ---
-title: "CCTV - HackTheBox Writeup"
+title: "CCTV - HTB Easy"
 date: 2026-03-27
 draft: false
 author: "keyll0ger"
+description: "Linux easy machine with SQL injection."
+summary: "Easy |  Linux | SQL Injection"
 tags:
   - "HTB"
   - "Linux"
   - "Easy"
   - "SQLi"
+  - "HackTheBox"
 categories:
   - "HackTheBox"
+series:
+  - "HackTheBox"
+weight: 11
 ShowToc: true
-TocOpen: true
+TocOpen: false
 ---
 
 > **OS:** Ubuntu 24.04 | **Difficulté:** Easy | **IP:** 10.129.15.181
