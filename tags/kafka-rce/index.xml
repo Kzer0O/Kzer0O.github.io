@@ -9,13 +9,11 @@
     <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://keyll0ger.github.io/tags/kafka-rce/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Sorcery - HackTheBox Writeup</title>
+      <title>Sorcery - HTB Insane</title>
       <link>https://keyll0ger.github.io/posts/sorcery/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/posts/sorcery/</guid>
-      <description>Résumé Machine Insane avec une architecture Docker complexe (9 containers) + FreeIPA domain. Chaîne d&amp;rsquo;attaque: Cypher Injection → XSS/WebAuthn Forgery → Kafka RCE → DNS Hijack + CA key → Phishing → SSH → FreeIPA privesc (IPA group roles → sudo rule injection).
-User flag: 15ea22ee4d2cbcc5f4b9b5632db6ee91 Root flag: b1e15dd687f19c6dbed6f0ed92c79147
-Reconnaissance Nmap 22/tcp open ssh OpenSSH 9.6p1 443/tcp open ssl/http nginx 1.27.1 Hostnames sorcery.htb → Next.js app git.sorcery.htb → Gitea 1.22.1 Source code Repo public sur Gitea: nicole_sullivan/infrastructure</description>
+      <description>Architecture Docker complexe (9 containers) &#43; FreeIPA domain. Cypher Injection → WebAuthn Forgery → Kafka RCE → DNS Hijack → Phishing → Xvfb Framebuffer → Sudoers Wildcard → SSSD/IPA Privesc → Root.</description>
     </item>
   </channel>
 </rss>

@@ -9,76 +9,53 @@
     <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://keyll0ger.github.io/tags/active-directory/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Cicada - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/cicada/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/cicada/</guid>
-      <description>Nmap Full Scan ┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada] └─$ nmap -sV -sC -p- -vv 10.10.11.35 -oN cicada.txt Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-01-25 21:22 CET NSE: Loaded 156 scripts for scanning. NSE: Script Pre-scanning. NSE: Starting runlevel 1 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 2 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 3 (of 3) scan.</description>
-    </item>
-    <item>
-      <title>EscapeTwo - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/escapetwo/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/escapetwo/</guid>
-      <description>Enumération Nmap Pour commencer, j&amp;rsquo;ai effectué une analyse rapide des ports avec la commande suivante :
-nmap -F -Pn 10.10.11.51 La sortie de cette commande a révélé les ports suivants ouverts :
-Nmap scan report for 10.10.11.51 Host is up (0.026s latency). Not shown: 93 filtered tcp ports (no-response) PORT STATE SERVICE 53/tcp open domain 88/tcp open kerberos-sec 135/tcp open msrpc 139/tcp open netbios-ssn 389/tcp open ldap 445/tcp open microsoft-ds 1433/tcp open ms-sql-s Nmap done: 1 IP address (1 host up) scanned in 1.</description>
-    </item>
-    <item>
-      <title>Fluffy - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/fluffy/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/fluffy/</guid>
-      <description>📋 Résumé Exécutif Machine : Fluffy (10.10.11.69)
-OS : Windows Server 2019 Build 17763
-Domaine : fluffy.htb / DC01.fluffy.htb
-Difficulté : Medium
-Points Clés : CVE-2025-24071, Shadow Credentials, ADCS ESC16
-🔗 Chaîne d&amp;rsquo;Attaque Complète j.fleischman (creds fournis) ↓ [CVE-2025-24071 - .library-ms] p.agila (hash NTLMv2 → cracké) ↓ [Ajout au groupe &amp;#34;Service Accounts&amp;#34;] GenericWrite sur winrm_svc &amp;amp; ca_svc ↓ [Shadow Credentials sur winrm_svc] winrm_svc (NT hash → WinRM) ↓ [ESC16 - UPN Spoofing via ca_svc] Administrator (certificat malveillant) 1️⃣ RECONNAISSANCE 🔍 Scan Nmap # Scan rapide des ports nmap -p- --min-rate 10000 10.</description>
-    </item>
-    <item>
-      <title>Pirate - HackTheBox Writeup</title>
+      <title>Pirate - HTB Hard</title>
       <link>https://keyll0ger.github.io/posts/pirate/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/posts/pirate/</guid>
-      <description>OS: Windows Server 2019 | Difficulté: Hard | IP: 10.129.15.19 | Domain: pirate.htb
-Phase 1 - Reconnaissance Pourquoi commencer par un scan de ports ? Sur une machine Windows Hard, on s&amp;rsquo;attend à un environnement Active Directory. Le scan révèle les services qui déterminent notre surface d&amp;rsquo;attaque.
-Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.19 nmap -Pn -sCV -p 53,80,88,135,389,445,636,3268,5985,9389 10.129.15.19 Résultats clés :
-Port Service Info 53 DNS Simple DNS Plus 80 HTTP IIS 10.</description>
+      <description>Windows Active Directory box featuring Pre-Windows 2000 abuse, gMSA password reading, NTLM relay with RBCD, SPN Hijacking, and Constrained Delegation to Domain Admin.</description>
     </item>
     <item>
-      <title>Principal - HackTheBox Writeup</title>
+      <title>Principal - HTB Medium</title>
       <link>https://keyll0ger.github.io/posts/principal/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/posts/principal/</guid>
-      <description>OS: Linux | Difficulté: Medium | IP: 10.129.15.16
-Phase 1 - Reconnaissance &amp;amp; Enumération Pourquoi on commence par là ? Toute attaque commence par comprendre la surface d&amp;rsquo;attaque. On veut savoir quels ports sont ouverts et quels services tournent avant de chercher des vulnérabilités.
-Scan de ports nmap -p- --min-rate 5000 -sS 10.129.15.16 nmap -sCV -p 22,8080 10.129.15.16 Résultats :
-Port 22 - OpenSSH Port 8080 - Serveur HTTP Réflexion : Seulement 2 ports.</description>
+      <description>Linux machine with FreeIPA domain exploitation.</description>
     </item>
     <item>
-      <title>Return - HackTheBox Writeup</title>
+      <title>Fluffy - HTB Medium</title>
+      <link>https://keyll0ger.github.io/posts/fluffy/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/fluffy/</guid>
+      <description>Windows Active Directory box with lateral movement and privilege escalation.</description>
+    </item>
+    <item>
+      <title>Cicada - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/cicada/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/cicada/</guid>
+      <description>Windows easy Active Directory machine.</description>
+    </item>
+    <item>
+      <title>EscapeTwo - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/escapetwo/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/escapetwo/</guid>
+      <description>Windows easy machine with Active Directory and MSSQL exploitation.</description>
+    </item>
+    <item>
+      <title>Return - HTB Easy</title>
       <link>https://keyll0ger.github.io/posts/return/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/posts/return/</guid>
-      <description>📋 Résumé Exécutif Machine : Return (10.10.11.108)
-OS : Windows Server (Domain Controller)
-Domaine : return.local / PRINTER.return.local
-Difficulté : Easy
-Points Clés : Printer Admin Panel LDAP Hijack, Server Operators Privilege Escalation
-🔗 Chaîne d&amp;rsquo;Attaque Complète Port 80 - Printer Admin Panel ↓ [Modification serveur LDAP → IP attaquant] nc listener port 389 ↓ [Capture credentials LDAP] svc-printer:1edFg43012!! (cleartext) ↓ [Evil-WinRM authentication] svc-printer (Remote Management Users) ↓ [Membre de Server Operators] Service Binary Hijacking (VSS/spooler) ↓ [sc.</description>
+      <description>Windows easy Active Directory machine.</description>
     </item>
     <item>
-      <title>Timelapse - HackTheBox Writeup</title>
+      <title>Timelapse - HTB Easy</title>
       <link>https://keyll0ger.github.io/posts/timelapse/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/posts/timelapse/</guid>
-      <description>📋 Résumé Exécutif Machine : Timelapse (10.10.11.152)
-OS : Windows Server 2019
-Domaine : timelapse.htb / DC01.timelapse.htb
-Difficulté : Easy
-Points Clés : SMB Anonymous, PFX Certificate, WinRM Auth, PowerShell History, LAPS Abuse
-🔗 Chaîne d&amp;rsquo;Attaque Complète SMB Anonymous Access ↓ [Partage &amp;#34;Shares&amp;#34;] winrm_backup.zip (password-protected) ↓ [zip2john + john → supremelegacy] legacyy_dev_auth.pfx (encrypted) ↓ [pfx2john + john → thuglegacy] Certificate SSL + Private Key ↓ [WinRM Certificate Auth] legacyy (utilisateur domain) ↓ [PowerShell ConsoleHost_history.</description>
+      <description>Windows easy Active Directory machine.</description>
     </item>
   </channel>
 </rss>

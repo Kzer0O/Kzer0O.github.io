@@ -9,165 +9,123 @@
     <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://keyll0ger.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>CCTV - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/cctv/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/cctv/</guid>
-      <description>OS: Ubuntu 24.04 | Difficulté: Easy | IP: 10.129.15.181
-Phase 1 - Reconnaissance Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.181 nmap -Pn -sCV -p 22,80 10.129.15.181 Résultats :
-Port Service Info 22 SSH OpenSSH 9.6p1 Ubuntu 80 HTTP Apache 2.4.58, redirect → http://cctv.htb/ Réflexion : Seulement 2 ports. Le redirect vers cctv.htb indique un virtual host. On ajoute au /etc/hosts.
-echo &amp;#39;10.129.15.181 cctv.htb&amp;#39; | sudo tee -a /etc/hosts Phase 2 - Enumération Web Page d&amp;rsquo;accueil curl -s http://cctv.</description>
-    </item>
-    <item>
-      <title>Chemistry - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/chemistry/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/chemistry/</guid>
-      <description>┌──(kali㉿kali)-[~/Downloads] └─$ nmap -sV -sC -p- -vv 10.10.11.38 Starting Nmap 7.95 ( https://nmap.org ) at 2025-01-28 03:01 EST NSE: Loaded 157 scripts for scanning. NSE: Script Pre-scanning. NSE: Starting runlevel 1 (of 3) scan. Initiating NSE at 03:01 Completed NSE at 03:01, 0.00s elapsed NSE: Starting runlevel 2 (of 3) scan. Initiating NSE at 03:01 Completed NSE at 03:01, 0.00s elapsed NSE: Starting runlevel 3 (of 3) scan. Initiating NSE at 03:01 Completed NSE at 03:01, 0.</description>
-    </item>
-    <item>
-      <title>Cicada - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/cicada/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/cicada/</guid>
-      <description>Nmap Full Scan ┌──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/Cicada] └─$ nmap -sV -sC -p- -vv 10.10.11.35 -oN cicada.txt Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-01-25 21:22 CET NSE: Loaded 156 scripts for scanning. NSE: Script Pre-scanning. NSE: Starting runlevel 1 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 2 (of 3) scan. Initiating NSE at 21:22 Completed NSE at 21:22, 0.00s elapsed NSE: Starting runlevel 3 (of 3) scan.</description>
-    </item>
-    <item>
-      <title>Conversor - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/conversor/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/conversor/</guid>
-      <description>📋 Table des matières Informations générales Résumé exécutif Reconnaissance Énumération web Analyse des vulnérabilités Exploitation - Initial Foothold Escalade de privilèges - User Escalade de privilèges - Root Scripts d&amp;rsquo;automatisation Recommandations et mitigations Références 🎯 Informations générales Paramètre Valeur Nom Conversor OS Linux (Ubuntu) Difficulté Medium IP 10.10.11.92 Points 30 Date Décembre 2025 📊 Résumé exécutif Conversor est une machine Linux de difficulté moyenne exploitant plusieurs vulnérabilités critiques :</description>
-    </item>
-    <item>
-      <title>EscapeTwo - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/escapetwo/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/escapetwo/</guid>
-      <description>Enumération Nmap Pour commencer, j&amp;rsquo;ai effectué une analyse rapide des ports avec la commande suivante :
-nmap -F -Pn 10.10.11.51 La sortie de cette commande a révélé les ports suivants ouverts :
-Nmap scan report for 10.10.11.51 Host is up (0.026s latency). Not shown: 93 filtered tcp ports (no-response) PORT STATE SERVICE 53/tcp open domain 88/tcp open kerberos-sec 135/tcp open msrpc 139/tcp open netbios-ssn 389/tcp open ldap 445/tcp open microsoft-ds 1433/tcp open ms-sql-s Nmap done: 1 IP address (1 host up) scanned in 1.</description>
-    </item>
-    <item>
-      <title>Fluffy - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/fluffy/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/fluffy/</guid>
-      <description>📋 Résumé Exécutif Machine : Fluffy (10.10.11.69)
-OS : Windows Server 2019 Build 17763
-Domaine : fluffy.htb / DC01.fluffy.htb
-Difficulté : Medium
-Points Clés : CVE-2025-24071, Shadow Credentials, ADCS ESC16
-🔗 Chaîne d&amp;rsquo;Attaque Complète j.fleischman (creds fournis) ↓ [CVE-2025-24071 - .library-ms] p.agila (hash NTLMv2 → cracké) ↓ [Ajout au groupe &amp;#34;Service Accounts&amp;#34;] GenericWrite sur winrm_svc &amp;amp; ca_svc ↓ [Shadow Credentials sur winrm_svc] winrm_svc (NT hash → WinRM) ↓ [ESC16 - UPN Spoofing via ca_svc] Administrator (certificat malveillant) 1️⃣ RECONNAISSANCE 🔍 Scan Nmap # Scan rapide des ports nmap -p- --min-rate 10000 10.</description>
-    </item>
-    <item>
-      <title>Imagery - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/imagery/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/imagery/</guid>
-      <description>Difficulté: Medium
-OS: Linux (Ubuntu)
-Release Date: 2025
-IP: 10.10.11.88
-Table des Matières Énumération Initial Foothold - Blind XSS LFI via Admin Panel RCE via ImageMagick User Flag - Privilege Escalation vers Mark Root - Exploitation de Charcol Flags Lessons Learned Énumération Nmap Scan Scan initial pour découvrir les ports ouverts :
-nmap -p- --min-rate 10000 -vv 10.10.11.88 Résultats :
-PORT STATE SERVICE 22/tcp open ssh 8000/tcp open http-alt Scan détaillé des services :</description>
-    </item>
-    <item>
-      <title>kobold - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/kobold/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/kobold/</guid>
-      <description>Field Details Difficulty Medium OS Linux (Ubuntu 24.04.4 LTS) Target IP 10.129.12.219 Attack IP 10.10.14.209 Author Jerry Date March 2026 Executive Summary Kobold is a medium-difficulty Linux machine that demonstrates a realistic attack chain involving modern AI tooling misconfigurations and container security failures. The engagement begins with reconnaissance revealing multiple web services including an MCPJam Inspector endpoint vulnerable to unauthenticated Remote Code Execution (CVE-2026-23744). After obtaining an initial shell as user ben, enumeration reveals the user possesses a dormant Docker group membership that - when activated via newgrp docker - provides full root access through a container escape technique, mounting the host filesystem into a privileged container.</description>
-    </item>
-    <item>
-      <title>LinkVortex - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/linkvortex/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/linkvortex/</guid>
-      <description>nmap -sSCV -Pn LinkVortex.htb Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-12-08 21:44 CST Nmap scan report for LinkVortex.htb (10.10.11.47) Host is up (0.088s latency). Not shown: 998 closed tcp ports (reset) PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 8.9p1 Ubuntu 3ubuntu0.10 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 256 3e:f8:b9:68:c8:eb:57:0f:cb:0b:47:b9:86:50:83:eb (ECDSA) |_ 256 a2:ea:6e:e1:b6:d7:e7:c5:86:69:ce:ba:05:9e:38:13 (ED25519) 80/tcp open http Apache httpd |_http-server-header: Apache | http-title: BitByBit Hardware |_Requested resource was http://linkvortex.</description>
-    </item>
-    <item>
-      <title>NanoCorp - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/nanocorp/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/nanocorp/</guid>
-      <description>📋 Résumé Exécutif Machine : Nanocorp (10.10.11.93)
-OS : Windows Server 2022 (Domain Controller)
-Domaine : nanocorp.htb / dc01.nanocorp.htb
-Difficulté : Hard
-Points Clés : CVE-2025-24071 (.library-ms NTLM Leak), IT_Support Group Abuse, ForceChangePassword Permission, WinRM Restrictions Bypass
-🔗 Chaîne d&amp;rsquo;Attaque Complète Port 80 - Apache/PHP Web Server ↓ [CVE-2025-24071 - Malicious .library-ms in ZIP] Responder capture (port 445) ↓ [NTLMv2 hash capture] web_svc hash → Hashcat crack ↓ [web_svc:dksehdgh712!@#] LDAP/AD Enumeration ↓ [Découverte groupe IT_Support + monitoring_svc] bloodyAD - Add web_svc to IT_Support ↓ [GenericAll permission sur monitoring_svc] bloodyAD - Change password monitoring_svc ↓ [monitoring_svc:PassW0rd!</description>
-    </item>
-    <item>
-      <title>Pirate - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/pirate/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/pirate/</guid>
-      <description>OS: Windows Server 2019 | Difficulté: Hard | IP: 10.129.15.19 | Domain: pirate.htb
-Phase 1 - Reconnaissance Pourquoi commencer par un scan de ports ? Sur une machine Windows Hard, on s&amp;rsquo;attend à un environnement Active Directory. Le scan révèle les services qui déterminent notre surface d&amp;rsquo;attaque.
-Scan de ports nmap -Pn -p- --min-rate 5000 10.129.15.19 nmap -Pn -sCV -p 53,80,88,135,389,445,636,3268,5985,9389 10.129.15.19 Résultats clés :
-Port Service Info 53 DNS Simple DNS Plus 80 HTTP IIS 10.</description>
-    </item>
-    <item>
-      <title>Principal - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/principal/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/principal/</guid>
-      <description>OS: Linux | Difficulté: Medium | IP: 10.129.15.16
-Phase 1 - Reconnaissance &amp;amp; Enumération Pourquoi on commence par là ? Toute attaque commence par comprendre la surface d&amp;rsquo;attaque. On veut savoir quels ports sont ouverts et quels services tournent avant de chercher des vulnérabilités.
-Scan de ports nmap -p- --min-rate 5000 -sS 10.129.15.16 nmap -sCV -p 22,8080 10.129.15.16 Résultats :
-Port 22 - OpenSSH Port 8080 - Serveur HTTP Réflexion : Seulement 2 ports.</description>
-    </item>
-    <item>
-      <title>Return - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/return/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/return/</guid>
-      <description>📋 Résumé Exécutif Machine : Return (10.10.11.108)
-OS : Windows Server (Domain Controller)
-Domaine : return.local / PRINTER.return.local
-Difficulté : Easy
-Points Clés : Printer Admin Panel LDAP Hijack, Server Operators Privilege Escalation
-🔗 Chaîne d&amp;rsquo;Attaque Complète Port 80 - Printer Admin Panel ↓ [Modification serveur LDAP → IP attaquant] nc listener port 389 ↓ [Capture credentials LDAP] svc-printer:1edFg43012!! (cleartext) ↓ [Evil-WinRM authentication] svc-printer (Remote Management Users) ↓ [Membre de Server Operators] Service Binary Hijacking (VSS/spooler) ↓ [sc.</description>
-    </item>
-    <item>
-      <title>Sorcery - HackTheBox Writeup</title>
+      <title>Sorcery - HTB Insane</title>
       <link>https://keyll0ger.github.io/posts/sorcery/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/posts/sorcery/</guid>
-      <description>Résumé Machine Insane avec une architecture Docker complexe (9 containers) + FreeIPA domain. Chaîne d&amp;rsquo;attaque: Cypher Injection → XSS/WebAuthn Forgery → Kafka RCE → DNS Hijack + CA key → Phishing → SSH → FreeIPA privesc (IPA group roles → sudo rule injection).
-User flag: 15ea22ee4d2cbcc5f4b9b5632db6ee91 Root flag: b1e15dd687f19c6dbed6f0ed92c79147
-Reconnaissance Nmap 22/tcp open ssh OpenSSH 9.6p1 443/tcp open ssl/http nginx 1.27.1 Hostnames sorcery.htb → Next.js app git.sorcery.htb → Gitea 1.22.1 Source code Repo public sur Gitea: nicole_sullivan/infrastructure</description>
+      <description>Architecture Docker complexe (9 containers) &#43; FreeIPA domain. Cypher Injection → WebAuthn Forgery → Kafka RCE → DNS Hijack → Phishing → Xvfb Framebuffer → Sudoers Wildcard → SSSD/IPA Privesc → Root.</description>
     </item>
     <item>
-      <title>Timelapse - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/timelapse/</link>
+      <title>Pirate - HTB Hard</title>
+      <link>https://keyll0ger.github.io/posts/pirate/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/timelapse/</guid>
-      <description>📋 Résumé Exécutif Machine : Timelapse (10.10.11.152)
-OS : Windows Server 2019
-Domaine : timelapse.htb / DC01.timelapse.htb
-Difficulté : Easy
-Points Clés : SMB Anonymous, PFX Certificate, WinRM Auth, PowerShell History, LAPS Abuse
-🔗 Chaîne d&amp;rsquo;Attaque Complète SMB Anonymous Access ↓ [Partage &amp;#34;Shares&amp;#34;] winrm_backup.zip (password-protected) ↓ [zip2john + john → supremelegacy] legacyy_dev_auth.pfx (encrypted) ↓ [pfx2john + john → thuglegacy] Certificate SSL + Private Key ↓ [WinRM Certificate Auth] legacyy (utilisateur domain) ↓ [PowerShell ConsoleHost_history.</description>
+      <guid>https://keyll0ger.github.io/posts/pirate/</guid>
+      <description>Windows Active Directory box featuring Pre-Windows 2000 abuse, gMSA password reading, NTLM relay with RBCD, SPN Hijacking, and Constrained Delegation to Domain Admin.</description>
     </item>
     <item>
-      <title>UnderPass - HackTheBox Writeup</title>
-      <link>https://keyll0ger.github.io/posts/underpass/</link>
+      <title>Principal - HTB Medium</title>
+      <link>https://keyll0ger.github.io/posts/principal/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/underpass/</guid>
-      <description>──(keylloger㉿Kali)-[~/…/VM/HTB/EASY/UnderPass] └─$ nmap -sV -sC -p- -vv 10.10.11.48 -oN underpass.txt Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-01-26 18:03 CET NSE: Loaded 156 scripts for scanning. NSE: Script Pre-scanning. NSE: Starting runlevel 1 (of 3) scan. Initiating NSE at 18:03 Completed NSE at 18:03, 0.00s elapsed NSE: Starting runlevel 2 (of 3) scan. Initiating NSE at 18:03 Completed NSE at 18:03, 0.00s elapsed NSE: Starting runlevel 3 (of 3) scan. Initiating NSE at 18:03 Completed NSE at 18:03, 0.</description>
+      <guid>https://keyll0ger.github.io/posts/principal/</guid>
+      <description>Linux machine with FreeIPA domain exploitation.</description>
     </item>
     <item>
-      <title>WingData - HackTheBox Writeup</title>
+      <title>Fluffy - HTB Medium</title>
+      <link>https://keyll0ger.github.io/posts/fluffy/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/fluffy/</guid>
+      <description>Windows Active Directory box with lateral movement and privilege escalation.</description>
+    </item>
+    <item>
+      <title>Imagery - HTB Medium</title>
+      <link>https://keyll0ger.github.io/posts/imagery/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/imagery/</guid>
+      <description>Linux medium difficulty machine.</description>
+    </item>
+    <item>
+      <title>NanoCorp - HTB Medium</title>
+      <link>https://keyll0ger.github.io/posts/nanocorp/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/nanocorp/</guid>
+      <description>Linux medium difficulty machine.</description>
+    </item>
+    <item>
+      <title>WingData - HTB Easy</title>
       <link>https://keyll0ger.github.io/posts/wingdata/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/posts/wingdata/</guid>
-      <description>OS: Debian 12 | Difficulté: Easy | IP: 10.129.244.106
-Phase 1 - Reconnaissance nmap -Pn -p- --min-rate 5000 10.129.244.106 nmap -Pn -sCV -p 22,80 10.129.244.106 Port Service Info 22 SSH OpenSSH 9.2p1 Debian 80 HTTP Apache 2.4.66, redirect → wingdata.htb Ajouter au hosts : 10.129.244.106 wingdata.htb ftp.wingdata.htb
-Le site principal est un site vitrine &amp;ldquo;WingData&amp;rdquo;. Le code source révèle un lien &amp;ldquo;Client Portal&amp;rdquo; vers http://ftp.wingdata.htb/.
-Phase 2 - Wing FTP Server 7.</description>
+      <description>Linux easy machine.</description>
+    </item>
+    <item>
+      <title>CCTV - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/cctv/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/cctv/</guid>
+      <description>Linux easy machine with SQL injection.</description>
+    </item>
+    <item>
+      <title>Chemistry - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/chemistry/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/chemistry/</guid>
+      <description>Linux easy machine.</description>
+    </item>
+    <item>
+      <title>Cicada - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/cicada/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/cicada/</guid>
+      <description>Windows easy Active Directory machine.</description>
+    </item>
+    <item>
+      <title>Conversor - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/conversor/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/conversor/</guid>
+      <description>Linux easy machine.</description>
+    </item>
+    <item>
+      <title>EscapeTwo - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/escapetwo/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/escapetwo/</guid>
+      <description>Windows easy machine with Active Directory and MSSQL exploitation.</description>
+    </item>
+    <item>
+      <title>Kobold - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/kobold/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/kobold/</guid>
+      <description>Linux easy machine.</description>
+    </item>
+    <item>
+      <title>LinkVortex - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/linkvortex/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/linkvortex/</guid>
+      <description>Linux easy machine.</description>
+    </item>
+    <item>
+      <title>Return - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/return/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/return/</guid>
+      <description>Windows easy Active Directory machine.</description>
+    </item>
+    <item>
+      <title>Timelapse - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/timelapse/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/timelapse/</guid>
+      <description>Windows easy Active Directory machine.</description>
+    </item>
+    <item>
+      <title>UnderPass - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/underpass/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/underpass/</guid>
+      <description>Linux easy machine.</description>
     </item>
   </channel>
 </rss>

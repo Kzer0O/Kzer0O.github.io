@@ -9,13 +9,11 @@
     <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://keyll0ger.github.io/tags/mssql/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>EscapeTwo - HackTheBox Writeup</title>
+      <title>EscapeTwo - HTB Easy</title>
       <link>https://keyll0ger.github.io/posts/escapetwo/</link>
       <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
       <guid>https://keyll0ger.github.io/posts/escapetwo/</guid>
-      <description>Enumération Nmap Pour commencer, j&amp;rsquo;ai effectué une analyse rapide des ports avec la commande suivante :
-nmap -F -Pn 10.10.11.51 La sortie de cette commande a révélé les ports suivants ouverts :
-Nmap scan report for 10.10.11.51 Host is up (0.026s latency). Not shown: 93 filtered tcp ports (no-response) PORT STATE SERVICE 53/tcp open domain 88/tcp open kerberos-sec 135/tcp open msrpc 139/tcp open netbios-ssn 389/tcp open ldap 445/tcp open microsoft-ds 1433/tcp open ms-sql-s Nmap done: 1 IP address (1 host up) scanned in 1.</description>
+      <description>Windows easy machine with Active Directory and MSSQL exploitation.</description>
     </item>
   </channel>
 </rss>
