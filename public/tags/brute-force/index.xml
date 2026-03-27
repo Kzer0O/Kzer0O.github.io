@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Brute Force on keyll0ger</title>
+    <link>https://keyll0ger.github.io/tags/brute-force/</link>
+    <description>Recent content in Brute Force on keyll0ger</description>
+    <generator>Hugo -- 0.131.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://keyll0ger.github.io/tags/brute-force/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Password Cracking - Hashcat &amp; John Cheatsheet</title>
+      <link>https://keyll0ger.github.io/cheatsheets/passwordattacks-cracking/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/cheatsheets/passwordattacks-cracking/</guid>
+      <description>Cheatsheet: Password Cracking - Hashcat &amp;amp; John Cheatsheet</description>
+    </item>
+  </channel>
+</rss>

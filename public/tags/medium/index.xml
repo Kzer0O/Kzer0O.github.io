@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Medium on keyll0ger</title>
+    <link>https://keyll0ger.github.io/tags/medium/</link>
+    <description>Recent content in Medium on keyll0ger</description>
+    <generator>Hugo -- 0.131.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://keyll0ger.github.io/tags/medium/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Principal - HTB Medium</title>
+      <link>https://keyll0ger.github.io/posts/principal/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/principal/</guid>
+      <description>Linux machine with FreeIPA domain exploitation.</description>
+    </item>
+    <item>
+      <title>Fluffy - HTB Medium</title>
+      <link>https://keyll0ger.github.io/posts/fluffy/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/fluffy/</guid>
+      <description>Windows Active Directory box with lateral movement and privilege escalation.</description>
+    </item>
+    <item>
+      <title>Imagery - HTB Medium</title>
+      <link>https://keyll0ger.github.io/posts/imagery/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/imagery/</guid>
+      <description>Linux medium difficulty machine.</description>
+    </item>
+    <item>
+      <title>NanoCorp - HTB Medium</title>
+      <link>https://keyll0ger.github.io/posts/nanocorp/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/nanocorp/</guid>
+      <description>Linux medium difficulty machine.</description>
+    </item>
+  </channel>
+</rss>

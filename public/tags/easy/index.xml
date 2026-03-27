@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Easy on keyll0ger</title>
+    <link>https://keyll0ger.github.io/tags/easy/</link>
+    <description>Recent content in Easy on keyll0ger</description>
+    <generator>Hugo -- 0.131.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://keyll0ger.github.io/tags/easy/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>WingData - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/wingdata/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/wingdata/</guid>
+      <description>Linux easy machine.</description>
+    </item>
+    <item>
+      <title>CCTV - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/cctv/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/cctv/</guid>
+      <description>Linux easy machine with SQL injection.</description>
+    </item>
+    <item>
+      <title>Chemistry - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/chemistry/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/chemistry/</guid>
+      <description>Linux easy machine.</description>
+    </item>
+    <item>
+      <title>Cicada - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/cicada/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/cicada/</guid>
+      <description>Windows easy Active Directory machine.</description>
+    </item>
+    <item>
+      <title>Conversor - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/conversor/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/conversor/</guid>
+      <description>Linux easy machine.</description>
+    </item>
+    <item>
+      <title>EscapeTwo - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/escapetwo/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/escapetwo/</guid>
+      <description>Windows easy machine with Active Directory and MSSQL exploitation.</description>
+    </item>
+    <item>
+      <title>Kobold - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/kobold/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/kobold/</guid>
+      <description>Linux easy machine.</description>
+    </item>
+    <item>
+      <title>LinkVortex - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/linkvortex/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/linkvortex/</guid>
+      <description>Linux easy machine.</description>
+    </item>
+    <item>
+      <title>Return - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/return/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/return/</guid>
+      <description>Windows easy Active Directory machine.</description>
+    </item>
+    <item>
+      <title>Timelapse - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/timelapse/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/timelapse/</guid>
+      <description>Windows easy Active Directory machine.</description>
+    </item>
+    <item>
+      <title>UnderPass - HTB Easy</title>
+      <link>https://keyll0ger.github.io/posts/underpass/</link>
+      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/underpass/</guid>
+      <description>Linux easy machine.</description>
+    </item>
+  </channel>
+</rss>
