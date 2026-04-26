@@ -2,6 +2,9 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://keyll0ger.github.io/posts/sorcery/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://keyll0ger.github.io/posts/pirate-tips/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
@@ -50,8 +53,59 @@
     <loc>https://keyll0ger.github.io/posts/underpass/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/posts/sorcery-tips/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
+    <loc>https://keyll0ger.github.io/categories/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/tags/cypher-injection/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/tags/docker/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/tags/freeipa/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/tags/hackthebox/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/series/hackthebox/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/categories/hackthebox/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/tags/htb/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/tags/insane/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/tags/kafka-rce/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/tags/linux/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/tags/phishing/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/posts/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/series/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/tags/sssd/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/tags/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://keyll0ger.github.io/tags/webauthn/</loc>
+    <lastmod>2026-04-26T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/tags/active-directory/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
@@ -75,9 +129,6 @@
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/tags/brute-force/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://keyll0ger.github.io/categories/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/tags/cheatsheet/</loc>
@@ -104,13 +155,7 @@
     <loc>https://keyll0ger.github.io/cheatsheets/exploitation-cve_2026_29000_pac4j_jwt/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/tags/cypher-injection/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://keyll0ger.github.io/cheatsheets/webattacks-dns_hijack_phishing/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://keyll0ger.github.io/tags/docker/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/tags/easy/</loc>
@@ -137,9 +182,6 @@
     <loc>https://keyll0ger.github.io/cheatsheets/networking-transfert_fichiers/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/tags/freeipa/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://keyll0ger.github.io/cheatsheets/privesc-freeipa_privesc/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
@@ -152,19 +194,7 @@
     <loc>https://keyll0ger.github.io/tags/gmsa/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/tags/hackthebox/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://keyll0ger.github.io/series/hackthebox/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://keyll0ger.github.io/categories/hackthebox/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://keyll0ger.github.io/tags/hard/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://keyll0ger.github.io/tags/htb/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/cheatsheets/activedirectory-htb-ad-enum-attacks/</loc>
@@ -179,25 +209,13 @@
     <loc>https://keyll0ger.github.io/cheatsheets/pivoting-pivoting-htb/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/tags/insane/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://keyll0ger.github.io/tags/kafka-rce/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://keyll0ger.github.io/tags/kerberos/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/cheatsheets/activedirectory-kcd_spn_hijacking/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://keyll0ger.github.io/cheatsheets/pivoting-ligolo_ng/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://keyll0ger.github.io/tags/linux/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/cheatsheets/privesc-linux/</loc>
@@ -245,16 +263,10 @@
     <loc>https://keyll0ger.github.io/categories/passwordattacks/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/tags/phishing/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://keyll0ger.github.io/tags/pivoting/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/categories/pivoting/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://keyll0ger.github.io/posts/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/cheatsheets/activedirectory-pre_win2000_gmsa/</loc>
@@ -284,9 +296,6 @@
     <loc>https://keyll0ger.github.io/cheatsheets/exploitation-reverse_shells/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/series/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://keyll0ger.github.io/cheatsheets/enumeration-services/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
@@ -296,13 +305,7 @@
     <loc>https://keyll0ger.github.io/tags/sqli/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://keyll0ger.github.io/tags/sssd/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://keyll0ger.github.io/cheatsheets/privesc-sudoers_wildcard_bypass/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://keyll0ger.github.io/tags/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/tags/tunneling/</loc>
@@ -315,9 +318,6 @@
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/categories/webattacks/</loc>
-    <lastmod>2026-03-27T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://keyll0ger.github.io/tags/webauthn/</loc>
     <lastmod>2026-03-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://keyll0ger.github.io/cheatsheets/webattacks-webauthn_passkey_forgery/</loc>

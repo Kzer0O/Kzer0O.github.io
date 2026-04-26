@@ -6,14 +6,14 @@
     <description>Recent content in SSSD on keyll0ger</description>
     <generator>Hugo -- 0.131.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 27 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 26 Apr 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://keyll0ger.github.io/tags/sssd/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>[Tips] Sorcery - HTB Insane</title>
-      <link>https://keyll0ger.github.io/posts/sorcery-tips/</link>
-      <pubDate>Fri, 27 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>https://keyll0ger.github.io/posts/sorcery-tips/</guid>
-      <description>Tips and hints to solve this machine — no spoilers!</description>
+      <title>Sorcery - HTB Insane</title>
+      <link>https://keyll0ger.github.io/posts/sorcery/</link>
+      <pubDate>Sun, 26 Apr 2026 00:00:00 +0000</pubDate>
+      <guid>https://keyll0ger.github.io/posts/sorcery/</guid>
+      <description>Architecture Docker complexe (9 containers) &#43; FreeIPA domain. Cypher Injection → WebAuthn Forgery → Kafka RCE → DNS Hijack → Phishing → Xvfb Framebuffer → Sudoers Wildcard → SSSD/IPA Privesc → Root.</description>
     </item>
   </channel>
 </rss>
